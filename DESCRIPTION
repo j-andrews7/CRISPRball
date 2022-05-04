@@ -39,6 +39,9 @@ Imports:
     htmlwidgets
 Suggests:
     BiocStyle,
-    msigdbr
+    msigdbr,
+    depmap,
+    pool,
+    RSQLite
 Depends:
     shinyBS
