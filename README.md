@@ -23,6 +23,7 @@ devtools::install_github("j-andrews7/CRISPRball")
 
 ### Quick Start
 
+The below shows how construct the input data - all that are needed are file paths to the MAGeCK output files.
 
 ```
 library("CRISPRball")

@@ -58,12 +58,11 @@ build_depmap_db <- function() {
   meta <- depmap::depmap_metadata()
   pool::dbWriteTable(pool, "meta", as.data.frame(meta), overwrite = TRUE, append = FALSE)
   
-  # data retrieval bugged, see https://github.com/UCLouvain-CBIO/depmap/issues/79
-  #drug <- depmap::depmap_drug_sensitivity()
-  #drug$gene <- NULL
-  #drug#cell_line <- NULL
-  #pool::dbWriteTable(pool, "drug", drug, overwrite = TRUE, append = FALSE)
-  #rm(drug)
+  drug <- depmap::depmap_drug_sensitivity()
+  drug$gene <- NULL
+  drug$cell_line <- NULL
+  drug$smiles <- NULL
+  pool::dbWriteTable(pool, "drug", drug, overwrite = TRUE, append = FALSE)
   
   pool::poolClose(pool)
   
