@@ -10,15 +10,15 @@
   }
 
   if (!is.null(depmap.genes)) {
-    df$DepMap_CRISPR_Essential <- df$id %in% depmap.genes$Gene[depmap.genes$Dataset == "DependencyEnum.Chronos_Combined" &
-                                                                 depmap.genes$Common.Essential == "True"]
-    df$DepMap_CRISPR_Selective <- df$id %in% depmap.genes$Gene[depmap.genes$Dataset == "DependencyEnum.Chronos_Combined" &
-                                                                 depmap.genes$Strongly.Selective == "True"]
+    df$DepMap_CRISPR_Essential <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "Chronos_Combined" &
+                                                                 depmap.genes$common_essential == "True"]
+    df$DepMap_CRISPR_Selective <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "Chronos_Combined" &
+                                                                 depmap.genes$strongly_selective == "True"]
 
-    df$DepMap_RNAi_Essential <- df$id %in% depmap.genes$Gene[depmap.genes$Dataset == "DependencyEnum.RNAi_merged" &
-                                                               depmap.genes$Common.Essential == "True"]
-    df$DepMap_RNAi_Selective <- df$id %in% depmap.genes$Gene[depmap.genes$Dataset == "DependencyEnum.RNAi_merged" &
-                                                               depmap.genes$Strongly.Selective == "True"]
+    df$DepMap_RNAi_Essential <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
+                                                               depmap.genes$common_essential == "True"]
+    df$DepMap_RNAi_Selective <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
+                                                               depmap.genes$strongly_selective == "True"]
   }
 
   df$LFC <- as.numeric(df$`neg|lfc`)
