@@ -10,7 +10,6 @@ CRISPRball(
   count.summary,
   norm.counts,
   h.id = "mag1",
-  use.depmap.essential = TRUE,
   positive.ctrl.genes = NULL,
   essential.genes = NULL,
   depmap.db = NULL,
@@ -33,9 +32,6 @@ Users will be able to swap between them within the app. List element names shoul
 
 \item{h.id}{String indicating unique ID for interactive plots.
 Required if multiple apps are run within the same Rmd file.}
-
-\item{use.depmap.essential}{Boolean indicating whether to download and use DepMap CRISPR and RNAi
-gene dependency summaries for selective and common essential gene labeling/filtering.}
 
 \item{positive.ctrl.genes}{Optional character vector of gene identifiers for
 positive control genes from the screen so that they can be easily filtered.}

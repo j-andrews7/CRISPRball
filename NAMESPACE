@@ -2,6 +2,8 @@
 
 export(CRISPRball)
 export(build_depmap_db)
+export(get_depmap_essentiality)
+export(plot_depmap_dependency)
 import(DT)
 import(ggplot2)
 import(shiny, except = c(dataTableOutput, renderDataTable))

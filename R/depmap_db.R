@@ -23,6 +23,12 @@
 #' @return Name of SQLite database containing DepMap data.
 #' 
 #' @export
+#' @author Jared Andrews
+#' 
+#' @examples
+#' \dontrun{
+#' build_depmap_db()
+#' }
 build_depmap_db <- function() {
   .error_if_no_depmap()
   .error_if_no_pool()
@@ -63,6 +69,9 @@ build_depmap_db <- function() {
   drug$cell_line <- NULL
   drug$smiles <- NULL
   pool::dbWriteTable(pool, "drug", drug, overwrite = TRUE, append = FALSE)
+  
+  gene.summary <- depmap::depmap_gene_summary()
+  pool::dbWriteTable(pool, "gene.summary", as.data.frame(gene.summary), overwrite = TRUE, append = FALSE)
   
   pool::poolClose(pool)
   
