@@ -55,66 +55,40 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
   return(outs)
 }
 
-
-#' Plot gene dependency information from DepMap CRISPR and RNAi tables.
-#' 
-#' @param gene Character scalar for gene symbol.
-#' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
-#'   of the SQLite database built by \code{\link{build_depmap_db}}.
-#' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
-#' @return plotly object
-#'   
-#' @export
-#' @author Jared Andrews  
-plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
-  
-  df.c <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "crispr" WHERE "gene_name" == (:x)', params = list(x = gene))
-  df.r <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "rnai" WHERE "gene_name" == (:x)', params = list(x = gene))
-  
-  df <- NULL
-  
-  if (nrow(df.c) > 0) {
-    df.c$dataset <- "CRISPR"
-    df <- df.c
+#' Generate dependency summary info tagList
+#' @param dep.info Named list containing summary CRISPR and RNAi info.
+#' @param dep.release Character scalar for DepMap release as returned by \code{\link[depmap]{depmap_release}}.
+.make_dependency_tag <- function(dep.info, dep.release) {  
+  cinfo <- "N/A"
+  if (dep.info$crispr$avail) {
+    cinfo <- paste0(dep.info$crispr$dep_lines, "/", dep.info$crispr$total_lines)
   }
   
-  if (nrow(df.r) > 0) {
-    df.r$dataset <- "RNAi"
-    
-    if(!is.null(df)) {
-      df <- rbind(df, df.r)
-    } else {
-      df <- df.r
-    }
+  rinfo <- "N/A"
+  if (dep.info$rnai$avail) {
+    rinfo <- paste0(dep.info$rnai$dep_lines, "/", dep.info$rnai$total_lines)
   }
   
-  df$cell_line_name <- depmap.meta$cell_line_name[df$depmap_id == depmap.meta$depmap_id]
-  df$primary_disease <- depmap.meta$primary_disease[df$depmap_id == depmap.meta$depmap_id]
-  df$lineage <- depmap.meta$lineage[df$depmap_id == depmap.meta$depmap_id]
-  df$lineage_subtype <- depmap.meta$lineage_subtype[df$depmap_id == depmap.meta$depmap_id]
+  c.lab <- NULL
+  r.lab <- NULL
   
-  gg <- ggplot() +  
-    geom_density(data = df, aes(x=dependency, color=dataset, fill=dataset), alpha = 0.6) + 
-    geom_rug(data = df[df$dataset == "CRISPR",], aes(x=dependency, color=dataset), outside = FALSE) + 
-    geom_rug(data = df[df$dataset == "RNAi",], aes(x=dependency, color=dataset), sides = "t") + 
-    ylab("") + 
-    xlab("") + 
-    theme_bw() + 
-    scale_color_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) + 
-    scale_fill_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) +
-    geom_vline(xintercept = 0) + 
-    geom_vline(xintercept = -1, color = "red", linetype = "dashed")
-    
-  gg <- ggplotly(gg) %>% 
-    layout(xaxis = list(
-             title="Gene Effect"),   
-           yaxis = list(   
-             title="Density"))
+  if (!is.null(dep.info$crispr$label)) {
+    c.lab <- span(strong(dep.info$crispr$label), br(), 
+                  style = "background: #3584B5; color: #ffffff; border-radius: 5px; padding: 3px;")
+  }
   
-  gg %>%
-    config(edits = list(annotationPosition = TRUE,
-                        annotationTail = TRUE),
-           toImageButtonOptions = list(format = "svg"),
-           displaylogo = FALSE,
-           plotGlPixelRatio = webgl.ratio)
+  if (!is.null(dep.info$rnai$label)) {
+    r.lab <- span(strong(dep.info$rnai$label), 
+                  style = "background: #52288E; color: #ffffff; border-radius: 5px; padding: 3px;")
+  }
+  
+  out <- tagList(div(span(strong(paste0("CRISPR (DepMap ", dep.release, ", ", dep.info$crispr$dataset, "): ", cinfo)), 
+                          style = "color: #3584B5;"), style = "margin-bottom: 7px;"),
+                 c.lab,
+                 div(span(strong(paste0("RNAi (DepMap ", dep.release, ", ", dep.info$rnai$dataset, "): ", rinfo)), 
+                          style = "color: #52288E;"), style = "margin-bottom: 7px; margin-top: 8px"),
+                 r.lab)
+  
+  return(out)
 }
+

@@ -775,3 +775,210 @@
            displaylogo = FALSE,
            plotGlPixelRatio = 7)
 }
+
+
+#' Plot gene dependency information from DepMap CRISPR and RNAi tables.
+#' 
+#' @param gene Character scalar for gene symbol.
+#' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
+#'   of the SQLite database built by \code{\link{build_depmap_db}}.
+#' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
+#' @return plotly object
+#'   
+#' @export
+#' @author Jared Andrews  
+plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
+  
+  df.c <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "crispr" WHERE "gene_name" == (:x)', params = list(x = gene))
+  df.r <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "rnai" WHERE "gene_name" == (:x)', params = list(x = gene))
+  
+  df <- data.frame()
+  
+  if (nrow(df.c) > 0) {
+    df.c$dataset <- "CRISPR"
+    df <- df.c
+  }
+  
+  if (nrow(df.r) > 0) {
+    df.r$dataset <- "RNAi"
+    
+    if(nrow(df) > 0) {
+      df <- rbind(df, df.r)
+    } else {
+      df <- df.r
+    }
+  }
+  
+  if (nrow(df) > 0) {
+    df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
+    
+    df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
+                              "</br><b>Gene Effect:</b> ", format(round(df$dependency, 3), nsmall = 3),
+                              "</br><b>Lineage:</b> ", df$lineage,
+                              "</br><b>Disease:</b> ", df$primary_disease)
+    
+    gg <- ggplot() +  
+      geom_density(data = df, aes(x=dependency, color=dataset, fill=dataset), alpha = 0.6) + 
+      geom_rug(data = df[df$dataset == "CRISPR",], aes(x=dependency, color=dataset, text=hover.string), outside = FALSE) + 
+      geom_rug(data = df[df$dataset == "RNAi",], aes(x=dependency, color=dataset, text=hover.string), sides = "t") + 
+      ylab("") + 
+      xlab("") + 
+      theme_bw() + 
+      scale_color_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) + 
+      scale_fill_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) +
+      geom_vline(xintercept = 0) + 
+      geom_vline(xintercept = -1, color = "red", linetype = "dashed")
+    
+    gg <- ggplotly(gg, tooltip = "text") %>% 
+      layout(xaxis = list(
+        title="Gene Effect"),   
+        yaxis = list(   
+          title="Density"))
+    
+    gg %>%
+      config(edits = list(annotationPosition = TRUE,
+                          annotationTail = TRUE),
+             toImageButtonOptions = list(format = "svg"),
+             displaylogo = FALSE,
+             plotGlPixelRatio = 7)
+  } else {
+    .plot_gene_not_found(gene)
+  }
+}
+
+
+#' Plot gene expression information from DepMap, mostly from CCLE.
+#' 
+#' @param gene Character scalar for gene symbol.
+#' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
+#'   of the SQLite database built by \code{\link{build_depmap_db}}.
+#' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
+#' @return plotly object
+#'   
+#' @export
+#' @author Jared Andrews  
+plot_depmap_expression <- function(gene, depmap.meta, depmap.pool) {
+  
+  df <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "ccle_tpm" WHERE "gene_name" == (:x)', params = list(x = gene))
+  
+  if (nrow(df) > 0) {
+    df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
+    
+    df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
+                              "</br><b>Expression:</b> ", format(round(df$rna_expression, 3), nsmall = 3),
+                              "</br><b>Lineage:</b> ", df$lineage,
+                              "</br><b>Disease:</b> ", df$primary_disease)
+    df$color <- "#7B8CB2"
+    
+    gg <- ggplot(show.legend = FALSE) +
+      geom_density(data = df, aes(x=rna_expression, color=color, fill=color)) +
+      geom_rug(data = df, aes(x=rna_expression, color=color, text=hover.string, fill=color), outside = FALSE) +
+      ylab("Density") +
+      xlab("Expression") +
+      theme_bw() +
+      scale_color_manual(values=c("#7B8CB2"), breaks = c("#7B8CB2")) +
+      scale_fill_manual(values=c("#7B8CB2"), breaks = c("#7B8CB2")) + theme(legend.position="none")
+    
+    gg <- ggplotly(gg, tooltip = "text")
+    
+    gg %>%
+      config(edits = list(annotationPosition = TRUE,
+                          annotationTail = TRUE),
+             toImageButtonOptions = list(format = "svg"),
+             displaylogo = FALSE,
+             plotGlPixelRatio = 7)
+  } else {
+    .plot_gene_not_found(gene)
+  }
+}
+
+
+#' Plot gene CN information from DepMap, mostly from CCLE.
+#' 
+#' @param gene Character scalar for gene symbol.
+#' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
+#'   of the SQLite database built by \code{\link{build_depmap_db}}.
+#' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
+#' @return plotly object
+#'   
+#' @export
+#' @author Jared Andrews  
+plot_depmap_cn <- function(gene, depmap.meta, depmap.pool) {
+  
+  df <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "cn" WHERE "gene_name" == (:x)', params = list(x = gene))
+  
+  if (nrow(df) > 0) {
+    df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
+    
+    df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
+                              "</br><b>Copy Number (log2):</b> ", format(round(df$log_copy_number, 3), nsmall = 3),
+                              "</br><b>Lineage:</b> ", df$lineage,
+                              "</br><b>Disease:</b> ", df$primary_disease)
+    df$color <- "#CEA3CB"
+    
+    gg <- ggplot(show.legend = FALSE) +
+      geom_density(data = df, aes(x=log_copy_number, color=color, fill=color)) +
+      geom_rug(data = df, aes(x=log_copy_number, color=color, text=hover.string, fill=color), outside = FALSE) +
+      ylab("Density") +
+      xlab("log2(Copy Number") +
+      theme_bw() +
+      scale_color_manual(values=c("#7B8CB2"), breaks = c("#7B8CB2")) +
+      scale_fill_manual(values=c("#7B8CB2"), breaks = c("#7B8CB2")) + theme(legend.position="none")
+    
+    gg <- ggplotly(gg, tooltip = "text")
+    
+    gg %>%
+      config(edits = list(annotationPosition = TRUE,
+                          annotationTail = TRUE),
+             toImageButtonOptions = list(format = "svg"),
+             displaylogo = FALSE,
+             plotGlPixelRatio = 7)
+  } else {
+    .plot_gene_not_found(gene)
+  }
+}
+
+.plot_gene_not_found <- function(gene) {
+  # Just plots text for when a gene isn't found in depmap.
+  fig <- plot_ly()
+  fig <- fig %>%
+    add_trace(
+      mode = "text",
+      text = paste0(gene, " not found in DepMap."),
+      type = "scattergl",
+      textfont = list(
+        size = 20
+      ),
+      x = 2,
+      y = 2
+    )
+  
+  fig <- fig %>%
+    layout(
+      xaxis = list(
+        range = c(0, 4),
+        showline = FALSE,
+        zeroline = FALSE,
+        showgrid = FALSE,
+        showticklabels = FALSE
+      ),
+      yaxis = list(
+        range = c(0, 4),
+        showline = FALSE,
+        zeroline = FALSE,
+        showgrid = FALSE,
+        showticklabels = FALSE
+      )
+    )
+  
+  fig %>% style(hoverinfo = 'none')
+}

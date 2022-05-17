@@ -595,7 +595,7 @@ CRISPRball <- function(gene.data, sgrna.data, count.summary, norm.counts, h.id =
                                         "timepoints and early passages. As selection occurs, the ",
                                         "distribution will begin to spread, and there may be buildup at the extremes."),
                                       placement = "top", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotOutput("depmap.histplot")))
+                               jqui_resizable(plotlyOutput("depmap.expplot")))
                    ),
                    column(width = 4,
                           span(popify(icon("info-circle", style="font-size: 20px"), "Zero Count gRNAs",
@@ -603,7 +603,7 @@ CRISPRball <- function(gene.data, sgrna.data, count.summary, norm.counts, h.id =
                                         "For early passages and initial timepoints, this count should ideally be zero ",
                                         "but should increase as selection occurs. Useful for assessing library quality."),
                                       placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotlyOutput("depmap.missed"))),
+                               jqui_resizable(plotlyOutput("depmap.cnplot"))),
                           span(popify(icon("info-circle", style="font-size: 20px"), "Sample Correlations",
                                       c("This plot shows correlation between samples. Typically, initial timepoints ",
                                         "and early passages, even from different tissues or conditions, correlate well, ",
@@ -1907,48 +1907,33 @@ CRISPRball <- function(gene.data, sgrna.data, count.summary, norm.counts, h.id =
         dep.info <- get_depmap_essentiality(input$depmap.gene, depmap.gene)
         dep.release <- depmap::depmap_release()
         
-        # TODO - fxnize this
-        cinfo <- "N/A"
-        if (dep.info$crispr$avail) {
-          cinfo <- paste0(dep.info$crispr$dep_lines, "/", dep.info$crispr$total_lines)
-        }
-        
-        rinfo <- "N/A"
-        if (dep.info$rnai$avail) {
-          rinfo <- paste0(dep.info$rnai$dep_lines, "/", dep.info$rnai$total_lines)
-        }
-        
-        c.lab <- NULL
-        r.lab <- NULL
-        
-        if (!is.null(dep.info$crispr$label)) {
-          c.lab <- span(strong(dep.info$crispr$label), br(), 
-                        style = "background: #3584B5; color: #ffffff; border-radius: 5px; padding: 3px;")
-        }
-        
-        if (!is.null(dep.info$rnai$label)) {
-          r.lab <- span(strong(dep.info$rnai$label), 
-                        style = "background: #52288E; color: #ffffff; border-radius: 5px; padding: 3px;")
-        }
-        
-        tagList(
-          div(span(strong(paste0("CRISPR (DepMap ", dep.release, ", ", dep.info$crispr$dataset, "): ", cinfo)), 
-               style = "color: #3584B5;"), style = "margin-bottom: 7px;"),
-          c.lab,
-          div(span(strong(paste0("RNAi (DepMap ", dep.release, ", ", dep.info$rnai$dataset, "): ", rinfo)), 
-               style = "color: #52288E;"), style = "margin-bottom: 7px; margin-top: 8px"),
-          r.lab
-        )
+        .make_dependency_tag(dep.info, dep.release)
       })
     }
     
+    # Dependency.
     if (!is.null(depmap.gene)) {
       output$depmap.essplot <- renderPlotly({
-        req(input$depmap.gene)
-        dep.info <- plot_depmap_dependency(input$depmap.gene, depmap.gene, pool)
+        req(input$depmap.gene, depmap.meta)
+        dep.info <- plot_depmap_dependency(input$depmap.gene, depmap.meta, pool)
       })
     }
     
+    # Expression.
+    if (!is.null(depmap.gene)) {
+      output$depmap.expplot <- renderPlotly({
+        req(input$depmap.gene, depmap.meta)
+        dep.info <- plot_depmap_expression(input$depmap.gene, depmap.meta, pool)
+      })
+    }
+    
+    # Copy Number.
+    if (!is.null(depmap.gene)) {
+      output$depmap.cnplot <- renderPlotly({
+        req(input$depmap.gene, depmap.meta)
+        dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)
+      })
+    }
   }
 
   if (return.app) {
