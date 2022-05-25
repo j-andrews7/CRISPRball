@@ -1,3 +1,62 @@
+.utils.js <- "
+shinyjs.disableTab = function(name) {
+  var tab = $('.nav li a[data-value=' + name + ']');
+  tab.bind('click.tab', function(e) {
+    e.preventDefault();
+    return false;
+  });
+  tab.addClass('disabled');
+}
+
+shinyjs.enableTab = function(name) {
+  var tab = $('.nav li a[data-value=' + name + ']');
+  tab.unbind('click.tab');
+  tab.removeClass('disabled');
+}
+"
+
+.count_norm_ingress <- function(fileList) {
+  .count_norm_to_df <- function(fileList.datapath) {
+    # browser()
+    return(read.table(fileList.datapath, sep = '\t', header = TRUE))
+  }
+  # browser()
+  out <- lapply(fileList$datapath, .count_norm_to_df)
+  names(out) <- sapply(fileList$name, gsub, pattern='.count_normalized.txt', replacement='', fixed=TRUE)
+  # browser()
+  return(out)
+}
+
+.count_summ_ingress <- function(fileList) {
+  .count_summ_to_df <- function(fileList.datapath) {
+    return(read.table(fileList.datapath, sep = '\t', header = TRUE))
+  }
+
+  out <- lapply(fileList$datapath, .count_summ_to_df)
+  names(out) <- sapply(fileList$name, gsub, pattern='.countsummary.txt', replacement='', fixed=TRUE)
+  return(out)
+}
+
+.gene_summ_ingress <- function(fileList) {
+  .gene_summ_to_df <- function(fileList.datapath) {
+    return(read.delim(fileList.datapath, check.names = FALSE))
+  }
+
+  out <- lapply(fileList$datapath, .gene_summ_to_df)
+  names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', replacement='', fixed=TRUE)
+  return(out)
+}
+
+.sgrna_summ_ingress <- function(fileList) {
+  .sgrna_summ_to_df <- function(fileList.datapath) {
+    return(read.delim(fileList.datapath, check.names = FALSE))
+  }
+
+  out <- lapply(fileList$datapath, .sgrna_summ_to_df)
+  names(out) <- sapply(fileList$name, gsub, pattern='.sgrna_summary.txt', replacement='', fixed=TRUE)
+  return(out)
+}
+
 # Generate easier columns for plotting for various data summaries.
 .gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL, essential.genes = NULL, depmap.genes = NULL) {
 
@@ -10,20 +69,20 @@
   }
 
   if (!is.null(depmap.genes)) {
-    df$DepMap_CRISPR_Essential <- df$id %in% 
-      depmap.genes$gene_name[depmap.genes$dataset %in% 
+    df$DepMap_CRISPR_Essential <- df$id %in%
+      depmap.genes$gene_name[depmap.genes$dataset %in%
                                c("Chronos_Combined", "Chronos_Score", "Chronos_Achilles") &
                                depmap.genes$common_essential == TRUE]
-    
-    df$DepMap_CRISPR_Selective <- df$id %in% 
-      depmap.genes$gene_name[depmap.genes$dataset %in% 
+
+    df$DepMap_CRISPR_Selective <- df$id %in%
+      depmap.genes$gene_name[depmap.genes$dataset %in%
                                c("Chronos_Combined", "Chronos_Score", "Chronos_Achilles") &
                                depmap.genes$strongly_selective == TRUE]
 
     df$DepMap_RNAi_Essential <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
-                                                               depmap.genes$common_essential == TRUE]
+                                                                    depmap.genes$common_essential == TRUE]
     df$DepMap_RNAi_Selective <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
-                                                               depmap.genes$strongly_selective == TRUE]
+                                                                    depmap.genes$strongly_selective == TRUE]
   }
 
   df$LFC <- as.numeric(df$`neg|lfc`)
