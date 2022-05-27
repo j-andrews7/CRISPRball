@@ -788,12 +788,12 @@
 #' @export
 #' @author Jared Andrews  
 plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
-  
+
   df.c <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "crispr" WHERE "gene_name" == (:x)', params = list(x = gene))
   df.r <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "rnai" WHERE "gene_name" == (:x)', params = list(x = gene))
-  
+
   df <- data.frame()
-  
+
   if (nrow(df.c) > 0) {
     df.c$dataset <- "CRISPR"
     df <- df.c
@@ -801,14 +801,14 @@ plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
   
   if (nrow(df.r) > 0) {
     df.r$dataset <- "RNAi"
-    
+
     if(nrow(df) > 0) {
       df <- rbind(df, df.r)
     } else {
       df <- df.r
     }
   }
-  
+
   if (nrow(df) > 0) {
     df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
     df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
@@ -819,23 +819,25 @@ plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
                               "</br><b>Gene Effect:</b> ", format(round(df$dependency, 3), nsmall = 3),
                               "</br><b>Lineage:</b> ", df$lineage,
                               "</br><b>Disease:</b> ", df$primary_disease)
-    
-    gg <- ggplot() +  
-      geom_density(data = df, aes(x=dependency, color=dataset, fill=dataset), alpha = 0.6) + 
-      geom_rug(data = df[df$dataset == "CRISPR",], aes(x=dependency, color=dataset, text=hover.string), outside = FALSE) + 
-      geom_rug(data = df[df$dataset == "RNAi",], aes(x=dependency, color=dataset, text=hover.string), sides = "t") + 
-      ylab("") + 
-      xlab("") + 
-      theme_bw() + 
-      scale_color_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) + 
+
+    gg <- ggplot() +
+      geom_density(data = df, aes(x=dependency, color=dataset, fill=dataset), alpha = 0.6) +
+      geom_rug(data = df[df$dataset == "CRISPR",], aes(x=dependency, color=dataset, text=hover.string), outside = FALSE) +
+      geom_rug(data = df[df$dataset == "RNAi",], aes(x=dependency, color=dataset, text=hover.string), sides = "t") +
+      ylab("") +
+      xlab("") +
+      theme_bw() +
+      scale_color_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) +
       scale_fill_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) +
-      geom_vline(xintercept = 0) + 
+      geom_vline(xintercept = 0) +
       geom_vline(xintercept = -1, color = "red", linetype = "dashed")
-    
-    gg <- ggplotly(gg, tooltip = "text") %>% 
-      layout(xaxis = list(
-        title="Gene Effect"),   
-        yaxis = list(   
+
+    gg <- ggplotly(gg, tooltip = "text") %>%
+      layout(
+        xaxis = list(
+          title="Gene Effect"
+        ),
+        yaxis = list(
           title="Density"))
     
     gg %>%
@@ -852,10 +854,7 @@ plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
 
 #' Plot gene expression information from DepMap, mostly from CCLE.
 #' 
-#' @param gene Character scalar for gene symbol.
-#' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
-#'   of the SQLite database built by \code{\link{build_depmap_db}}.
-#' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
+#' @inheritParams plot_depmap_dependency
 #' @return plotly object
 #'   
 #' @export
@@ -901,11 +900,7 @@ plot_depmap_expression <- function(gene, depmap.meta, depmap.pool) {
 
 #' Plot gene CN information from DepMap, mostly from CCLE.
 #' 
-#' @param gene Character scalar for gene symbol.
-#' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
-#'   of the SQLite database built by \code{\link{build_depmap_db}}.
-#' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
-#' @return plotly object
+#' @inheritParams plot_depmap_dependency
 #'   
 #' @export
 #' @author Jared Andrews  
@@ -929,10 +924,10 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool) {
       geom_density(data = df, aes(x=log_copy_number, color=color, fill=color)) +
       geom_rug(data = df, aes(x=log_copy_number, color=color, text=hover.string, fill=color), outside = FALSE) +
       ylab("Density") +
-      xlab("log2(Copy Number") +
+      xlab("log2(Copy Number)") +
       theme_bw() +
-      scale_color_manual(values=c("#7B8CB2"), breaks = c("#7B8CB2")) +
-      scale_fill_manual(values=c("#7B8CB2"), breaks = c("#7B8CB2")) + theme(legend.position="none")
+      scale_color_manual(values=c("#CEA3CB"), breaks = c("#CEA3CB")) +
+      scale_fill_manual(values=c("#CEA3CB"), breaks = c("#CEA3CB")) + theme(legend.position="none")
     
     gg <- ggplotly(gg, tooltip = "text")
     

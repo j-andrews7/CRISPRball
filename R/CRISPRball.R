@@ -503,7 +503,6 @@ CRISPRball <- function(gene.data, sgrna.data, count.summary, norm.counts, h.id =
                      )
                    ),
                    style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
-
                ),
                mainPanel(
                  width = 10,
@@ -580,53 +579,75 @@ CRISPRball <- function(gene.data, sgrna.data, count.summary, norm.counts, h.id =
                  width = 10,
                  fluidRow(
                    column(width = 4,
-                          span(h3("Dependent Cell Lines", popify(icon("info-circle", style="font-size: 20px"), "Gini Index",
-                                      c("This plot shows the gini index for each sample, ",
-                                        "which is a measure of read count inequality between guides. ",
-                                        "For initial timepoints and early passages, this should usually be <0.1, ",
-                                        "but should increase as selection occurs."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
+                          span(h3("Dependent Cell Lines", popify(icon("info-circle", style="font-size: 20px"), "Dependent Cell Lines",
+                                      c("This plot shows DepMap dependency scores for the selected gene. ",
+                                        "A cell line is considered dependent if it has a probability of dependency ",
+                                        "greater than 50%. <br><br>",
+                                        "Probabilities of dependency are calculated for each gene score in a cell ",
+                                        "line as the probability that score arises from the distribution of essential ",
+                                        "gene scores rather than nonessential gene scores.",
+                                        "See the <a href=https://www.biorxiv.org/content/10.1101/720243v1>DepMap preprint</a> ",
+                                        "for more info. <br><br>",
+                                        "<b>Gene Effect</b><br>",
+                                        "Outcome from <a href=https://www.nature.com/articles/s41467-018-06916-5>DEMETER2</a>",
+                                        " or <a href=https://www.biorxiv.org/content/10.1101/2021.02.25.432728v1>Chronos</a>. ",
+                                        "A lower score means that a gene is more likely to be dependent in a given cell line. ",
+                                        "A score of 0 is equivalent to a gene that is not essential whereas a score of -1 corresponds ",
+                                        "to the median of all common essential genes."),
+                                      placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
                                uiOutput("depmap.deplines"),
-                               jqui_resizable(plotlyOutput("depmap.essplot"))),
+                               jqui_resizable(plotlyOutput("depmap.essplot", height = 250))),
                           
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Read Distributions",
-                                      c("This plot shows the read distribution across guides for each sample. ",
-                                        "The distribution should be normal and relatively tight for initial ",
-                                        "timepoints and early passages. As selection occurs, the ",
-                                        "distribution will begin to spread, and there may be buildup at the extremes."),
-                                      placement = "top", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotlyOutput("depmap.expplot")))
+                          span(h3("Expression", popify(icon("info-circle", style="font-size: 20px"), "Gene Expression",
+                                      c("RNASeq files are aligned with STAR and quantified with RSEM, then TPM-normalized. ",
+                                      "Reported values are log2(TPM+1)."),
+                                      placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
+                               jqui_resizable(plotlyOutput("depmap.expplot", height = 200))),
+                          span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
+                                                        c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
+                                                          "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
+                                                          "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
+                                                          "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
+                                                          "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
+                                                          "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
+                                                          "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
+                                                        placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
+                               jqui_resizable(plotlyOutput("depmap.cnplot", height = 200)))
                    ),
                    column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Zero Count gRNAs",
-                                      c("This plot shows the number of guides with zero reads for each sample. ",
-                                        "For early passages and initial timepoints, this count should ideally be zero ",
-                                        "but should increase as selection occurs. Useful for assessing library quality."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotlyOutput("depmap.cnplot"))),
+                          span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
+                                        c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
+                                        "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
+                                        "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
+                                        "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
+                                        "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
+                                        "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
+                                        "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
+                                        placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
+                               jqui_resizable(plotlyOutput("depmap.cnnplot", height = 350))),
                           span(popify(icon("info-circle", style="font-size: 20px"), "Sample Correlations",
                                       c("This plot shows correlation between samples. Typically, initial timepoints ",
                                         "and early passages, even from different tissues or conditions, correlate well, ",
                                         "but diverge more and more as selection occurs."),
                                       placement = "top", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotOutput("depmap.corr")))
+                               jqui_resizable(plotOutput("depmap.corr", height = 350)))
                    ),
                    column(width = 4,
                           span(popify(icon("info-circle", style="font-size: 20px"), "Mapping Rates",
                                       c("This plot shows read mapping rates for each sample. 50-75% mapped is typical."),
                                       placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotOutput("depmap.map"))),
+                               jqui_resizable(plotOutput("depmap.map", height = 300))),
                           span(popify(icon("info-circle", style="font-size: 20px"), "Principal Componenet Analysis",
                                       c("This biplot shows two (or three) PCs from a principal component analysis. ",
                                         "For early passages and initial timepoints, this count should ideally be zero ",
                                         "but should increase as selection occurs. Useful for assessing library quality."),
                                       placement = "top", trigger = "hover", options = list(container = "body")),
-                               withSpinner(jqui_resizable(plotlyOutput("depmap.pca")))),
+                               withSpinner(jqui_resizable(plotlyOutput("depmap.pca", height = 300))))
                    )
                  )
                )
              )
-    ),
+    )
   )
 
   server <- function(input, output, session) {
@@ -1909,26 +1930,20 @@ CRISPRball <- function(gene.data, sgrna.data, count.summary, norm.counts, h.id =
         
         .make_dependency_tag(dep.info, dep.release)
       })
-    }
-    
-    # Dependency.
-    if (!is.null(depmap.gene)) {
+      
+      # Dependency
       output$depmap.essplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
         dep.info <- plot_depmap_dependency(input$depmap.gene, depmap.meta, pool)
       })
-    }
-    
-    # Expression.
-    if (!is.null(depmap.gene)) {
+      
+      # Expression
       output$depmap.expplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
         dep.info <- plot_depmap_expression(input$depmap.gene, depmap.meta, pool)
       })
-    }
-    
-    # Copy Number.
-    if (!is.null(depmap.gene)) {
+      
+      # Copy number.
       output$depmap.cnplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
         dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)

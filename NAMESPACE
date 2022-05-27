@@ -3,6 +3,7 @@
 export(CRISPRball)
 export(build_depmap_db)
 export(get_depmap_essentiality)
+export(plot_depmap_cn)
 export(plot_depmap_dependency)
 export(plot_depmap_expression)
 import(DT)

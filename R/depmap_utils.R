@@ -72,13 +72,27 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
   c.lab <- NULL
   r.lab <- NULL
   
+  cess.mess <- c("A gene which, in a large, pan-cancer screen, ranks in the top X most ",
+                 "depleting genes in at least 90% of cell lines. X is chosen empirically ",
+                 "using the minimum of the distribution of gene ranks in their 90th percentile ",
+                 "least depleting lines.")
+  
+  ssel.mess <- c("A gene whose dependency is at least 100 times more likely to have been sampled",
+                 "from a skewed distribution than a normal distribution.")
+  
   if (!is.null(dep.info$crispr$label)) {
-    c.lab <- span(strong(dep.info$crispr$label), br(), 
+    outpop <- if (dep.info$crispr$label == "COMMON ESSENTIAL") cess.mess else ssel.mess
+    c.lab <- span(strong(dep.info$crispr$label), 
+                  popify(icon("info-circle", style="font-size: 12px"), dep.info$crispr$label,
+                        outpop, placement = "right", trigger = c("hover", "click"), options = list(container = "body")), br(), 
                   style = "background: #3584B5; color: #ffffff; border-radius: 5px; padding: 3px;")
   }
   
   if (!is.null(dep.info$rnai$label)) {
+    outpop <- if (dep.info$rnai$label == "COMMON ESSENTIAL") cess.mess else ssel.mess
     r.lab <- span(strong(dep.info$rnai$label), 
+                  popify(icon("info-circle", style="font-size: 12px"), dep.info$rnai$label,
+                         outpop, placement = "right", trigger = c("hover", "click"), options = list(container = "body")), br(), 
                   style = "background: #52288E; color: #ffffff; border-radius: 5px; padding: 3px;")
   }
   
