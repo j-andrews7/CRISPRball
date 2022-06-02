@@ -82,14 +82,6 @@
   res$order[dn.feats] <- 1
   res$opacity[dn.feats] <- sig.opacity
 
-  # LFC filter.
-  if(fc.thresh > 0) {
-    fc.threshed <- abs(res[[lfc.term]]) < fc.thresh
-    res$col[fc.threshed] <- insig.color
-    res$cex[fc.threshed] <- insig.size
-    res$order[fc.threshed] <- 0
-  }
-
   res$x <- res[[lfc.term]]
   res$y <- -log10(res[[sig.term]])
 
@@ -332,14 +324,6 @@
   df$order[dn.feats] <- 1
   df$opacity[dn.feats] <- sig.opacity
 
-  # LFC filter.
-  if(y.thresh > 0) {
-    y.threshed <- abs(df[[y.term]]) < y.thresh
-    df$col[y.threshed] <- insig.color
-    df$cex[y.threshed] <- insig.size
-    df$order[y.threshed] <- 0
-  }
-
   df$x <- df[[x.term]]
   df$y <- df[[y.term]]
 
@@ -559,14 +543,6 @@
   res$cex[dn.feats] <- sig.size
   res$order[dn.feats] <- 1
   res$opacity[dn.feats] <- sig.opacity
-
-  # LFC filter.
-  if(fc.thresh > 0) {
-    fc.threshed <- abs(res[[lfc.term]]) < fc.thresh
-    res$col[fc.threshed] <- insig.color
-    res$cex[fc.threshed] <- insig.size
-    res$order[fc.threshed] <- 0
-  }
 
   res$x <- res[[x.term]]
   res$y <- -log10(res[[sig.term]])
