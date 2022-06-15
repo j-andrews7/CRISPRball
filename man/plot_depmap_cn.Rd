@@ -14,9 +14,6 @@ of the SQLite database built by \code{\link{build_depmap_db}}.}
 
 \item{depmap.pool}{pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.}
 }
-\value{
-plotly object
-}
 \description{
 Plot gene CN information from DepMap, mostly from CCLE.
 }

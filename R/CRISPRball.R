@@ -17,7 +17,7 @@
 #' @importFrom shinyWidgets prettyCheckbox dropdownButton tooltipOptions pickerInput
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable
-#' @importFrom shinyjs show useShinyjs hidden disable click
+#' @importFrom shinyjs show useShinyjs hidden disable click extendShinyjs
 #' @importFrom shinyBS tipify popify
 #' @importFrom colourpicker colourInput
 #' @importFrom MAGeCKFlute BarView MapRatesView
@@ -610,28 +610,28 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  fluidRow(
                    column(width = 4,
                           span(h3("Dependent Cell Lines", popify(icon("info-circle", style="font-size: 20px"), "Dependent Cell Lines",
-                                      c("This plot shows DepMap dependency scores for the selected gene. ",
-                                        "A cell line is considered dependent if it has a probability of dependency ",
-                                        "greater than 50%. <br><br>",
-                                        "Probabilities of dependency are calculated for each gene score in a cell ",
-                                        "line as the probability that score arises from the distribution of essential ",
-                                        "gene scores rather than nonessential gene scores.",
-                                        "See the <a href=https://www.biorxiv.org/content/10.1101/720243v1>DepMap preprint</a> ",
-                                        "for more info. <br><br>",
-                                        "<b>Gene Effect</b><br>",
-                                        "Outcome from <a href=https://www.nature.com/articles/s41467-018-06916-5>DEMETER2</a>",
-                                        " or <a href=https://www.biorxiv.org/content/10.1101/2021.02.25.432728v1>Chronos</a>. ",
-                                        "A lower score means that a gene is more likely to be dependent in a given cell line. ",
-                                        "A score of 0 is equivalent to a gene that is not essential whereas a score of -1 corresponds ",
-                                        "to the median of all common essential genes."),
-                                      placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
+                                                                 c("This plot shows DepMap dependency scores for the selected gene. ",
+                                                                   "A cell line is considered dependent if it has a probability of dependency ",
+                                                                   "greater than 50%. <br><br>",
+                                                                   "Probabilities of dependency are calculated for each gene score in a cell ",
+                                                                   "line as the probability that score arises from the distribution of essential ",
+                                                                   "gene scores rather than nonessential gene scores.",
+                                                                   "See the <a href=https://www.biorxiv.org/content/10.1101/720243v1>DepMap preprint</a> ",
+                                                                   "for more info. <br><br>",
+                                                                   "<b>Gene Effect</b><br>",
+                                                                   "Outcome from <a href=https://www.nature.com/articles/s41467-018-06916-5>DEMETER2</a>",
+                                                                   " or <a href=https://www.biorxiv.org/content/10.1101/2021.02.25.432728v1>Chronos</a>. ",
+                                                                   "A lower score means that a gene is more likely to be dependent in a given cell line. ",
+                                                                   "A score of 0 is equivalent to a gene that is not essential whereas a score of -1 corresponds ",
+                                                                   "to the median of all common essential genes."),
+                                                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
                                uiOutput("depmap.deplines"),
                                jqui_resizable(plotlyOutput("depmap.essplot", height = 250))),
-                          
+
                           span(h3("Expression", popify(icon("info-circle", style="font-size: 20px"), "Gene Expression",
-                                      c("RNASeq files are aligned with STAR and quantified with RSEM, then TPM-normalized. ",
-                                      "Reported values are log2(TPM+1)."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
+                                                       c("RNASeq files are aligned with STAR and quantified with RSEM, then TPM-normalized. ",
+                                                         "Reported values are log2(TPM+1)."),
+                                                       placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
                                jqui_resizable(plotlyOutput("depmap.expplot", height = 200))),
                           span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
                                                         c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
@@ -646,14 +646,14 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                    ),
                    column(width = 4,
                           span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
-                                        c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
-                                        "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
-                                        "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
-                                        "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
-                                        "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
-                                        "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
-                                        "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
-                                        placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
+                                                        c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
+                                                          "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
+                                                          "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
+                                                          "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
+                                                          "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
+                                                          "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
+                                                          "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
+                                                        placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
                                jqui_resizable(plotlyOutput("depmap.cnnplot", height = 350))),
                           span(popify(icon("info-circle", style="font-size: 20px"), "Sample Correlations",
                                       c("This plot shows correlation between samples. Typically, initial timepoints ",
@@ -2028,23 +2028,25 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
         .make_dependency_tag(dep.info, dep.release)
       })
-      
+
       # Dependency
       output$depmap.essplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
         dep.info <- plot_depmap_dependency(input$depmap.gene, depmap.meta, pool)
       })
-      
+
       # Expression
       output$depmap.expplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
         dep.info <- plot_depmap_expression(input$depmap.gene, depmap.meta, pool)
       })
-      
+
       # Copy number.
-  if (return.app) {
-    shinyApp(ui, server)
-  } else {
-    return(list(ui = ui, server = server))
+      if (return.app) {
+        shinyApp(ui, server)
+      } else {
+        return(list(ui = ui, server = server))
+      }
+    }
   }
 }
