@@ -2042,13 +2042,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       })
       
       # Copy number.
-      output$depmap.cnplot <- renderPlotly({
-        req(input$depmap.gene, depmap.meta)
-        dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)
-      })
-    }
-  }
-
   if (return.app) {
     shinyApp(ui, server)
   } else {
