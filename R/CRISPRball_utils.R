@@ -16,43 +16,26 @@ shinyjs.enableTab = function(name) {
 "
 
 .count_norm_ingress <- function(fileList) {
-  .count_norm_to_df <- function(fileList.datapath) {
-    # browser()
-    return(read.table(fileList.datapath, sep = '\t', header = TRUE))
-  }
-  # browser()
-  out <- lapply(fileList$datapath, .count_norm_to_df)
+  out <- lapply(fileList$datapath, read.table, sep='\t', header=TRUE)
   names(out) <- sapply(fileList$name, gsub, pattern='.count_normalized.txt', replacement='', fixed=TRUE)
   # browser()
   return(out)
 }
 
 .count_summ_ingress <- function(fileList) {
-  .count_summ_to_df <- function(fileList.datapath) {
-    return(read.table(fileList.datapath, sep = '\t', header = TRUE))
-  }
-
-  out <- lapply(fileList$datapath, .count_summ_to_df)
+  out <- lapply(fileList$datapath, read.table, sep = '\t', header = TRUE)
   names(out) <- sapply(fileList$name, gsub, pattern='.countsummary.txt', replacement='', fixed=TRUE)
   return(out)
 }
 
 .gene_summ_ingress <- function(fileList) {
-  .gene_summ_to_df <- function(fileList.datapath) {
-    return(read.delim(fileList.datapath, check.names = FALSE))
-  }
-
-  out <- lapply(fileList$datapath, .gene_summ_to_df)
+  out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
   names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', replacement='', fixed=TRUE)
   return(out)
 }
 
 .sgrna_summ_ingress <- function(fileList) {
-  .sgrna_summ_to_df <- function(fileList.datapath) {
-    return(read.delim(fileList.datapath, check.names = FALSE))
-  }
-
-  out <- lapply(fileList$datapath, .sgrna_summ_to_df)
+  out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
   names(out) <- sapply(fileList$name, gsub, pattern='.sgrna_summary.txt', replacement='', fixed=TRUE)
   return(out)
 }

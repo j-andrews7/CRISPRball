@@ -138,14 +138,14 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       wellPanel(
         h3('Count Files'),
         # fileInput("countFile", "Choose Count File (Raw)", multiple=F, accept = ".txt"),
-        fileInput("countNormFile", "Choose Normalized Count File", multiple=F, accept = ".txt"),
-        fileInput("countSummary", "Choose Count Summary File", multiple=F, accept = ".txt"),
+        fileInput("countNormFile", "Choose Normalized Count File", multiple=FALSE, accept = ".txt"),
+        fileInput("countSummary", "Choose Count Summary File", multiple=FALSE, accept = ".txt"),
       ),
       br(),
       wellPanel(
         h3('Gene and sgRNA Summary Files'),
-        fileInput("geneSummaryFiles", "Choose Gene Summary File(s)", multiple=T, accept = ".txt"),
-        fileInput("sgrnaSummaryFiles", "Choose sgRNA Summary File(s)", multiple=T, accept = ".txt"),
+        fileInput("geneSummaryFiles", "Choose Gene Summary File(s)", multiple=TRUE, accept = ".txt"),
+        fileInput("sgrnaSummaryFiles", "Choose sgRNA Summary File(s)", multiple=TRUE, accept = ".txt"),
       ),
     ),
     tabPanel(title = "QC",
@@ -682,16 +682,29 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
   server <- function(input, output, session) {
 
+    # -------------Reactive Values---------------
+
+    gene.data <- reactiveVal(gene.data)
+    sgrna.data <- reactiveVal(sgrna.data)
+    count.summary <- reactiveVal(count.summary)
+    norm.counts <- reactiveVal(norm.counts)
+
+
     # --------------Disable Tabs-----------------
 
-    defaultDisabledTabs <- c(
-      'qc',
-      'qc-table',
-      'gene-overview',
-      'gene-summ',
-      'sgrna',
-      'sgrna-tables'
-    )
+    defaultDisabledTabs <- c()
+
+    if (is.null(gene.data)) {
+      defaultDisabledTabs <- c(defaultDisabledTabs, "gene-overview", "gene-summ")
+    }
+
+    if (is.null(sgrna.data)) {
+      defaultDisabledTabs <- c(defaultDisabledTabs, "sgrna-overview", "sgrna-tables")
+    }
+
+    if (is.null(count.summary) | is.null(norm.counts)) {
+      defaultDisabledTabs <- c(defaultDisabledTabs, "qc", "qc-table")
+    }
 
     for (tabname in defaultDisabledTabs) {
       js$disableTab(tabname)
@@ -700,7 +713,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # -----------Loading Files In----------------
 
-    gene.data <- reactiveVal(gene.data)
     observeEvent(input$geneSummaryFiles, {
       new.data <- .gene_summ_ingress(input$geneSummaryFiles)
       gene.data(new.data)
@@ -710,7 +722,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       }
     })
 
-    sgrna.data <- reactiveVal(sgrna.data)
     observeEvent(input$sgrnaSummaryFiles, {
       new.data <- .sgrna_summ_ingress(input$sgrnaSummaryFiles)
       sgrna.data(new.data)
@@ -720,7 +731,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       }
     })
 
-    count.summary <- reactiveVal(count.summary)
     observeEvent(input$countSummary, {
       new.data <- .count_summ_ingress(input$countSummary)
       count.summary(new.data)
@@ -730,7 +740,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       }
     })
 
-    norm.counts <- reactiveVal(norm.counts)
     observeEvent(input$countNormFile, {
       new.data <- .count_norm_ingress(input$countNormFile)
       norm.counts(new.data)
@@ -744,6 +753,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     if (is.null(depmap.db)) {
       shinyjs::hide(selector = '.navbar-nav a[data-value="DepMap"')
     }
+
 
     # -----------QC & QC Summary Tabs------------
     # PCA.
