@@ -718,37 +718,37 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     observeEvent(input$geneSummaryFiles, {
       new.data <- .gene_summ_ingress(input$geneSummaryFiles)
       gene.data(new.data)
-      if (!is.null(gene.data())) {
-        js$enableTab('gene-overview')
-        js$enableTab('gene-summ')
-      }
+      # if (!is.null(gene.data())) {
+      #   js$enableTab('gene-overview')
+      #   js$enableTab('gene-summ')
+      # }
     })
 
     observeEvent(input$sgrnaSummaryFiles, {
       new.data <- .sgrna_summ_ingress(input$sgrnaSummaryFiles)
       sgrna.data(new.data)
-      if (!is.null(sgrna.data())) {
-        js$enableTab('sgrna')
-        js$enableTab('sgrna-tables')
-      }
+      # if (!is.null(sgrna.data())) {
+      #   js$enableTab('sgrna')
+      #   js$enableTab('sgrna-tables')
+      # }
     })
 
     observeEvent(input$countSummary, {
-      new.data <- .count_summ_ingress(input$countSummary)
+      new.data <- read.delim(input$countSummary$datapath)
       count.summary(new.data)
-      if (!is.null(count.summary())) {
-        js$enableTab('qc')
-        js$enableTab('qc-table')
-      }
+      # if (!is.null(count.summary())) {
+      #   js$enableTab('qc')
+      #   js$enableTab('qc-table')
+      # }
     })
 
     observeEvent(input$countNormFile, {
-      new.data <- .count_norm_ingress(input$countNormFile)
+      new.data <- read.delim(input$countNormFile$datapath)
       norm.counts(new.data)
-      if (!is.null(norm.counts())) {
-        js$enableTab('qc')
-        js$enableTab('qc-table')
-      }
+      # if (!is.null(norm.counts())) {
+      #   js$enableTab('qc')
+      #   js$enableTab('qc-table')
+      # }
     })
 
     # Hide depmap tab if database not provided. Tried disable, still looks/feels selectable which may be confusing.
@@ -1149,55 +1149,53 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       clicked$lawn1 <- NULL
     })
 
-    #if (length(gene.data) > 1) {
-      observeEvent(event_data("plotly_click", source = paste0(h.id,"_volc2")), {
-        gene <- event_data("plotly_click", source = paste0(h.id,"_volc2"))
-        gene_old_new <- rbind(clicked$volc2, gene)
-        keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
+    observeEvent(event_data("plotly_click", source = paste0(h.id,"_volc2")), {
+      gene <- event_data("plotly_click", source = paste0(h.id,"_volc2"))
+      gene_old_new <- rbind(clicked$volc2, gene)
+      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
 
-        if (nrow(keep) == 0) {
-          clicked$volc2 <- NULL
-        } else {
-          clicked$volc2 <- keep
-        }
-      })
-
-      observeEvent(event_data("plotly_click", source = paste0(h.id,"_rank2")), {
-        gene <- event_data("plotly_click", source = paste0(h.id,"_rank2"))
-        gene_old_new <- rbind(clicked$rank2, gene)
-        keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
-
-        if (nrow(keep) == 0) {
-          clicked$rank2 <- NULL
-        } else {
-          clicked$rank2 <- keep
-        }
-      })
-
-      observeEvent(event_data("plotly_click", source = paste0(h.id,"_lawn2")), {
-        gene <- event_data("plotly_click", source = paste0(h.id,"_lawn2"))
-        gene_old_new <- rbind(clicked$lawn2, gene)
-        keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
-
-        if (nrow(keep) == 0) {
-          clicked$lawn2 <- NULL
-        } else {
-          clicked$lawn2 <- keep
-        }
-      })
-
-      observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_volc2")), {
+      if (nrow(keep) == 0) {
         clicked$volc2 <- NULL
-      })
+      } else {
+        clicked$volc2 <- keep
+      }
+    })
 
-      observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_rank2")), {
+    observeEvent(event_data("plotly_click", source = paste0(h.id,"_rank2")), {
+      gene <- event_data("plotly_click", source = paste0(h.id,"_rank2"))
+      gene_old_new <- rbind(clicked$rank2, gene)
+      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
+
+      if (nrow(keep) == 0) {
         clicked$rank2 <- NULL
-      })
+      } else {
+        clicked$rank2 <- keep
+      }
+    })
 
-      observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_lawn2")), {
+    observeEvent(event_data("plotly_click", source = paste0(h.id,"_lawn2")), {
+      gene <- event_data("plotly_click", source = paste0(h.id,"_lawn2"))
+      gene_old_new <- rbind(clicked$lawn2, gene)
+      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
+
+      if (nrow(keep) == 0) {
         clicked$lawn2 <- NULL
-      })
-    #}
+      } else {
+        clicked$lawn2 <- keep
+      }
+    })
+
+    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_volc2")), {
+      clicked$volc2 <- NULL
+    })
+
+    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_rank2")), {
+      clicked$rank2 <- NULL
+    })
+
+    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_lawn2")), {
+      clicked$lawn2 <- NULL
+    })
 
     # Summary table and plots.
     output$gene1.summary <- renderDT({
