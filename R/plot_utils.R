@@ -877,6 +877,7 @@ plot_depmap_expression <- function(gene, depmap.meta, depmap.pool) {
 #' Plot gene CN information from DepMap, mostly from CCLE.
 #' 
 #' @inheritParams plot_depmap_dependency
+#' @return plotly object
 #'   
 #' @export
 #' @author Jared Andrews  
@@ -917,6 +918,57 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool) {
     .plot_gene_not_found(gene)
   }
 }
+
+#' Plot selected information across lineages from DepMap.
+#' 
+#' @inheritParams plot_depmap_dependency
+#' @param data.type One of "crispr", "rnai", "cn", or "ccle_tpm".
+#' @return plotly object
+#'   
+#' @export
+#' @author Jared Andrews  
+# plot_depmap_lineages <- function(gene, data.type, depmap.meta, depmap.pool) {
+#   
+#   data.type <- match.arg(data.type, c("crispr", "rnai", "cn", "ccle_tpm"), several.ok = FALSE)
+#   h.text <- 
+#   
+#   df <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM (:y) WHERE "gene_name" == (:x)', params = list(x = gene, y = data.type))
+#   
+#   
+#   
+#   if (nrow(df) > 0) {
+#     df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
+#     df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
+#     df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
+#     df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
+#     
+#     df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
+#                               "</br><b>Copy Number (log2):</b> ", format(round(df$log_copy_number, 3), nsmall = 3),
+#                               "</br><b>Lineage:</b> ", df$lineage,
+#                               "</br><b>Disease:</b> ", df$primary_disease)
+#     df$color <- "#CEA3CB"
+#     
+#     gg <- ggplot(show.legend = FALSE) +
+#       geom_density(data = df, aes(x=log_copy_number, color=color, fill=color)) +
+#       geom_rug(data = df, aes(x=log_copy_number, color=color, text=hover.string, fill=color), outside = FALSE) +
+#       ylab("Density") +
+#       xlab("log2(Copy Number)") +
+#       theme_bw() +
+#       scale_color_manual(values=c("#CEA3CB"), breaks = c("#CEA3CB")) +
+#       scale_fill_manual(values=c("#CEA3CB"), breaks = c("#CEA3CB")) + theme(legend.position="none")
+#     
+#     gg <- ggplotly(gg, tooltip = "text")
+#     
+#     gg %>%
+#       config(edits = list(annotationPosition = TRUE,
+#                           annotationTail = TRUE),
+#              toImageButtonOptions = list(format = "svg"),
+#              displaylogo = FALSE,
+#              plotGlPixelRatio = 7)
+#   } else {
+#     .plot_gene_not_found(gene)
+#   }
+# }
 
 .plot_gene_not_found <- function(gene) {
   # Just plots text for when a gene isn't found in depmap.
