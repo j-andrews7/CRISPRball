@@ -17,7 +17,7 @@
 #' @importFrom shinyWidgets prettyCheckbox dropdownButton tooltipOptions pickerInput
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable
-#' @importFrom shinyjs show useShinyjs hidden disable click extendShinyjs
+#' @importFrom shinyjs show useShinyjs hidden disable click extendShinyjs js
 #' @importFrom shinyBS tipify popify
 #' @importFrom colourpicker colourInput
 #' @importFrom MAGeCKFlute BarView MapRatesView
@@ -70,6 +70,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # Close db on app close.
     onStop(function() {pool::poolClose(pool)})
+  } else {
+    depmap.meta <- NULL
+    depmap.gene <- NULL
   }
 
   ui <- navbarPage(
@@ -192,11 +195,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                                     icon = icon("check"), width = "100%"),
                                      "Filter PCA samples to those in metadata table.", "right", options = list(container = "body")),
                               fluidRow(
-                                column(6, tipify(selectInput("bip.color", "Color by:",
-                                                             choices = c("", colnames(count.summary)), selected = "Label"),
+                                column(6, tipify(selectizeInput("bip.color", "Color by:",
+                                                                choices = NULL),
                                                  "Metadata variable by which samples are colored.", "right", options = list(container = "body"))),
-                                column(6, tipify(selectInput("bip.shape", "Shape by:",
-                                                             choices = c("", colnames(count.summary))),
+                                column(6, tipify(selectizeInput("bip.shape", "Shape by:",
+                                                                choices = NULL),
                                                  "Metadata variable by which samples are shaped.", "right", options = list(container = "body")))
                               ),
                               fluidRow(
@@ -210,13 +213,15 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                        tipify(prettyCheckbox("bip.loadings", strong("Plot Loadings"), FALSE, bigger = FALSE,
                                                              animation = "smooth", status = "success",
                                                              icon = icon("check"), width = "100%"),
-                                              "Plot top PCA loadings for each PC.", "right", options = list(container = "body"))
-                                )
-                              ),
-                              tipify(numericInput("bip.n.loadings", "Loadings:",
-                                                  min = 0, max = 100, step = 1, value = 5),
-                                     "Number of PCA loadings to plot (if checked).", "right", options = list(container = "body")),
-                              div(actionButton("pca.update", "Update PCA"), align = "center")
+                                              "Plot top PCA loadings for each PC.", "right", options = list(container = "body")
+                                       )
+                                ),
+                                tipify(numericInput("bip.n.loadings", "Loadings:",
+                                                    min = 0, max = 100, step = 1, value = 5),
+                                       "Number of PCA loadings to plot (if checked).", "right", options = list(container = "body")
+                                ),
+                                div(actionButton("pca.update", "Update PCA"), align = "center")
+                              )
                             )
                  )
                ),
@@ -284,15 +289,13 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  div(
                    fluidRow(
                      column(6,
-                            tipify(selectInput("gene.sel1", "Dataset 1:", choices = names(gene.data)),
+                            tipify(selectizeInput("gene.sel1", "Dataset 1:", choices = NULL),
                                    "Dataset shown in top row.", "right", options = list(container = "body")),
                             numericInput("gene.fdr.th", "FDR threshold:",
                                          min = 0, max = 1, step = 0.01, value = 0.05)
                      ),
                      column(6,
-                            tipify(selectInput("gene.sel2", "Dataset 2:", choices = names(gene.data),
-                                               selected = ifelse(length(names(gene.data) > 1), names(gene.data)[2],
-                                                                 names(gene.data)[1])),
+                            tipify(selectizeInput("gene.sel2", "Dataset 2:", choices = NULL),
                                    "Dataset shown in bottom row.", "right", options = list(container = "body")),
                             numericInput("gene.lfc.th", "log2FC threshold:",
                                          min = 0, max = Inf, step = 0.05, value = 0.5)
@@ -515,12 +518,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  div(
                    fluidRow(
                      column(6,
-                            tipify(selectInput("sgrna.sel1", "Dataset 1:", choices = names(sgrna.data)),
+                            tipify(selectizeInput("sgrna.sel1", "Dataset 1:", choices = NULL),
                                    "Dataset shown in top row.", "right", options = list(container = "body"))
                      ),
                      column(6,
-                            tipify(selectInput("sgrna.sel2", "Dataset 2:", choices = names(sgrna.data),
-                                               selected = ifelse(length(names(sgrna.data) > 1), names(sgrna.data)[2], names(sgrna.data)[1])),
+                            tipify(selectizeInput("sgrna.sel2", "Dataset 2:", choices = NULL),
                                    "Dataset shown in bottom row.", "right", options = list(container = "body"))
                      )
                    ),
@@ -587,12 +589,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  div(
                    fluidRow(
                      column(6,
-                            tipify(selectInput("depmap.sel1", "Dataset 1:", choices = names(sgrna.data)),
+                            tipify(selectizeInput("depmap.sel1", "Dataset 1:", choices = NULL),
                                    "Dataset shown in top row.", "right", options = list(container = "body"))
                      ),
                      column(6,
-                            tipify(selectInput("depmap.sel2", "Dataset 2:", choices = names(sgrna.data),
-                                               selected = ifelse(length(names(sgrna.data) > 1), names(sgrna.data)[2], names(sgrna.data)[1])),
+                            tipify(selectizeInput("depmap.sel2", "Dataset 2:", choices = NULL),
                                    "Dataset shown in bottom row.", "right", options = list(container = "body"))
                      )
                    ),
@@ -682,6 +683,25 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
   server <- function(input, output, session) {
 
+    # --------------Disable Tabs-----------------
+    defaultDisabledTabs <- c()
+
+    if (is.null(gene.data)) {
+      defaultDisabledTabs <- c(defaultDisabledTabs, "Gene (Overview)", "Gene Summary Tables")
+    }
+
+    if (is.null(sgrna.data)) {
+      defaultDisabledTabs <- c(defaultDisabledTabs, "sgRNA", "sgRNA Summary Tables")
+    }
+
+    if (is.null(count.summary) | is.null(norm.counts)) {
+      defaultDisabledTabs <- c(defaultDisabledTabs, "QC", "QC Table")
+    }
+
+    for (tabname in defaultDisabledTabs) {
+      js$disableTab(tabname)
+    }
+
     # -------------Reactive Values---------------
 
     gene.data <- reactiveVal(gene.data)
@@ -690,65 +710,52 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     norm.counts <- reactiveVal(norm.counts)
 
 
-    # --------------Disable Tabs-----------------
-    # This isn't gonna work, ignoring for now.
-    #
-    # defaultDisabledTabs <- c()
-    # 
-    # if (is.null(gene.data)) {
-    #   defaultDisabledTabs <- c(defaultDisabledTabs, "gene-overview", "gene-summ")
-    # }
-    # 
-    # if (is.null(sgrna.data)) {
-    #   defaultDisabledTabs <- c(defaultDisabledTabs, "sgrna-overview", "sgrna-tables")
-    # }
-    # 
-    # if (is.null(count.summary) | is.null(norm.counts)) {
-    #   defaultDisabledTabs <- c(defaultDisabledTabs, "qc", "qc-table")
-    # }
-    # 
-    # Where is js defined?
-    # for (tabname in defaultDisabledTabs) {
-    #   js$disableTab(tabname)
-    # }
-
-
     # -----------Loading Files In----------------
 
     observeEvent(input$geneSummaryFiles, {
       new.data <- .gene_summ_ingress(input$geneSummaryFiles)
       gene.data(new.data)
-      # if (!is.null(gene.data())) {
-      #   js$enableTab('gene-overview')
-      #   js$enableTab('gene-summ')
-      # }
+      if (!is.null(gene.data())) {
+        js$enableTab('Gene (Overview)')
+        js$enableTab('Gene Summary Tables')
+        updateSelectizeInput(session, 'gene.sel1', choices = names(gene.data()), server = TRUE)
+        updateSelectizeInput(session, 'gene.sel2', choices = names(gene.data()), server = TRUE)
+      }
     })
 
     observeEvent(input$sgrnaSummaryFiles, {
       new.data <- .sgrna_summ_ingress(input$sgrnaSummaryFiles)
       sgrna.data(new.data)
-      # if (!is.null(sgrna.data())) {
-      #   js$enableTab('sgrna')
-      #   js$enableTab('sgrna-tables')
-      # }
+      if (!is.null(sgrna.data())) {
+        js$enableTab('sgRNA')
+        js$enableTab('sgRNA Summary Tables')
+        updateSelectizeInput(session, 'sgrna.sel1', choices = names(sgrna.data()), server = TRUE)
+        updateSelectizeInput(session, 'sgrna.sel2', choices = names(sgrna.data()), server = TRUE)
+        if (!is.null(depmap.db)) {
+          updateSelectizeInput(session, 'depmap.sel1', choices = names(sgrna.data()), server = TRUE)
+          updateSelectizeInput(session, 'depmap.sel2', choices = names(sgrna.data()), server = TRUE)
+        }
+      }
     })
 
     observeEvent(input$countSummary, {
       new.data <- read.delim(input$countSummary$datapath)
       count.summary(new.data)
-      # if (!is.null(count.summary())) {
-      #   js$enableTab('qc')
-      #   js$enableTab('qc-table')
-      # }
+      if (!is.null(count.summary())) {
+        js$enableTab('QC')
+        js$enableTab('QC Table')
+      }
     })
 
     observeEvent(input$countNormFile, {
       new.data <- read.delim(input$countNormFile$datapath)
       norm.counts(new.data)
-      # if (!is.null(norm.counts())) {
-      #   js$enableTab('qc')
-      #   js$enableTab('qc-table')
-      # }
+      if (!is.null(norm.counts)) {
+        js$enableTab('QC')
+        js$enableTab('QC Table')
+        updateSelectizeInput(session, 'bip.color', choices = c('', colnames(count.summary())), server = TRUE)
+        updateSelectizeInput(session, 'bip.shape', choices = c('', colnames(count.summary())), server = TRUE)
+      }
     })
 
     # Hide depmap tab if database not provided. Tried disable, still looks/feels selectable which may be confusing.
@@ -759,7 +766,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # -----------QC & QC Summary Tabs------------
     # PCA.
+
     pc <- reactive({
+      req(norm.counts)
+      req(count.summary)
+
       slmed <- norm.counts()
       slmat <- as.matrix(slmed[,c(-1,-2)])
       mat <- log2(slmat+1)
@@ -803,19 +814,18 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # Populate UI with all PCs.
     # TODO: Write check for only 2 PCs.
+
     output$pca.comps <- renderUI({
       req(pc)
-      local({
-        pcs <- pc()
+      pcs <- pc()
 
-        tagList(
-          fluidRow(
-            column(4, selectInput("dim1", "Dim1:", choices = pcs$components, selected = "PC1")),
-            column(4, selectInput("dim2", "Dim2:", choices = pcs$components, selected = "PC2")),
-            column(4, selectInput("dim3", "Dim3:", choices = pcs$components, selected = "PC3"))
-          )
+      tagList(
+        fluidRow(
+          column(4, selectInput("dim1", "Dim1:", choices = pcs$components, selected = "PC1")),
+          column(4, selectInput("dim2", "Dim2:", choices = pcs$components, selected = "PC2")),
+          column(4, selectInput("dim3", "Dim3:", choices = pcs$components, selected = "PC3"))
         )
-      })
+      )
     })
 
     output$qc.gini <- renderPlotly({
@@ -856,183 +866,189 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     # TODO: rewrite this.
-    output$qc.histplot <- renderPlot({
-      colors <- dittoColors()
+    observeEvent(norm.counts, {
+      output$qc.histplot <- renderPlot({
+        colors <- dittoColors()
 
-      slmed <- norm.counts()
-      tabsmat <- as.matrix(log2(slmed[,c(-1,-2)] + 1))
-      colnames(tabsmat) <- colnames(slmed)[c(-1,-2)]
-      samplecol <- colors[((1:ncol(tabsmat)) %% length(colors))]
-      tgz <- hist(tabsmat, breaks = 40)
+        slmed <- norm.counts()
+        tabsmat <- as.matrix(log2(slmed[,c(-1,-2)] + 1))
+        colnames(tabsmat) <- colnames(slmed)[c(-1,-2)]
+        samplecol <- colors[((1:ncol(tabsmat)) %% length(colors))]
+        tgz <- hist(tabsmat, breaks = 40)
 
-      if(ncol(tabsmat) >= 1) {
-        histlist <- lapply(1:ncol(tabsmat), function(X) { return (hist(tabsmat[,X], plot=FALSE, breaks=tgz$breaks)) })
-        xrange <- range(unlist(lapply(histlist, function(X) {X$mids})))
-        yrange <- range(unlist(lapply(histlist, function(X) {X$counts})))
-        hst1 <- histlist[[1]]
-        plot(hst1$mids, hst1$counts, type='b', pch=20, xlim=c(0,xrange[2]*1.2),
-             ylim=c(0,yrange[2]*1.2), xlab='log2(counts)', ylab='Frequency',
-             main='Distribution of read counts', col = samplecol[1])
-      }
-
-      if(ncol(tabsmat) >= 2){
-        for(i in 2:ncol(tabsmat)){
-          hstn <- histlist[[i]]
-          lines(hstn$mids, hstn$counts, type='b', pch=20, col=samplecol[i])
+        if(ncol(tabsmat) >= 1) {
+          histlist <- lapply(1:ncol(tabsmat), function(X) { return (hist(tabsmat[,X], plot=FALSE, breaks=tgz$breaks)) })
+          xrange <- range(unlist(lapply(histlist, function(X) {X$mids})))
+          yrange <- range(unlist(lapply(histlist, function(X) {X$counts})))
+          hst1 <- histlist[[1]]
+          plot(hst1$mids, hst1$counts, type='b', pch=20, xlim=c(0,xrange[2]*1.2),
+               ylim=c(0,yrange[2]*1.2), xlab='log2(counts)', ylab='Frequency',
+               main='Distribution of read counts', col = samplecol[1])
         }
-      }
 
-      legend('topright', colnames(tabsmat), pch=20, lwd=1, col=samplecol)
+        if(ncol(tabsmat) >= 2){
+          for(i in 2:ncol(tabsmat)){
+            hstn <- histlist[[i]]
+            lines(hstn$mids, hstn$counts, type='b', pch=20, col=samplecol[i])
+          }
+        }
+
+        legend('topright', colnames(tabsmat), pch=20, lwd=1, col=samplecol)
+      })
+
+      # TODO: rewrite this, add color min/max/mid selectors.
+      output$qc.corr <- renderPlot({
+        slmed <- norm.counts()
+        slmat <- as.matrix(slmed[,c(-1,-2)])
+        slmat.log <- log2(slmat+1)
+
+        if (ncol(slmat.log) > 1){
+          ComplexHeatmap::pheatmap(cor(slmat.log),
+                                   heatmap_legend_param = list(title = "Pearson\nCorr."),
+                                   main = "Correlation Matrix")
+        } else {
+          grid.newpage()
+          grid.text("Only one sample, no correlation possible.")
+        }
+
+      })
     })
 
-    # TODO: rewrite this, add color min/max/mid selectors.
-    output$qc.corr <- renderPlot({
-      slmed <- norm.counts()
-      slmat <- as.matrix(slmed[,c(-1,-2)])
-      slmat.log <- log2(slmat+1)
+    observeEvent(pc, {
+      output$qc.pca <- renderPlotly({
+        req(pc, input$dim1, input$dim2, input$dim3)
+        input$pca.update
 
-      if (ncol(slmat.log) > 1){
-        ComplexHeatmap::pheatmap(cor(slmat.log),
-                                 heatmap_legend_param = list(title = "Pearson\nCorr."),
-                                 main = "Correlation Matrix")
-      } else {
-        grid.newpage()
-        grid.text("Only one sample, no correlation possible.")
-      }
+        pc.res <- isolate(pc())
 
+        pl.cols <- NULL
+        pl.shapes <- NULL
+        pl.col <- "black"
+        hov.text <- NULL
+
+        # Get marker aesthetics mappings.
+        # Drop unused factor levels if possible.
+        if (isolate(input$bip.color) != "") {
+          pl.cols <- pc.res$metadata[,isolate(input$bip.color), drop = TRUE]
+          if (is.factor(pl.cols)) {
+            pl.cols <- droplevels(pl.cols)
+          }
+          pl.col <- dittoColors()[seq_along(unique(pc.res$metadata[,isolate(input$bip.color), drop = TRUE]))]
+        }
+
+        if (isolate(input$bip.shape) != "") {
+          pl.shapes <- pc.res$metadata[,isolate(input$bip.shape), drop = TRUE]
+          if (is.factor(pl.shapes)) {
+            pl.shapes <- droplevels(pl.shapes)
+          }
+        }
+
+        # Just throw label on hover for now.
+        hov.text <- paste0("</br><b>Label:</b> ", pc.res$metadata$Label)
+
+        # Check if 2D is wanted.
+        if (isolate(input$bip.twod)) {
+          fig <- plot_ly(pc.res$rotated,
+                         x = as.formula(paste0("~", isolate(input$dim1))),
+                         y = as.formula(paste0("~", isolate(input$dim2))),
+                         type = "scatter",
+                         mode = "markers",
+                         marker = list(size = 15),
+                         color = pl.cols,
+                         colors = pl.col,
+                         symbol = pl.shapes,
+                         symbols = c("circle", "square", "diamond", "cross",
+                                     "diamond-open", "circle-open", "square-open", "x"),
+                         text = hov.text,
+                         hoverinfo = "text") %>%
+            layout(xaxis = list(showgrid = FALSE, showline = TRUE, mirror = TRUE, zeroline = FALSE,
+                                title = paste0(isolate(input$dim1),
+                                               " (", format(round(pc.res$variance[isolate(input$dim1)], 2), nsmall = 2),"%)")),
+                   yaxis = list(showgrid = FALSE, showline = TRUE, mirror = TRUE, zeroline = FALSE,
+                                title = paste0(isolate(input$dim2),
+                                               " (", format(round(pc.res$variance[isolate(input$dim2)], 2), nsmall = 2),"%)")))
+
+          fig <- fig %>% toWebGL()
+
+          # Plot loadings.
+          if (isolate(input$bip.loadings)) {
+            lengthLoadingsArrowsFactor <- 1.5
+
+            # Get number of loadings to display.
+            xidx <- order(abs(pc.res$loadings[,isolate(input$dim1)]), decreasing = TRUE)
+            yidx <- order(abs(pc.res$loadings[,isolate(input$dim2)]), decreasing = TRUE)
+            vars <- unique(c(
+              rownames(pc.res$loadings)[xidx][seq_len(isolate(input$bip.n.loadings))],
+              rownames(pc.res$loadings)[yidx][seq_len(isolate(input$bip.n.loadings))]))
+
+            # get scaling parameter to match between variable loadings and rotated loadings
+            # This is cribbed almost verbatim from PCAtools code.
+            r <- min(
+              (max(pc.res$rotated[,isolate(input$dim1)]) - min(pc.res$rotated[,isolate(input$dim1)]) /
+                 (max(pc.res$loadings[,isolate(input$dim1)]) - min(pc.res$loadings[,isolate(input$dim1)]))),
+              (max(pc.res$rotated[,isolate(input$dim2)]) - min(pc.res$rotated[,isolate(input$dim2)]) /
+                 (max(pc.res$loadings[,isolate(input$dim2)]) - min(pc.res$loadings[,isolate(input$dim2)]))))
+
+            fig <- fig %>%
+              add_segments(x = 0, xend = pc.res$loadings[vars,isolate(input$dim1)] * r * lengthLoadingsArrowsFactor,
+                           y = 0, yend = pc.res$loadings[vars,isolate(input$dim2)] * r * lengthLoadingsArrowsFactor,
+                           line = list(color = 'black'), inherit = FALSE, showlegend = FALSE, hoverinfo = "text") %>%
+              add_annotations(x = pc.res$loadings[vars,isolate(input$dim1)] * r * lengthLoadingsArrowsFactor,
+                              y = pc.res$loadings[vars,isolate(input$dim2)] * r * lengthLoadingsArrowsFactor,
+                              ax = 0, ay = 0, text = vars, xanchor = 'center', yanchor= 'bottom')
+          }
+        } else {
+
+          # Generate plot.
+          fig <- plot_ly(pc.res$rotated, x = as.formula(paste0("~", isolate(input$dim1))),
+                         y = as.formula(paste0("~", isolate(input$dim2))),
+                         z = as.formula(paste0("~", isolate(input$dim3))),
+                         type = "scatter3d",
+                         mode = "markers",
+                         color = pl.cols,
+                         colors = pl.col,
+                         symbol = pl.shapes,
+                         symbols = c("circle", "square", "diamond", "cross", "diamond-open",
+                                     "circle-open", "square-open", "x"),
+                         text = hov.text,
+                         hoverinfo = "text") %>%
+            layout(scene = list(
+              xaxis = list(title = paste0(isolate(input$dim1), " (",
+                                          format(round(pc.res$variance[isolate(input$dim1)], 2), nsmall = 2),"%)")),
+              yaxis = list(title = paste0(isolate(input$dim2), " (",
+                                          format(round(pc.res$variance[isolate(input$dim2)], 2), nsmall = 2),"%)")),
+              zaxis = list(title = paste0(isolate(input$dim3), " (",
+                                          format(round(pc.res$variance[isolate(input$dim3)], 2), nsmall = 2),"%)")),
+              camera = list(eye = list(x=1.5, y = 1.8, z = 0.4))))
+        }
+        fig <- fig %>%
+          config(edits = list(annotationPosition = TRUE,
+                              annotationTail = FALSE),
+                 toImageButtonOptions = list(format = "svg"),
+                 displaylogo = FALSE,
+                 plotGlPixelRatio = 7)
+
+        fig
+      })
     })
 
-    output$qc.pca <- renderPlotly({
-      req(pc, input$dim1, input$dim2, input$dim3)
-      input$pca.update
-
-      pc.res <- isolate(pc())
-
-      pl.cols <- NULL
-      pl.shapes <- NULL
-      pl.col <- "black"
-      hov.text <- NULL
-
-      # Get marker aesthetics mappings.
-      # Drop unused factor levels if possible.
-      if (isolate(input$bip.color) != "") {
-        pl.cols <- pc.res$metadata[,isolate(input$bip.color), drop = TRUE]
-        if (is.factor(pl.cols)) {
-          pl.cols <- droplevels(pl.cols)
-        }
-        pl.col <- dittoColors()[seq_along(unique(pc.res$metadata[,isolate(input$bip.color), drop = TRUE]))]
-      }
-
-      if (isolate(input$bip.shape) != "") {
-        pl.shapes <- pc.res$metadata[,isolate(input$bip.shape), drop = TRUE]
-        if (is.factor(pl.shapes)) {
-          pl.shapes <- droplevels(pl.shapes)
-        }
-      }
-
-      # Just throw label on hover for now.
-      hov.text <- paste0("</br><b>Label:</b> ", pc.res$metadata$Label)
-
-      # Check if 2D is wanted.
-      if (isolate(input$bip.twod)) {
-        fig <- plot_ly(pc.res$rotated,
-                       x = as.formula(paste0("~", isolate(input$dim1))),
-                       y = as.formula(paste0("~", isolate(input$dim2))),
-                       type = "scatter",
-                       mode = "markers",
-                       marker = list(size = 15),
-                       color = pl.cols,
-                       colors = pl.col,
-                       symbol = pl.shapes,
-                       symbols = c("circle", "square", "diamond", "cross",
-                                   "diamond-open", "circle-open", "square-open", "x"),
-                       text = hov.text,
-                       hoverinfo = "text") %>%
-          layout(xaxis = list(showgrid = FALSE, showline = TRUE, mirror = TRUE, zeroline = FALSE,
-                              title = paste0(isolate(input$dim1),
-                                             " (", format(round(pc.res$variance[isolate(input$dim1)], 2), nsmall = 2),"%)")),
-                 yaxis = list(showgrid = FALSE, showline = TRUE, mirror = TRUE, zeroline = FALSE,
-                              title = paste0(isolate(input$dim2),
-                                             " (", format(round(pc.res$variance[isolate(input$dim2)], 2), nsmall = 2),"%)")))
-
-        fig <- fig %>% toWebGL()
-
-        # Plot loadings.
-        if (isolate(input$bip.loadings)) {
-          lengthLoadingsArrowsFactor <- 1.5
-
-          # Get number of loadings to display.
-          xidx <- order(abs(pc.res$loadings[,isolate(input$dim1)]), decreasing = TRUE)
-          yidx <- order(abs(pc.res$loadings[,isolate(input$dim2)]), decreasing = TRUE)
-          vars <- unique(c(
-            rownames(pc.res$loadings)[xidx][seq_len(isolate(input$bip.n.loadings))],
-            rownames(pc.res$loadings)[yidx][seq_len(isolate(input$bip.n.loadings))]))
-
-          # get scaling parameter to match between variable loadings and rotated loadings
-          # This is cribbed almost verbatim from PCAtools code.
-          r <- min(
-            (max(pc.res$rotated[,isolate(input$dim1)]) - min(pc.res$rotated[,isolate(input$dim1)]) /
-               (max(pc.res$loadings[,isolate(input$dim1)]) - min(pc.res$loadings[,isolate(input$dim1)]))),
-            (max(pc.res$rotated[,isolate(input$dim2)]) - min(pc.res$rotated[,isolate(input$dim2)]) /
-               (max(pc.res$loadings[,isolate(input$dim2)]) - min(pc.res$loadings[,isolate(input$dim2)]))))
-
-          fig <- fig %>%
-            add_segments(x = 0, xend = pc.res$loadings[vars,isolate(input$dim1)] * r * lengthLoadingsArrowsFactor,
-                         y = 0, yend = pc.res$loadings[vars,isolate(input$dim2)] * r * lengthLoadingsArrowsFactor,
-                         line = list(color = 'black'), inherit = FALSE, showlegend = FALSE, hoverinfo = "text") %>%
-            add_annotations(x = pc.res$loadings[vars,isolate(input$dim1)] * r * lengthLoadingsArrowsFactor,
-                            y = pc.res$loadings[vars,isolate(input$dim2)] * r * lengthLoadingsArrowsFactor,
-                            ax = 0, ay = 0, text = vars, xanchor = 'center', yanchor= 'bottom')
-        }
-      } else {
-
-        # Generate plot.
-        fig <- plot_ly(pc.res$rotated, x = as.formula(paste0("~", isolate(input$dim1))),
-                       y = as.formula(paste0("~", isolate(input$dim2))),
-                       z = as.formula(paste0("~", isolate(input$dim3))),
-                       type = "scatter3d",
-                       mode = "markers",
-                       color = pl.cols,
-                       colors = pl.col,
-                       symbol = pl.shapes,
-                       symbols = c("circle", "square", "diamond", "cross", "diamond-open",
-                                   "circle-open", "square-open", "x"),
-                       text = hov.text,
-                       hoverinfo = "text") %>%
-          layout(scene = list(
-            xaxis = list(title = paste0(isolate(input$dim1), " (",
-                                        format(round(pc.res$variance[isolate(input$dim1)], 2), nsmall = 2),"%)")),
-            yaxis = list(title = paste0(isolate(input$dim2), " (",
-                                        format(round(pc.res$variance[isolate(input$dim2)], 2), nsmall = 2),"%)")),
-            zaxis = list(title = paste0(isolate(input$dim3), " (",
-                                        format(round(pc.res$variance[isolate(input$dim3)], 2), nsmall = 2),"%)")),
-            camera = list(eye = list(x=1.5, y = 1.8, z = 0.4))))
-      }
-      fig <- fig %>%
-        config(edits = list(annotationPosition = TRUE,
-                            annotationTail = FALSE),
-               toImageButtonOptions = list(format = "svg"),
-               displaylogo = FALSE,
-               plotGlPixelRatio = 7)
-
-      fig
-    })
-
-    output$count.summary <- renderDT(server = FALSE, {
-      DT::datatable(count.summary(),
-                    rownames = FALSE,
-                    filter = "top",
-                    extensions = c("Buttons", "Scroller"),
-                    options = list(
-                      search = list(regex = TRUE),
-                      lengthMenu = list(c(10, 25, 50, -1), c("10", "25", "50", "all")),
-                      dom = 'Blfrtip',
-                      buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
-                      scrollX = TRUE,
-                      deferRender = TRUE,
-                      scrollY = 600,
-                      scroller = TRUE)
-      ) %>% DT::formatStyle(0, target = "row", lineHeight = '80%')
+    observeEvent(count.summary, {
+      output$count.summary <- renderDT(server = FALSE, {
+        DT::datatable(count.summary(),
+                      rownames = FALSE,
+                      filter = "top",
+                      extensions = c("Buttons", "Scroller"),
+                      options = list(
+                        search = list(regex = TRUE),
+                        lengthMenu = list(c(10, 25, 50, -1), c("10", "25", "50", "all")),
+                        dom = 'Blfrtip',
+                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                        scrollX = TRUE,
+                        deferRender = TRUE,
+                        scrollY = 600,
+                        scroller = TRUE)
+        ) %>% DT::formatStyle(0, target = "row", lineHeight = '80%')
+      })
     })
 
     # Initialize plots by simulating button click once.
@@ -1043,7 +1059,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     #---------Gene (Overview) & Summary Tables Tabs-------------
-
     # Remove certain outputs if parameters for them are not provided.
     if (is.null(depmap.gene)) {
       shinyjs::hide("dep.crispr.ess")
@@ -1052,13 +1067,16 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       shinyjs::hide("dep.rnai.sel")
     }
 
+
     if (is.null(essential.genes)) {
       shinyjs::hide("rem.ess")
     }
 
+
     if (is.null(positive.ctrl.genes)) {
       shinyjs::hide("rem.pos")
     }
+
 
     # Disable certain inputs if only one dataset provided.
     observe({
@@ -1068,13 +1086,14 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       }
     })
 
+
     # Load the gene summaries for easy plotting.
     set1.genes <- reactive({
       df <- gene.data()[[input$gene.sel1]]
       .gene_ingress(df, sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
                     positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene)
     })
-    
+
     set2.genes <- reactive({
       if (length(gene.data()) > 1) {
         df <- gene.data()[[input$gene.sel2]]
@@ -1082,6 +1101,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                       positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene)
       }
     })
+
 
     # Get overlapping hits between sets if needed.
     common.hits <- reactive({
@@ -1207,7 +1227,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
       df <- set1.genes()
 
-      if (!is.null(common.hits())) {
+      if (!is.null(common.hits)) {
         df$Overlap <- df$id %in% common.hits()
       }
 
@@ -1496,305 +1516,307 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # If only one dataset provided, don't render second dataset.
     observe({if (length(gene.data()) > 1) {
-        output$gene2.summary <- renderDT({
-          req(set2.genes)
-          # Remove columns that are redundant or confusing.
-          target <- which(names(set2.genes()) %in% c("neg|score", "neg|p-value", "neg|rank",
-                                                     "neg|lfc", "pos|score", "pos|p-value", "pos|rank",
-                                                     "pos|lfc", "RandomIndex", "Rank", "goodsgrna")) - 1
-  
-          df <- set2.genes()
-  
-          # Label overlapping hits between datasets if available.
-          if (!is.null(common.hits())) {
-            df$Overlap <- df$id %in% common.hits()
+      output$gene2.summary <- renderDT({
+        req(set2.genes)
+        # Remove columns that are redundant or confusing.
+        target <- which(names(set2.genes()) %in% c("neg|score", "neg|p-value", "neg|rank",
+                                                   "neg|lfc", "pos|score", "pos|p-value", "pos|rank",
+                                                   "pos|lfc", "RandomIndex", "Rank", "goodsgrna")) - 1
+
+        df <- set2.genes()
+
+        # Label overlapping hits between datasets if available.
+        if (!is.null(common.hits())) {
+          df$Overlap <- df$id %in% common.hits()
+        }
+
+        DT::datatable(df,
+                      rownames = FALSE,
+                      filter = "top",
+                      extensions = c("Buttons"),
+                      caption = paste0(input$gene.sel2, " Gene Summary"),
+                      options = list(
+                        search = list(regex = TRUE),
+                        dom = 'Blfrtip',
+                        buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                        pageLength = 10,
+                        columnDefs = list(list(visible = FALSE, targets = target)))
+        ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
+      })
+
+      output$gene2.vol <- renderPlotly({
+        req(set2.genes)
+        input$vol.update
+
+        df <- set2.genes()
+
+        hov.info <- c("hit_type", "num", "goodsgrna")
+
+        # Remove common essential genes if needed.
+        if (isolate(input$rem.ess) & !is.null(df$essential)) {
+          df <- df[!df$essential,]
+        }
+
+        # Remove positive control genes if needed.
+        if (isolate(input$rem.pos) & !is.null(df$Positive_Control)) {
+          df <- df[!df$Positive_Control,]
+        }
+
+        # Remove DepMap stuff if requested.
+        if (!is.null(depmap.gene)) {
+          if (isolate(input$dep.crispr.ess)) {
+            df <- df[!df$DepMap_CRISPR_Essential,]
           }
-  
-          DT::datatable(df,
-                        rownames = FALSE,
-                        filter = "top",
-                        extensions = c("Buttons"),
-                        caption = paste0(input$gene.sel2, " Gene Summary"),
-                        options = list(
-                          search = list(regex = TRUE),
-                          dom = 'Blfrtip',
-                          buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
-                          pageLength = 10,
-                          columnDefs = list(list(visible = FALSE, targets = target)))
-          ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
-        })
-  
-        output$gene2.vol <- renderPlotly({
-          req(set2.genes)
-          input$vol.update
-  
-          df <- set2.genes()
-  
-          hov.info <- c("hit_type", "num", "goodsgrna")
-  
-          # Remove common essential genes if needed.
-          if (isolate(input$rem.ess) & !is.null(df$essential)) {
-            df <- df[!df$essential,]
+
+          if (isolate(input$dep.crispr.sel)) {
+            df <- df[!df$DepMap_CRISPR_Selective,]
           }
-  
-          # Remove positive control genes if needed.
-          if (isolate(input$rem.pos) & !is.null(df$Positive_Control)) {
-            df <- df[!df$Positive_Control,]
+
+          if (isolate(input$dep.rnai.ess)) {
+            df <- df[!df$DepMap_RNAi_Essential,]
           }
-  
-          # Remove DepMap stuff if requested.
-          if (!is.null(depmap.gene)) {
-            if (isolate(input$dep.crispr.ess)) {
-              df <- df[!df$DepMap_CRISPR_Essential,]
-            }
-  
-            if (isolate(input$dep.crispr.sel)) {
-              df <- df[!df$DepMap_CRISPR_Selective,]
-            }
-  
-            if (isolate(input$dep.rnai.ess)) {
-              df <- df[!df$DepMap_RNAi_Essential,]
-            }
-  
-            if (isolate(input$dep.rnai.sel)) {
-              df <- df[!df$DepMap_RNAi_Selective,]
-            }
+
+          if (isolate(input$dep.rnai.sel)) {
+            df <- df[!df$DepMap_RNAi_Selective,]
           }
-  
-          highlight <- NULL
-          if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-            highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
-            highlight <- highlight.feats[highlight.feats != ""]
+        }
+
+        highlight <- NULL
+        if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
+          highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+          highlight <- highlight.feats[highlight.feats != ""]
+        }
+
+        # Add common hits to highlight.
+        if (isolate(input$highlight.common)) {
+          highlight <- unique(c(common.hits(), highlight))
+        }
+
+
+        .make_volcano(res = df,
+                      xlim = isolate(input$vol.x),
+                      ylim = isolate(input$vol.y),
+                      fc.thresh = isolate(input$gene.lfc.th),
+                      fc.lines = isolate(input$vol.fcline),
+                      sig.thresh = isolate(input$gene.fdr.th),
+                      sig.line = isolate(input$vol.sigline),
+                      h.id = h.id,
+                      h.id.suffix = "_volc2",
+                      sig.term = "FDR",
+                      lfc.term = "LFC",
+                      feat.term = "id",
+                      hover.info = hov.info,
+                      fs = clicked$volc2,
+                      up.color = isolate(input$up.color),
+                      down.color = isolate(input$down.color),
+                      insig.color = isolate(input$insig.color),
+                      sig.opacity = isolate(input$sig.opa),
+                      insig.opacity = isolate(input$insig.opa),
+                      sig.size = isolate(input$sig.size),
+                      insig.size = isolate(input$insig.size),
+                      label.size = isolate(input$lab.size),
+                      webgl = isolate(input$webgl),
+                      webgl.ratio = isolate(input$webgl.ratio),
+                      show.counts = isolate(input$counts),
+                      show.hl.counts = isolate(input$hl.counts),
+                      counts.size = isolate(input$counts.size),
+                      highlight.featsets = isolate(input$hl.genesets),
+                      highlight.feats = highlight,
+                      featsets = genesets,
+                      highlight.feats.color = isolate(input$hl.genes.col),
+                      highlight.feats.size = isolate(input$hl.genes.size),
+                      highlight.feats.opac = isolate(input$hl.genes.opa),
+                      highlight.feats.linecolor = isolate(input$hl.genes.lcol),
+                      highlight.feats.linewidth = isolate(input$hl.genes.lw),
+                      highlight.featsets.color = isolate(input$hl.genesets.col),
+                      highlight.featsets.size = isolate(input$hl.genesets.size),
+                      highlight.featsets.opac = isolate(input$hl.genesets.opa),
+                      highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
+                      highlight.featsets.linewidth = isolate(input$hl.genesets.lw))
+      })
+
+      output$gene2.rank <- renderPlotly({
+        req(set2.genes)
+        input$rank.update
+
+        hov.info <- c("hit_type", "num", "goodsgrna")
+
+        df <- set2.genes()
+
+        # Remove common essential genes if needed.
+        if (isolate(input$rem.ess) & !is.null(df$essential)) {
+          df <- df[!df$essential,]
+        }
+
+        # Remove positive control genes if needed.
+        if (isolate(input$rem.pos) & !is.null(df$Positive_Control)) {
+          df <- df[!df$Positive_Control,]
+        }
+
+        # Remove DepMap stuff if requested.
+        if (!is.null(depmap.gene)) {
+          if (isolate(input$dep.crispr.ess)) {
+            df <- df[!df$DepMap_CRISPR_Essential,]
           }
-  
-          # Add common hits to highlight.
-          if (isolate(input$highlight.common)) {
-            highlight <- unique(c(common.hits(), highlight))
+
+          if (isolate(input$dep.crispr.sel)) {
+            df <- df[!df$DepMap_CRISPR_Selective,]
           }
-  
-  
-          .make_volcano(res = df,
-                        xlim = isolate(input$vol.x),
-                        ylim = isolate(input$vol.y),
-                        fc.thresh = isolate(input$gene.lfc.th),
-                        fc.lines = isolate(input$vol.fcline),
-                        sig.thresh = isolate(input$gene.fdr.th),
-                        sig.line = isolate(input$vol.sigline),
-                        h.id = h.id,
-                        h.id.suffix = "_volc2",
-                        sig.term = "FDR",
-                        lfc.term = "LFC",
-                        feat.term = "id",
-                        hover.info = hov.info,
-                        fs = clicked$volc2,
-                        up.color = isolate(input$up.color),
-                        down.color = isolate(input$down.color),
-                        insig.color = isolate(input$insig.color),
-                        sig.opacity = isolate(input$sig.opa),
-                        insig.opacity = isolate(input$insig.opa),
-                        sig.size = isolate(input$sig.size),
-                        insig.size = isolate(input$insig.size),
-                        label.size = isolate(input$lab.size),
-                        webgl = isolate(input$webgl),
-                        webgl.ratio = isolate(input$webgl.ratio),
-                        show.counts = isolate(input$counts),
-                        show.hl.counts = isolate(input$hl.counts),
-                        counts.size = isolate(input$counts.size),
-                        highlight.featsets = isolate(input$hl.genesets),
-                        highlight.feats = highlight,
-                        featsets = genesets,
-                        highlight.feats.color = isolate(input$hl.genes.col),
-                        highlight.feats.size = isolate(input$hl.genes.size),
-                        highlight.feats.opac = isolate(input$hl.genes.opa),
-                        highlight.feats.linecolor = isolate(input$hl.genes.lcol),
-                        highlight.feats.linewidth = isolate(input$hl.genes.lw),
-                        highlight.featsets.color = isolate(input$hl.genesets.col),
-                        highlight.featsets.size = isolate(input$hl.genesets.size),
-                        highlight.featsets.opac = isolate(input$hl.genesets.opa),
-                        highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-                        highlight.featsets.linewidth = isolate(input$hl.genesets.lw))
-        })
-  
-        output$gene2.rank <- renderPlotly({
-          req(set2.genes)
-          input$rank.update
-  
-          hov.info <- c("hit_type", "num", "goodsgrna")
-  
-          df <- set2.genes()
-  
-          # Remove common essential genes if needed.
-          if (isolate(input$rem.ess) & !is.null(df$essential)) {
-            df <- df[!df$essential,]
+
+          if (isolate(input$dep.rnai.ess)) {
+            df <- df[!df$DepMap_RNAi_Essential,]
           }
-  
-          # Remove positive control genes if needed.
-          if (isolate(input$rem.pos) & !is.null(df$Positive_Control)) {
-            df <- df[!df$Positive_Control,]
+
+          if (isolate(input$dep.rnai.sel)) {
+            df <- df[!df$DepMap_RNAi_Selective,]
           }
-  
-          # Remove DepMap stuff if requested.
-          if (!is.null(depmap.gene)) {
-            if (isolate(input$dep.crispr.ess)) {
-              df <- df[!df$DepMap_CRISPR_Essential,]
-            }
-  
-            if (isolate(input$dep.crispr.sel)) {
-              df <- df[!df$DepMap_CRISPR_Selective,]
-            }
-  
-            if (isolate(input$dep.rnai.ess)) {
-              df <- df[!df$DepMap_RNAi_Essential,]
-            }
-  
-            if (isolate(input$dep.rnai.sel)) {
-              df <- df[!df$DepMap_RNAi_Selective,]
-            }
+        }
+
+        highlight <- NULL
+        if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
+          highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+          highlight <- highlight.feats[highlight.feats != ""]
+        }
+
+        # Add common hits to highlight.
+        if (isolate(input$highlight.common)) {
+          highlight <- unique(c(common.hits(), highlight))
+        }
+
+        .make_rank(df = df,
+                   ylim = list(isolate(input$rank.y.min), isolate(input$rank.y.max)),
+                   y.thresh = isolate(input$gene.lfc.th),
+                   y.lines = isolate(input$rank.fcline),
+                   sig.thresh = isolate(input$gene.fdr.th),
+                   h.id = h.id,
+                   h.id.suffix = "_rank2",
+                   sig.term = "FDR",
+                   y.term = "LFC",
+                   x.term = "Rank",
+                   feat.term = "id",
+                   hover.info = hov.info,
+                   fs = clicked$rank2,
+                   up.color = isolate(input$up.color),
+                   down.color = isolate(input$down.color),
+                   insig.color = isolate(input$insig.color),
+                   sig.opacity = isolate(input$sig.opa),
+                   insig.opacity = isolate(input$insig.opa),
+                   sig.size = isolate(input$sig.size),
+                   insig.size = isolate(input$insig.size),
+                   label.size = isolate(input$lab.size),
+                   webgl = isolate(input$webgl),
+                   webgl.ratio = isolate(input$webgl.ratio),
+                   show.counts = isolate(input$counts),
+                   show.hl.counts = isolate(input$hl.counts),
+                   counts.size = isolate(input$counts.size),
+                   highlight.featsets = isolate(input$hl.genesets),
+                   highlight.feats = highlight,
+                   featsets = genesets,
+                   highlight.feats.color = isolate(input$hl.genes.col),
+                   highlight.feats.size = isolate(input$hl.genes.size),
+                   highlight.feats.opac = isolate(input$hl.genes.opa),
+                   highlight.feats.linecolor = isolate(input$hl.genes.lcol),
+                   highlight.feats.linewidth = isolate(input$hl.genes.lw),
+                   highlight.featsets.color = isolate(input$hl.genesets.col),
+                   highlight.featsets.size = isolate(input$hl.genesets.size),
+                   highlight.featsets.opac = isolate(input$hl.genesets.opa),
+                   highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
+                   highlight.featsets.linewidth = isolate(input$hl.genesets.lw))
+      })
+
+      output$gene2.lawn <- renderPlotly({
+        req(set2.genes)
+        input$lawn.update
+
+        hov.info <- c("hit_type", "num", "goodsgrna")
+
+        df <- set2.genes()
+
+        # Remove common essential genes if needed.
+        if (isolate(input$rem.ess) & !is.null(df$essential)) {
+          df <- df[!df$essential,]
+        }
+
+        # Remove positive control genes if needed.
+        if (isolate(input$rem.pos) & !is.null(df$Positive_Control)) {
+          df <- df[!df$Positive_Control,]
+        }
+
+        # Remove DepMap stuff if requested.
+        if (!is.null(depmap.gene)) {
+          if (isolate(input$dep.crispr.ess)) {
+            df <- df[!df$DepMap_CRISPR_Essential,]
           }
-  
-          highlight <- NULL
-          if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-            highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
-            highlight <- highlight.feats[highlight.feats != ""]
+
+          if (isolate(input$dep.crispr.sel)) {
+            df <- df[!df$DepMap_CRISPR_Selective,]
           }
-  
-          # Add common hits to highlight.
-          if (isolate(input$highlight.common)) {
-            highlight <- unique(c(common.hits(), highlight))
+
+          if (isolate(input$dep.rnai.ess)) {
+            df <- df[!df$DepMap_RNAi_Essential,]
           }
-  
-          .make_rank(df = df,
-                     ylim = list(isolate(input$rank.y.min), isolate(input$rank.y.max)),
-                     y.thresh = isolate(input$gene.lfc.th),
-                     y.lines = isolate(input$rank.fcline),
-                     sig.thresh = isolate(input$gene.fdr.th),
-                     h.id = h.id,
-                     h.id.suffix = "_rank2",
-                     sig.term = "FDR",
-                     y.term = "LFC",
-                     x.term = "Rank",
-                     feat.term = "id",
-                     hover.info = hov.info,
-                     fs = clicked$rank2,
-                     up.color = isolate(input$up.color),
-                     down.color = isolate(input$down.color),
-                     insig.color = isolate(input$insig.color),
-                     sig.opacity = isolate(input$sig.opa),
-                     insig.opacity = isolate(input$insig.opa),
-                     sig.size = isolate(input$sig.size),
-                     insig.size = isolate(input$insig.size),
-                     label.size = isolate(input$lab.size),
-                     webgl = isolate(input$webgl),
-                     webgl.ratio = isolate(input$webgl.ratio),
-                     show.counts = isolate(input$counts),
-                     show.hl.counts = isolate(input$hl.counts),
-                     counts.size = isolate(input$counts.size),
-                     highlight.featsets = isolate(input$hl.genesets),
-                     highlight.feats = highlight,
-                     featsets = genesets,
-                     highlight.feats.color = isolate(input$hl.genes.col),
-                     highlight.feats.size = isolate(input$hl.genes.size),
-                     highlight.feats.opac = isolate(input$hl.genes.opa),
-                     highlight.feats.linecolor = isolate(input$hl.genes.lcol),
-                     highlight.feats.linewidth = isolate(input$hl.genes.lw),
-                     highlight.featsets.color = isolate(input$hl.genesets.col),
-                     highlight.featsets.size = isolate(input$hl.genesets.size),
-                     highlight.featsets.opac = isolate(input$hl.genesets.opa),
-                     highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-                     highlight.featsets.linewidth = isolate(input$hl.genesets.lw))
-        })
-  
-        output$gene2.lawn <- renderPlotly({
-          req(set2.genes)
-          input$lawn.update
-  
-          hov.info <- c("hit_type", "num", "goodsgrna")
-  
-          df <- set2.genes()
-  
-          # Remove common essential genes if needed.
-          if (isolate(input$rem.ess) & !is.null(df$essential)) {
-            df <- df[!df$essential,]
+
+          if (isolate(input$dep.rnai.sel)) {
+            df <- df[!df$DepMap_RNAi_Selective,]
           }
-  
-          # Remove positive control genes if needed.
-          if (isolate(input$rem.pos) & !is.null(df$Positive_Control)) {
-            df <- df[!df$Positive_Control,]
-          }
-  
-          # Remove DepMap stuff if requested.
-          if (!is.null(depmap.gene)) {
-            if (isolate(input$dep.crispr.ess)) {
-              df <- df[!df$DepMap_CRISPR_Essential,]
-            }
-  
-            if (isolate(input$dep.crispr.sel)) {
-              df <- df[!df$DepMap_CRISPR_Selective,]
-            }
-  
-            if (isolate(input$dep.rnai.ess)) {
-              df <- df[!df$DepMap_RNAi_Essential,]
-            }
-  
-            if (isolate(input$dep.rnai.sel)) {
-              df <- df[!df$DepMap_RNAi_Selective,]
-            }
-          }
-  
-          highlight <- NULL
-          if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-            highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
-            highlight <- highlight.feats[highlight.feats != ""]
-          }
-  
-          # Add common hits to highlight.
-          if (isolate(input$highlight.common)) {
-            highlight <- unique(c(common.hits(), highlight))
-          }
-  
-          .make_lawn(res = df,
-                     ylim = isolate(input$lawn.y),
-                     fc.thresh = isolate(input$gene.lfc.th),
-                     sig.thresh = isolate(input$gene.fdr.th),
-                     sig.line = isolate(input$lawn.sigline),
-                     h.id = h.id,
-                     h.id.suffix = "_lawn2",
-                     sig.term = "FDR",
-                     lfc.term = "LFC",
-                     feat.term = "id",
-                     x.term = "RandomIndex",
-                     hover.info = hov.info,
-                     fs = clicked$lawn2,
-                     up.color = isolate(input$up.color),
-                     down.color = isolate(input$down.color),
-                     insig.color = isolate(input$insig.color),
-                     sig.opacity = isolate(input$sig.opa),
-                     insig.opacity = isolate(input$insig.opa),
-                     sig.size = isolate(input$sig.size),
-                     insig.size = isolate(input$insig.size),
-                     label.size = isolate(input$lab.size),
-                     webgl = isolate(input$webgl),
-                     webgl.ratio = isolate(input$webgl.ratio),
-                     show.counts = isolate(input$counts),
-                     show.hl.counts = isolate(input$hl.counts),
-                     counts.size = isolate(input$counts.size),
-                     highlight.featsets = isolate(input$hl.genesets),
-                     highlight.feats = highlight,
-                     featsets = genesets,
-                     highlight.feats.color = isolate(input$hl.genes.col),
-                     highlight.feats.size = isolate(input$hl.genes.size),
-                     highlight.feats.opac = isolate(input$hl.genes.opa),
-                     highlight.feats.linecolor = isolate(input$hl.genes.lcol),
-                     highlight.feats.linewidth = isolate(input$hl.genes.lw),
-                     highlight.featsets.color = isolate(input$hl.genesets.col),
-                     highlight.featsets.size = isolate(input$hl.genesets.size),
-                     highlight.featsets.opac = isolate(input$hl.genesets.opa),
-                     highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-                     highlight.featsets.linewidth = isolate(input$hl.genesets.lw))
-        })
+        }
+
+        highlight <- NULL
+        if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
+          highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+          highlight <- highlight.feats[highlight.feats != ""]
+        }
+
+        # Add common hits to highlight.
+        if (isolate(input$highlight.common)) {
+          highlight <- unique(c(common.hits(), highlight))
+        }
+
+        .make_lawn(res = df,
+                   ylim = isolate(input$lawn.y),
+                   fc.thresh = isolate(input$gene.lfc.th),
+                   sig.thresh = isolate(input$gene.fdr.th),
+                   sig.line = isolate(input$lawn.sigline),
+                   h.id = h.id,
+                   h.id.suffix = "_lawn2",
+                   sig.term = "FDR",
+                   lfc.term = "LFC",
+                   feat.term = "id",
+                   x.term = "RandomIndex",
+                   hover.info = hov.info,
+                   fs = clicked$lawn2,
+                   up.color = isolate(input$up.color),
+                   down.color = isolate(input$down.color),
+                   insig.color = isolate(input$insig.color),
+                   sig.opacity = isolate(input$sig.opa),
+                   insig.opacity = isolate(input$insig.opa),
+                   sig.size = isolate(input$sig.size),
+                   insig.size = isolate(input$insig.size),
+                   label.size = isolate(input$lab.size),
+                   webgl = isolate(input$webgl),
+                   webgl.ratio = isolate(input$webgl.ratio),
+                   show.counts = isolate(input$counts),
+                   show.hl.counts = isolate(input$hl.counts),
+                   counts.size = isolate(input$counts.size),
+                   highlight.featsets = isolate(input$hl.genesets),
+                   highlight.feats = highlight,
+                   featsets = genesets,
+                   highlight.feats.color = isolate(input$hl.genes.col),
+                   highlight.feats.size = isolate(input$hl.genes.size),
+                   highlight.feats.opac = isolate(input$hl.genes.opa),
+                   highlight.feats.linecolor = isolate(input$hl.genes.lcol),
+                   highlight.feats.linewidth = isolate(input$hl.genes.lw),
+                   highlight.featsets.color = isolate(input$hl.genesets.col),
+                   highlight.featsets.size = isolate(input$hl.genesets.size),
+                   highlight.featsets.opac = isolate(input$hl.genesets.opa),
+                   highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
+                   highlight.featsets.linewidth = isolate(input$hl.genesets.lw))
       }
-    })
-      
+      )
+    }
+    }
+    )
+
     # If the Gene tab update button is pressed, click all the update buttons.
     observeEvent(input$gene.update, {
       shinyjs::click("lawn.update")
@@ -1905,27 +1927,20 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       df <- set1.sgrnas()
       df <- df[df$Gene == input$sgrna.gene,]
 
-      target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
+      if (length(sgrna.data()) > 1) {
+        set2.sgrnas <- reactive({
+          df <- sgrna.data()[[input$sgrna.sel2]]
+          df$Rank <- rank(df$LFC)
+          df
+        })
+      }
 
-      DT::datatable(df,
-                    rownames = FALSE,
-                    filter = "top",
-                    extensions = c("Buttons"),
-                    caption = paste0(input$sgrna.sel1, " ", input$sgrna.gene, " sgRNA Details"),
-                    options = list(
-                      pageLength = 10,
-                      dom = 'Blfrtip',
-                      buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
-                      columnDefs = list(list(visible = FALSE, targets = target)))
-      ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
-    })
-
-    observe({if (length(sgrna.data()) > 1) {
+      observe({if (length(sgrna.data()) > 1) {
         output$sgrna2.summary <- renderDT(server = FALSE, {
           req(set2.sgrnas)
-  
+
           df <- set2.sgrnas()
-  
+
           DT::datatable(df,
                         rownames = FALSE,
                         filter = "top",
@@ -1938,27 +1953,27 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                           buttons = c('copy', 'csv', 'excel', 'pdf', 'print'))
           ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
         })
-  
+
         output$sgrna2.counts <- renderPlotly({
           req(set2.sgrnas, input$sgrna.gene)
-  
+
           df <- set2.sgrnas()
           df <- df[df$Gene == input$sgrna.gene,]
-  
+
           .make_sgrna_pairplot(df)
         })
-  
+
         output$sgrna2.rank <- renderPlotly({
           req(set2.sgrnas)
           input$rank.update
-  
+
           df <- set2.sgrnas()
-  
+
           hov.info <- c("Gene")
-  
+
           highlight <- NULL
           highlight <- df$sgrna[df$Gene == input$sgrna.gene]
-  
+
           .make_rank(df = df,
                      ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
                      y.thresh = 0,
@@ -1999,15 +2014,15 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                      highlight.featsets.linecolor = "black",
                      highlight.featsets.linewidth = 0.5)
         })
-  
+
         output$sgrna2.detail <- renderDT({
           req(set2.sgrnas, input$sgrna.gene)
-  
+
           df <- set2.sgrnas()
           df <- df[df$Gene == input$sgrna.gene,]
-  
+
           target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
-  
+
           DT::datatable(df,
                         rownames = FALSE,
                         filter = "top",
@@ -2021,38 +2036,134 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
           ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
         })
       }
-    })
-
-    #--------------DepMap Tab-----------------
-    if (!is.null(depmap.gene)) {
-      output$depmap.deplines <- renderUI({
-        req(input$depmap.gene, depmap.gene)
-        dep.info <- get_depmap_essentiality(input$depmap.gene, depmap.gene)
-        dep.release <- depmap::depmap_release()
-
-        .make_dependency_tag(dep.info, dep.release)
       })
 
-      # Dependency
-      output$depmap.essplot <- renderPlotly({
-        req(input$depmap.gene, depmap.meta)
-        dep.info <- plot_depmap_dependency(input$depmap.gene, depmap.meta, pool)
-      })
+      #--------------DepMap Tab-----------------
+      if (!is.null(depmap.gene)) {
+        output$depmap.deplines <- renderUI({
+          req(input$depmap.gene, depmap.gene)
+          dep.info <- get_depmap_essentiality(input$depmap.gene, depmap.gene)
+          dep.release <- depmap::depmap_release()
 
-      # Expression
-      output$depmap.expplot <- renderPlotly({
-        req(input$depmap.gene, depmap.meta)
-        dep.info <- plot_depmap_expression(input$depmap.gene, depmap.meta, pool)
-      })
+          if (length(sgrna.data()) > 1) {
+            output$sgrna2.summary <- renderDT(server = FALSE, {
+              req(set2.sgrnas)
 
-      # Copy number.
-      output$depmap.cnplot <- renderPlotly({
-        req(input$depmap.gene, depmap.meta)
-        dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)
-      })
+              df <- set2.sgrnas()
+
+              DT::datatable(df,
+                            rownames = FALSE,
+                            filter = "top",
+                            extensions = c("Buttons"),
+                            caption = paste0(input$sgrna.sel2, " sgRNA Summary"),
+                            options = list(
+                              search = list(regex = TRUE),
+                              pageLength = 10,
+                              dom = 'Blfrtip',
+                              buttons = c('copy', 'csv', 'excel', 'pdf', 'print'))
+              ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
+            })
+
+            output$sgrna2.counts <- renderPlotly({
+              req(set2.sgrnas, input$sgrna.gene)
+
+              df <- set2.sgrnas()
+              df <- df[df$Gene == input$sgrna.gene,]
+
+              .make_sgrna_pairplot(df)
+            })
+
+            output$sgrna2.rank <- renderPlotly({
+              req(set2.sgrnas)
+              input$rank.update
+
+              df <- set2.sgrnas()
+
+              hov.info <- c("Gene")
+
+              highlight <- NULL
+              highlight <- df$sgrna[df$Gene == input$sgrna.gene]
+
+              .make_rank(df = df,
+                         ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
+                         y.thresh = 0,
+                         y.lines = FALSE,
+                         sig.thresh = 0,
+                         h.id = h.id,
+                         h.id.suffix = "_sgrank1",
+                         sig.term = "FDR",
+                         y.term = "LFC",
+                         x.term = "Rank",
+                         feat.term = "sgrna",
+                         hover.info = hov.info,
+                         fs = NULL,
+                         up.color = "#A6A6A6",
+                         down.color = "#A6A6A6",
+                         insig.color = "#A6A6A6",
+                         sig.opacity = 1,
+                         insig.opacity = 1,
+                         sig.size = 5,
+                         insig.size = 5,
+                         label.size = 8,
+                         webgl = TRUE,
+                         webgl.ratio = 7,
+                         show.counts = FALSE,
+                         show.hl.counts = FALSE,
+                         counts.size = 8,
+                         highlight.featsets = NULL,
+                         highlight.feats = highlight,
+                         featsets = NULL,
+                         highlight.feats.color = "red",
+                         highlight.feats.size = 8,
+                         highlight.feats.opac = 1,
+                         highlight.feats.linecolor = "black",
+                         highlight.feats.linewidth = 0.5,
+                         highlight.featsets.color = "#A6A6A6",
+                         highlight.featsets.size = 7,
+                         highlight.featsets.opac = 1,
+                         highlight.featsets.linecolor = "black",
+                         highlight.featsets.linewidth = 0.5)
+            })
+
+            output$sgrna2.detail <- renderDT({
+              req(set2.sgrnas, input$sgrna.gene)
+
+              df <- set2.sgrnas()
+              df <- df[df$Gene == input$sgrna.gene,]
+
+              target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
+
+              DT::datatable(df,
+                            rownames = FALSE,
+                            filter = "top",
+                            extensions = c("Buttons"),
+                            caption = paste0(input$sgrna.sel2, " ", input$sgrna.gene, " sgRNA Details"),
+                            options = list(
+                              pageLength = 10,
+                              dom = 'Blfrtip',
+                              buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                              columnDefs = list(list(visible = FALSE, targets = target)
+                              )
+                            )
+              ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
+            }
+            )
+          }
+        }
+        )
+
+        #--------------DepMap Tab-----------------
+
+        # Copy number.
+        output$depmap.cnplot <- renderPlotly({
+          req(input$depmap.gene, depmap.meta)
+          dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)
+        })
+      }
     }
+    )
   }
-  
+
   if (return.app) {
     shinyApp(ui, server)
   } else {
