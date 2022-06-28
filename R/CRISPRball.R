@@ -59,6 +59,23 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                        positive.ctrl.genes = NULL, essential.genes = NULL,
                        depmap.db = NULL, genesets = NULL, return.app = TRUE) {
 
+  # Set initial metadata and dataset choices if input data isn't NULL.
+  gene.choices <- NULL
+  sgrna.choices <- NULL
+  summ.choices <- NULL
+  
+  if (!is.null(gene.data)) {
+    gene.choices <- names(gene.data)
+  }
+  
+  if (!is.null(sgrna.data)) {
+    sgrna.choices <- names(sgrna.data)
+  }
+  
+  if (!is.null(count.summary)) {
+    summ.choices <- colnames(count.summary)
+  }
+  
   # Load cell line metadata and gene summaries if depmap db provided.
   if (!is.null(depmap.db)) {
     .error_if_no_pool()
@@ -137,22 +154,21 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     ),
     tabPanel(
       title = "Data Upload",
-      id = 'upload',
+      id = "upload",
       wellPanel(
-        h3('Count Files'),
-        # fileInput("countFile", "Choose Count File (Raw)", multiple=F, accept = ".txt"),
+        h3("Count Files"),
         fileInput("countNormFile", "Choose Normalized Count File", multiple=FALSE, accept = ".txt"),
         fileInput("countSummary", "Choose Count Summary File", multiple=FALSE, accept = ".txt"),
       ),
       br(),
       wellPanel(
-        h3('Gene and sgRNA Summary Files'),
+        h3("Gene and sgRNA Summary Files"),
         fileInput("geneSummaryFiles", "Choose Gene Summary File(s)", multiple=TRUE, accept = ".txt"),
         fileInput("sgrnaSummaryFiles", "Choose sgRNA Summary File(s)", multiple=TRUE, accept = ".txt"),
       ),
     ),
     tabPanel(title = "QC",
-             id = 'qc',
+             id = "qc",
              sidebarLayout(
                sidebarPanel(
                  width = 2,
@@ -196,10 +212,10 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                      "Filter PCA samples to those in metadata table.", "right", options = list(container = "body")),
                               fluidRow(
                                 column(6, tipify(selectizeInput("bip.color", "Color by:",
-                                                                choices = NULL),
+                                                                choices = summ.choices),
                                                  "Metadata variable by which samples are colored.", "right", options = list(container = "body"))),
                                 column(6, tipify(selectizeInput("bip.shape", "Shape by:",
-                                                                choices = NULL),
+                                                                choices = summ.choices),
                                                  "Metadata variable by which samples are shaped.", "right", options = list(container = "body")))
                               ),
                               fluidRow(
@@ -275,12 +291,12 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
              )
     ),
     tabPanel(title = "QC Table",
-             id = 'qc-table',
+             id = "qc-table",
              br(),
              DTOutput("count.summary")
     ),
     tabPanel(title = "Gene (Overview)",
-             id = 'gene-overview',
+             id = "gene-overview",
              sidebarLayout(
                sidebarPanel(
                  width = 2,
@@ -289,13 +305,13 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  div(
                    fluidRow(
                      column(6,
-                            tipify(selectizeInput("gene.sel1", "Dataset 1:", choices = NULL),
+                            tipify(selectizeInput("gene.sel1", "Dataset 1:", choices = gene.choices),
                                    "Dataset shown in top row.", "right", options = list(container = "body")),
                             numericInput("gene.fdr.th", "FDR threshold:",
                                          min = 0, max = 1, step = 0.01, value = 0.05)
                      ),
                      column(6,
-                            tipify(selectizeInput("gene.sel2", "Dataset 2:", choices = NULL),
+                            tipify(selectizeInput("gene.sel2", "Dataset 2:", choices = gene.choices),
                                    "Dataset shown in bottom row.", "right", options = list(container = "body")),
                             numericInput("gene.lfc.th", "log2FC threshold:",
                                          min = 0, max = Inf, step = 0.05, value = 0.5)
@@ -518,11 +534,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  div(
                    fluidRow(
                      column(6,
-                            tipify(selectizeInput("sgrna.sel1", "Dataset 1:", choices = NULL),
+                            tipify(selectizeInput("sgrna.sel1", "Dataset 1:", choices = sgrna.choices),
                                    "Dataset shown in top row.", "right", options = list(container = "body"))
                      ),
                      column(6,
-                            tipify(selectizeInput("sgrna.sel2", "Dataset 2:", choices = NULL),
+                            tipify(selectizeInput("sgrna.sel2", "Dataset 2:", choices = sgrna.choices),
                                    "Dataset shown in bottom row.", "right", options = list(container = "body"))
                      )
                    ),
@@ -587,16 +603,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  h4("Plot Controls"),
                  hr(),
                  div(
-                   fluidRow(
-                     column(6,
-                            tipify(selectizeInput("depmap.sel1", "Dataset 1:", choices = NULL),
-                                   "Dataset shown in top row.", "right", options = list(container = "body"))
-                     ),
-                     column(6,
-                            tipify(selectizeInput("depmap.sel2", "Dataset 2:", choices = NULL),
-                                   "Dataset shown in bottom row.", "right", options = list(container = "body"))
-                     )
-                   ),
                    fluidRow(
                      column(12,
                             pickerInput("depmap.gene", "Choose gene:", choices = unique(c(sgrna.data[[1]]$Gene)),
@@ -750,7 +756,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     observeEvent(input$countNormFile, {
       new.data <- read.delim(input$countNormFile$datapath)
       norm.counts(new.data)
-      if (!is.null(norm.counts)) {
+      if (!is.null(norm.counts())) {
         js$enableTab('QC')
         js$enableTab('QC Table')
         updateSelectizeInput(session, 'bip.color', choices = c('', colnames(count.summary())), server = TRUE)
@@ -814,7 +820,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # Populate UI with all PCs.
     # TODO: Write check for only 2 PCs.
-
     output$pca.comps <- renderUI({
       req(pc)
       pcs <- pc()
@@ -1923,24 +1928,32 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     output$sgrna1.detail <- renderDT({
       req(set1.sgrnas, input$sgrna.gene)
-
+      
       df <- set1.sgrnas()
       df <- df[df$Gene == input$sgrna.gene,]
+      
+      target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
+      
+      DT::datatable(df,
+                    rownames = FALSE,
+                    filter = "top",
+                    extensions = c("Buttons"),
+                    caption = paste0(input$sgrna.sel1, " ", input$sgrna.gene, " sgRNA Details"),
+                    options = list(
+                      pageLength = 10,
+                      dom = 'Blfrtip',
+                      buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+                      columnDefs = list(list(visible = FALSE, targets = target)))
+      ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
+    })
 
+    observe({
       if (length(sgrna.data()) > 1) {
-        set2.sgrnas <- reactive({
-          df <- sgrna.data()[[input$sgrna.sel2]]
-          df$Rank <- rank(df$LFC)
-          df
-        })
-      }
-
-      observe({if (length(sgrna.data()) > 1) {
         output$sgrna2.summary <- renderDT(server = FALSE, {
           req(set2.sgrnas)
-
+  
           df <- set2.sgrnas()
-
+  
           DT::datatable(df,
                         rownames = FALSE,
                         filter = "top",
@@ -1953,27 +1966,27 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                           buttons = c('copy', 'csv', 'excel', 'pdf', 'print'))
           ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
         })
-
+  
         output$sgrna2.counts <- renderPlotly({
           req(set2.sgrnas, input$sgrna.gene)
-
+  
           df <- set2.sgrnas()
           df <- df[df$Gene == input$sgrna.gene,]
-
+  
           .make_sgrna_pairplot(df)
         })
-
+  
         output$sgrna2.rank <- renderPlotly({
           req(set2.sgrnas)
           input$rank.update
-
+  
           df <- set2.sgrnas()
-
+  
           hov.info <- c("Gene")
-
+  
           highlight <- NULL
           highlight <- df$sgrna[df$Gene == input$sgrna.gene]
-
+  
           .make_rank(df = df,
                      ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
                      y.thresh = 0,
@@ -2014,15 +2027,15 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                      highlight.featsets.linecolor = "black",
                      highlight.featsets.linewidth = 0.5)
         })
-
+  
         output$sgrna2.detail <- renderDT({
           req(set2.sgrnas, input$sgrna.gene)
-
+  
           df <- set2.sgrnas()
           df <- df[df$Gene == input$sgrna.gene,]
-
+  
           target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
-
+  
           DT::datatable(df,
                         rownames = FALSE,
                         filter = "top",
@@ -2036,132 +2049,32 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
           ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
         })
       }
+    })
+
+    #--------------DepMap Tab-----------------
+    if (!is.null(depmap.gene)) {
+      output$depmap.deplines <- renderUI({
+        req(input$depmap.gene, depmap.gene)
+        dep.info <- get_depmap_essentiality(input$depmap.gene, depmap.gene)
+        dep.release <- depmap::depmap_release()
+        .make_dependency_tag(dep.info, dep.release)
       })
-
-      #--------------DepMap Tab-----------------
-      if (!is.null(depmap.gene)) {
-        output$depmap.deplines <- renderUI({
-          req(input$depmap.gene, depmap.gene)
-          dep.info <- get_depmap_essentiality(input$depmap.gene, depmap.gene)
-          dep.release <- depmap::depmap_release()
-
-          if (length(sgrna.data()) > 1) {
-            output$sgrna2.summary <- renderDT(server = FALSE, {
-              req(set2.sgrnas)
-
-              df <- set2.sgrnas()
-
-              DT::datatable(df,
-                            rownames = FALSE,
-                            filter = "top",
-                            extensions = c("Buttons"),
-                            caption = paste0(input$sgrna.sel2, " sgRNA Summary"),
-                            options = list(
-                              search = list(regex = TRUE),
-                              pageLength = 10,
-                              dom = 'Blfrtip',
-                              buttons = c('copy', 'csv', 'excel', 'pdf', 'print'))
-              ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
-            })
-
-            output$sgrna2.counts <- renderPlotly({
-              req(set2.sgrnas, input$sgrna.gene)
-
-              df <- set2.sgrnas()
-              df <- df[df$Gene == input$sgrna.gene,]
-
-              .make_sgrna_pairplot(df)
-            })
-
-            output$sgrna2.rank <- renderPlotly({
-              req(set2.sgrnas)
-              input$rank.update
-
-              df <- set2.sgrnas()
-
-              hov.info <- c("Gene")
-
-              highlight <- NULL
-              highlight <- df$sgrna[df$Gene == input$sgrna.gene]
-
-              .make_rank(df = df,
-                         ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
-                         y.thresh = 0,
-                         y.lines = FALSE,
-                         sig.thresh = 0,
-                         h.id = h.id,
-                         h.id.suffix = "_sgrank1",
-                         sig.term = "FDR",
-                         y.term = "LFC",
-                         x.term = "Rank",
-                         feat.term = "sgrna",
-                         hover.info = hov.info,
-                         fs = NULL,
-                         up.color = "#A6A6A6",
-                         down.color = "#A6A6A6",
-                         insig.color = "#A6A6A6",
-                         sig.opacity = 1,
-                         insig.opacity = 1,
-                         sig.size = 5,
-                         insig.size = 5,
-                         label.size = 8,
-                         webgl = TRUE,
-                         webgl.ratio = 7,
-                         show.counts = FALSE,
-                         show.hl.counts = FALSE,
-                         counts.size = 8,
-                         highlight.featsets = NULL,
-                         highlight.feats = highlight,
-                         featsets = NULL,
-                         highlight.feats.color = "red",
-                         highlight.feats.size = 8,
-                         highlight.feats.opac = 1,
-                         highlight.feats.linecolor = "black",
-                         highlight.feats.linewidth = 0.5,
-                         highlight.featsets.color = "#A6A6A6",
-                         highlight.featsets.size = 7,
-                         highlight.featsets.opac = 1,
-                         highlight.featsets.linecolor = "black",
-                         highlight.featsets.linewidth = 0.5)
-            })
-
-            output$sgrna2.detail <- renderDT({
-              req(set2.sgrnas, input$sgrna.gene)
-
-              df <- set2.sgrnas()
-              df <- df[df$Gene == input$sgrna.gene,]
-
-              target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
-
-              DT::datatable(df,
-                            rownames = FALSE,
-                            filter = "top",
-                            extensions = c("Buttons"),
-                            caption = paste0(input$sgrna.sel2, " ", input$sgrna.gene, " sgRNA Details"),
-                            options = list(
-                              pageLength = 10,
-                              dom = 'Blfrtip',
-                              buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
-                              columnDefs = list(list(visible = FALSE, targets = target)
-                              )
-                            )
-              ) %>% DT::formatStyle(0, target = "row", lineHeight = '50%')
-            }
-            )
-          }
-        }
-        )
-
-        #--------------DepMap Tab-----------------
-
-        # Copy number.
-        output$depmap.cnplot <- renderPlotly({
-          req(input$depmap.gene, depmap.meta)
-          dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)
-        })
-      }
+      # Dependency
+      output$depmap.essplot <- renderPlotly({
+        req(input$depmap.gene, depmap.meta)
+        dep.info <- plot_depmap_dependency(input$depmap.gene, depmap.meta, pool)
+      })
+      # Expression
+      output$depmap.expplot <- renderPlotly({
+        req(input$depmap.gene, depmap.meta)
+        dep.info <- plot_depmap_expression(input$depmap.gene, depmap.meta, pool)
+      })
+      # Copy number.
+      output$depmap.cnplot <- renderPlotly({
+        req(input$depmap.gene, depmap.meta)
+        dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)
+      })
     }
-    )
   }
 
   if (return.app) {
