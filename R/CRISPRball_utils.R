@@ -15,20 +15,7 @@ shinyjs.enableTab = function(name) {
 }
 "
 
-# .count_norm_ingress <- function(fileList) {
-#  out <- read.delim(fileList$datapath)
-#  # names(out) <- sapply(fileList$name, gsub, pattern='.count_normalized.txt', replacement='', fixed=TRUE)
-#  # browser()
-#  return(out)
-# }
-# 
-# .count_summ_ingress <- function(fileList) {
-#  out <- unlist(lapply(fileList$datapath, read.table, sep = '\t', header = TRUE))
-#  # names(out) <- sapply(fileList$name, gsub, pattern='.countsummary.txt', replacement='', fixed=TRUE)
-#  return(out)
-# }
-
-# TODO: These still need testing/tweaks.
+# File upload ingress to appropriate named list structure.
 .gene_summ_ingress <- function(fileList) {
   out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
   names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', replacement='', fixed=TRUE)
