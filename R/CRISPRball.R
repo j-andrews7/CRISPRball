@@ -14,7 +14,7 @@
 #' @import DT
 #' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations config toRGB event_data
 #' @import ggplot2
-#' @importFrom shinyWidgets prettyCheckbox dropdownButton tooltipOptions pickerInput
+#' @importFrom shinyWidgets prettyCheckbox dropdownButton tooltipOptions pickerInput updatePickerInput
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable
 #' @importFrom shinyjs show useShinyjs hidden disable click extendShinyjs js
@@ -66,6 +66,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
   gene.choices <- NULL
   sgrna.choices <- NULL
   summ.choices <- NULL
+  sgrna.gene <- NULL
   
   if (!is.null(gene.data)) {
     gene.choices <- names(gene.data)
@@ -73,6 +74,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
   
   if (!is.null(sgrna.data)) {
     sgrna.choices <- names(sgrna.data)
+    sgrna.gene <- unique(c(sgrna.data[[1]]$Gene))
   }
   
   if (!is.null(count.summary)) {
@@ -549,7 +551,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                    ),
                    fluidRow(
                      column(12,
-                            pickerInput("sgrna.gene", "Choose gene:", choices = unique(c(sgrna.data[[1]]$Gene)),
+                            pickerInput("sgrna.gene", "Choose gene:", choices = sgrna.gene,
                                         multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE))
                      )
                    ),
@@ -722,7 +724,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
 
     # -----------Loading Files In----------------
-
+    # Update inputs and data reactives as necessary.
     observeEvent(input$geneSummaryFiles, {
       new.data <- .gene_summ_ingress(input$geneSummaryFiles)
       gene.data(new.data)
@@ -742,10 +744,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         js$enableTab('sgRNA Summary Tables')
         updateSelectizeInput(session, 'sgrna.sel1', choices = names(sgrna.data()), server = TRUE)
         updateSelectizeInput(session, 'sgrna.sel2', choices = names(sgrna.data()), server = TRUE)
-        if (!is.null(depmap.db)) {
-          updateSelectizeInput(session, 'depmap.sel1', choices = names(sgrna.data()), server = TRUE)
-          updateSelectizeInput(session, 'depmap.sel2', choices = names(sgrna.data()), server = TRUE)
-        }
+        updatePickerInput(session, 'sgrna.gene', choices = unique(c(sgrna.data()[[1]]$Gene)))
       }
     })
 

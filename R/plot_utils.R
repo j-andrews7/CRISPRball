@@ -718,7 +718,9 @@
 # sgRNA pair plot.
 .make_sgrna_pairplot <- function(df) {
   gene <- df$Gene[1]
-  df <- data.frame(group = c(rep("control", nrow(df)), rep("treatment", nrow(df))), counts = c(df$control_count, df$treatment_count), id = rep(df$sgrna, 2))
+  df <- data.frame(group = c(rep("control", nrow(df)), rep("treatment", nrow(df))), 
+                   counts = c(df$control_count, df$treatment_count), id = rep(df$sgrna, 2))
+  
   df$hover.string <- paste0("</br><b>Control counts:</b> ", df$counts[df$group == "control"],
                             "</br><b>Treatment counts:</b> ", df$counts[df$group == "treatment"],
                             "</br><b>sgRNA:</b> ", df$id)
@@ -919,14 +921,14 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool) {
   }
 }
 
-#' Plot selected information across lineages from DepMap.
-#' 
-#' @inheritParams plot_depmap_dependency
-#' @param data.type One of "crispr", "rnai", "cn", or "ccle_tpm".
-#' @return plotly object
-#'   
-#' @export
-#' @author Jared Andrews  
+# #' Plot selected information across lineages from DepMap.
+# #' 
+# #' @inheritParams plot_depmap_dependency
+# #' @param data.type One of "crispr", "rnai", "cn", or "ccle_tpm".
+# #' @return plotly object
+# #' 
+# #' @export
+# #' @author Jared Andrews
 # plot_depmap_lineages <- function(gene, data.type, depmap.meta, depmap.pool) {
 #   
 #   data.type <- match.arg(data.type, c("crispr", "rnai", "cn", "ccle_tpm"), several.ok = FALSE)
