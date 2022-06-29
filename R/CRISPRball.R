@@ -1098,14 +1098,14 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # Load the gene summaries for easy plotting.
     set1.genes <- reactive({
       df <- gene.data()[[input$gene.sel1]]
-      .gene_ingress(df, sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
+      .gene_ingress(df, sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
                     positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene)
     })
 
     set2.genes <- reactive({
       if (length(gene.data()) > 1) {
         df <- gene.data()[[input$gene.sel2]]
-        .gene_ingress(df, sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
+        .gene_ingress(df, sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
                       positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene)
       }
     })
