@@ -59,6 +59,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                        positive.ctrl.genes = NULL, essential.genes = NULL,
                        depmap.db = NULL, genesets = NULL, return.app = TRUE) {
 
+  # Increase file upload size limit to 50MB, which should cover pretty much any use case.
+  options(shiny.maxRequestSize = 50*1024^2)
+  
   # Set initial metadata and dataset choices if input data isn't NULL.
   gene.choices <- NULL
   sgrna.choices <- NULL
@@ -232,9 +235,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                               "Plot top PCA loadings for each PC.", "right", options = list(container = "body")
                                        )
                                 ),
-                                tipify(numericInput("bip.n.loadings", "Loadings:",
-                                                    min = 0, max = 100, step = 1, value = 5),
-                                       "Number of PCA loadings to plot (if checked).", "right", options = list(container = "body")
+                                column(12,
+                                  tipify(numericInput("bip.n.loadings", "Loadings:",
+                                                      min = 0, max = 100, step = 1, value = 5),
+                                         "Number of PCA loadings to plot (if checked).", "right", options = list(container = "body")
+                                  )
                                 ),
                                 div(actionButton("pca.update", "Update PCA"), align = "center")
                               )
