@@ -762,7 +762,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       norm.counts(new.data)
       if (!is.null(norm.counts())) {
         js$enableTab('QC')
-        js$enableTab('QC Table')
         updateSelectizeInput(session, 'bip.color', choices = c('', colnames(count.summary())), server = TRUE)
         updateSelectizeInput(session, 'bip.shape', choices = c('', colnames(count.summary())), server = TRUE)
       }
