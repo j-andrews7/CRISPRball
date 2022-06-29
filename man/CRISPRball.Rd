@@ -5,10 +5,10 @@
 \title{Create an interactive Shiny app for visualization & exploration of MAGeCK RRA CRISPR analyses}
 \usage{
 CRISPRball(
-  gene.data,
-  sgrna.data,
-  count.summary,
-  norm.counts,
+  gene.data = NULL,
+  sgrna.data = NULL,
+  count.summary = NULL,
+  norm.counts = NULL,
   h.id = "mag1",
   positive.ctrl.genes = NULL,
   essential.genes = NULL,

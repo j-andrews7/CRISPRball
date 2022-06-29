@@ -1,3 +1,33 @@
+.utils.js <- "
+shinyjs.disableTab = function(name) {
+  var tab = $('.nav.navbar-nav li a[data-value=\"' + name + '\"]');
+  tab.bind('click.tab', function(e) {
+    e.preventDefault();
+    return false;
+  });
+  tab.addClass('disabled');
+}
+
+shinyjs.enableTab = function(name) {
+  var tab = $('.nav.navbar-nav li a[data-value=\"' + name + '\"]');
+  tab.unbind('click.tab');
+  tab.removeClass('disabled');
+}
+"
+
+# File upload ingress to appropriate named list structure.
+.gene_summ_ingress <- function(fileList) {
+  out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
+  names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', replacement='', fixed=TRUE)
+  return(out)
+}
+
+.sgrna_summ_ingress <- function(fileList) {
+  out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
+  names(out) <- sapply(fileList$name, gsub, pattern='.sgrna_summary.txt', replacement='', fixed=TRUE)
+  return(out)
+}
+
 # Generate easier columns for plotting for various data summaries.
 .gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL, essential.genes = NULL, depmap.genes = NULL) {
 
@@ -10,20 +40,20 @@
   }
 
   if (!is.null(depmap.genes)) {
-    df$DepMap_CRISPR_Essential <- df$id %in% 
-      depmap.genes$gene_name[depmap.genes$dataset %in% 
+    df$DepMap_CRISPR_Essential <- df$id %in%
+      depmap.genes$gene_name[depmap.genes$dataset %in%
                                c("Chronos_Combined", "Chronos_Score", "Chronos_Achilles") &
                                depmap.genes$common_essential == TRUE]
-    
-    df$DepMap_CRISPR_Selective <- df$id %in% 
-      depmap.genes$gene_name[depmap.genes$dataset %in% 
+
+    df$DepMap_CRISPR_Selective <- df$id %in%
+      depmap.genes$gene_name[depmap.genes$dataset %in%
                                c("Chronos_Combined", "Chronos_Score", "Chronos_Achilles") &
                                depmap.genes$strongly_selective == TRUE]
 
     df$DepMap_RNAi_Essential <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
-                                                               depmap.genes$common_essential == TRUE]
+                                                                    depmap.genes$common_essential == TRUE]
     df$DepMap_RNAi_Selective <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
-                                                               depmap.genes$strongly_selective == TRUE]
+                                                                    depmap.genes$strongly_selective == TRUE]
   }
 
   df$LFC <- as.numeric(df$`neg|lfc`)
