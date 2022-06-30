@@ -136,6 +136,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
           .selectize-control {
             margin-bottom: 0px;
           }
+          .btn-file {
+            padding: 1px 12px;
+          }
           body {
             line-height: 1.1;
           }
@@ -157,21 +160,28 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
           }
         "))
     ),
+    # ---------------Data Upload-----------------
     tabPanel(
       title = "Data Upload",
       id = "upload",
-      wellPanel(
-        h3("Count Files"),
-        fileInput("countNormFile", "Choose Normalized Count File", multiple=FALSE, accept = ".txt"),
-        fileInput("countSummary", "Choose Count Summary File", multiple=FALSE, accept = ".txt"),
-      ),
-      br(),
-      wellPanel(
-        h3("Gene and sgRNA Summary Files"),
-        fileInput("geneSummaryFiles", "Choose Gene Summary File(s)", multiple=TRUE, accept = ".txt"),
-        fileInput("sgrnaSummaryFiles", "Choose sgRNA Summary File(s)", multiple=TRUE, accept = ".txt"),
+      fluidRow(
+        column(6,
+          wellPanel(
+            h3("Count Files"),
+            fileInput("countNormFile", "Choose Normalized Count File", multiple=FALSE, accept = ".txt"),
+            fileInput("countSummary", "Choose Count Summary File", multiple=FALSE, accept = ".txt"),
+          )
+        ),
+        column(6,
+          wellPanel(
+            h3("Gene and sgRNA Summary Files"),
+            fileInput("geneSummaryFiles", "Choose Gene Summary File(s)", multiple=TRUE, accept = ".txt"),
+            fileInput("sgrnaSummaryFiles", "Choose sgRNA Summary File(s)", multiple=TRUE, accept = ".txt"),
+          )
+        )
       ),
     ),
+    # ----------------QC--------------------
     tabPanel(title = "QC",
              id = "qc",
              sidebarLayout(
@@ -297,11 +307,13 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                )
              )
     ),
+    # -------------------QC Table----------------
     tabPanel(title = "QC Table",
              id = "qc-table",
              br(),
              DTOutput("count.summary")
     ),
+    # ------------------Gene (Overview)-------------
     tabPanel(title = "Gene (Overview)",
              id = "gene-overview",
              sidebarLayout(
@@ -524,6 +536,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                )
              )
     ),
+    # ----------------Gene Summary Tables--------------
     tabPanel(title = "Gene Summary Tables",
              id = 'gene-summ',
              br(),
@@ -531,6 +544,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
              br(),
              div(DT::dataTableOutput("gene2.summary"), style = "font-size:80%;")
     ),
+    # ----------------sgRNA---------------------
     tabPanel(title = "sgRNA",
              id = 'sgrna',
              sidebarLayout(
@@ -595,6 +609,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                )
              )
     ),
+    # --------------------sgRNA Summary Tables----------------
     tabPanel(title = "sgRNA Summary Tables",
              id = 'sgrna-tables',
              br(),
@@ -602,6 +617,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
              br(),
              div(DT::dataTableOutput("sgrna2.summary"), style = "font-size:80%;")
     ),
+    # -----------------DepMap-------------------
     tabPanel(title = "DepMap",
              id = 'depmap',
              sidebarLayout(
