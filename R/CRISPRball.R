@@ -770,6 +770,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       if (!is.null(count.summary())) {
         js$enableTab('QC')
         js$enableTab('QC Table')
+        updateSelectizeInput(session, 'bip.color', choices = c('', colnames(count.summary())), server = TRUE)
+        updateSelectizeInput(session, 'bip.shape', choices = c('', colnames(count.summary())), server = TRUE)
       }
     })
 
@@ -778,8 +780,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       norm.counts(new.data)
       if (!is.null(norm.counts())) {
         js$enableTab('QC')
-        updateSelectizeInput(session, 'bip.color', choices = c('', colnames(count.summary())), server = TRUE)
-        updateSelectizeInput(session, 'bip.shape', choices = c('', colnames(count.summary())), server = TRUE)
       }
     })
 
@@ -800,7 +800,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       slmat <- as.matrix(slmed[,c(-1,-2)])
       mat <- log2(slmat+1)
       rownames(mat) <- slmed$sgRNA
-
+  
       req(input$var.remove)
       meta <- count.summary()
 
@@ -811,7 +811,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       }
 
       rownames(meta) <- gsub("-", ".", meta$Label)
-
+      
       # Remove guides with no variance in counts, as they break the PCA.
       mat <- mat[(rowMaxs(mat) - rowMins(mat) > 0),]
 
@@ -823,6 +823,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       } else {
         var.remove <- input$var.remove
       }
+      
+      meta <- meta[colnames(mat),]
 
       if (ncol(mat) > 1) {
 

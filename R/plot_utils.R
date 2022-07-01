@@ -719,7 +719,7 @@
 .make_sgrna_pairplot <- function(df) {
   gene <- df$Gene[1]
   df <- data.frame(group = c(rep("control", nrow(df)), rep("treatment", nrow(df))), 
-                   counts = c(df$control_count, df$treatment_count), id = rep(df$sgrna, 2))
+                   counts = c(df$control_mean, df$treatment_mean), id = rep(df$sgrna, 2))
   
   df$hover.string <- paste0("</br><b>Control counts:</b> ", df$counts[df$group == "control"],
                             "</br><b>Treatment counts:</b> ", df$counts[df$group == "treatment"],
