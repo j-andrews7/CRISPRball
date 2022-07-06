@@ -182,531 +182,623 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       ),
     ),
     # ----------------QC--------------------
-    tabPanel(title = "QC",
-             id = "qc",
-             sidebarLayout(
-               sidebarPanel(
-                 width = 2,
-                 h4("Plot Controls"),
-                 hr(),
-                 bsCollapse(open = "pca.settings",
-                            bsCollapsePanel(
-                              title = span(icon("plus"), "PCA Settings"), value = "pca.settings", style = "info",
-                              uiOutput("pca.comps"),
-                              conditionalPanel(
-                                condition = "input['keep.top.n'] == false",
-                                numericInput("var.remove", "Remove this proportion of features ranked by variance:",
-                                             min = 0, max = 1, step = 0.01, value = 0)
-                              ),
-                              conditionalPanel(
-                                condition = "input['keep.top.n'] == true",
-                                numericInput("var.n.keep", "Number of features to retain by variance:",
-                                             min = 2, max = Inf, step = 1, value = 500)
-                              ),
-                              fluidRow(
-                                column(6,
-                                       tipify(prettyCheckbox("center", strong("Center data"), TRUE, bigger = FALSE,
-                                                             animation = "smooth", status = "success",
-                                                             icon = icon("check"), width = "100%"),
-                                              "Zero center the data before performing PCA.", "right", options = list(container = "body")),
-                                       tipify(prettyCheckbox("keep.top.n", strong("Limit by top N features"), FALSE, bigger = FALSE,
-                                                             animation = "smooth", status = "success",
-                                                             icon = icon("check"), width = "100%"),
-                                              "Limit PCA to top N features ranked by variance.", "right", options = list(container = "body"))
-                                ),
-                                column(6,
-                                       tipify(prettyCheckbox("scale", strong("Scale data"), TRUE, bigger = FALSE,
-                                                             animation = "smooth", status = "success",
-                                                             icon = icon("check"), width = "100%"),
-                                              "Scale the data to have unit variance before performing PCA.", "right", options = list(container = "body"))
-                                )
-                              ),
-                              tipify(prettyCheckbox("meta.filt", strong("Filter via metadata table"), TRUE, bigger = FALSE,
-                                                    animation = "smooth", status = "success",
-                                                    icon = icon("check"), width = "100%"),
-                                     "Filter PCA samples to those in metadata table.", "right", options = list(container = "body")),
-                              fluidRow(
-                                column(6, tipify(selectizeInput("bip.color", "Color by:",
-                                                                choices = summ.choices),
-                                                 "Metadata variable by which samples are colored.", "right", options = list(container = "body"))),
-                                column(6, tipify(selectizeInput("bip.shape", "Shape by:",
-                                                                choices = summ.choices),
-                                                 "Metadata variable by which samples are shaped.", "right", options = list(container = "body")))
-                              ),
-                              fluidRow(
-                                column(6,
-                                       tipify(prettyCheckbox("bip.twod", strong("Limit to 2D"), TRUE, bigger = FALSE,
-                                                             animation = "smooth", status = "success",
-                                                             icon = icon("check"), width = "100%"),
-                                              "Limit PCA biplot to 2D.", "right", options = list(container = "body"))
-                                ),
-                                column(6,
-                                       tipify(prettyCheckbox("bip.loadings", strong("Plot Loadings"), FALSE, bigger = FALSE,
-                                                             animation = "smooth", status = "success",
-                                                             icon = icon("check"), width = "100%"),
-                                              "Plot top PCA loadings for each PC.", "right", options = list(container = "body")
-                                       )
-                                ),
-                                column(12,
-                                  tipify(numericInput("bip.n.loadings", "Loadings:",
-                                                      min = 0, max = 100, step = 1, value = 5),
-                                         "Number of PCA loadings to plot (if checked).", "right", options = list(container = "body")
-                                  )
-                                ),
-                                div(actionButton("pca.update", "Update PCA"), align = "center")
-                              )
-                            )
-                 )
-               ),
-               mainPanel(
-                 width = 10,
-                 fluidRow(
-                   column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Gini Index",
-                                      c("This plot shows the gini index for each sample, ",
-                                        "which is a measure of read count inequality between guides. ",
-                                        "For initial timepoints and early passages, this should usually be <0.1, ",
-                                        "but should increase as selection occurs."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotlyOutput("qc.gini"))),
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Read Distributions",
-                                      c("This plot shows the read distribution across guides for each sample. ",
-                                        "The distribution should be normal and relatively tight for initial ",
-                                        "timepoints and early passages. As selection occurs, the ",
-                                        "distribution will begin to spread, and there may be buildup at the extremes."),
-                                      placement = "top", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotOutput("qc.histplot")))
-                   ),
-                   column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Zero Count gRNAs",
-                                      c("This plot shows the number of guides with zero reads for each sample. ",
-                                        "For early passages and initial timepoints, this count should ideally be zero ",
-                                        "but should increase as selection occurs. Useful for assessing library quality."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotlyOutput("qc.missed"))),
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Sample Correlations",
-                                      c("This plot shows correlation between samples. Typically, initial timepoints ",
-                                        "and early passages, even from different tissues or conditions, correlate well, ",
-                                        "but diverge more and more as selection occurs."),
-                                      placement = "top", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotOutput("qc.corr")))
-                   ),
-                   column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Mapping Rates",
-                                      c("This plot shows read mapping rates for each sample. 50-75% mapped is typical."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotOutput("qc.map"))),
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Principal Componenet Analysis",
-                                      c("This biplot shows two (or three) PCs from a principal component analysis. ",
-                                        "For initial timepoints, libraries should be nearly identical, even for different tissues or cell lines. ",
-                                        "As selection occurs, samples should diverge."),
-                                      placement = "top", trigger = "hover", options = list(container = "body")),
-                               withSpinner(jqui_resizable(plotlyOutput("qc.pca")))),
-                   )
-                 )
-               )
-             )
+    tabPanel(
+      title = "QC",
+      id = "qc",
+      sidebarLayout(
+       sidebarPanel(
+         width = 2,
+         h4("Plot Controls"),
+         hr(),
+         bsCollapse(open = "pca.settings",
+                    bsCollapsePanel(
+                      title = span(icon("plus"), "PCA Settings"), value = "pca.settings", style = "info",
+                      uiOutput("pca.comps"),
+                      conditionalPanel(
+                        condition = "input['keep.top.n'] == false",
+                        numericInput("var.remove", "Remove this proportion of features ranked by variance:",
+                                     min = 0, max = 1, step = 0.01, value = 0)
+                      ),
+                      conditionalPanel(
+                        condition = "input['keep.top.n'] == true",
+                        numericInput("var.n.keep", "Number of features to retain by variance:",
+                                     min = 2, max = Inf, step = 1, value = 500)
+                      ),
+                      fluidRow(
+                        column(6,
+                               tipify(prettyCheckbox("center", strong("Center data"), TRUE, bigger = FALSE,
+                                                     animation = "smooth", status = "success",
+                                                     icon = icon("check"), width = "100%"),
+                                      "Zero center the data before performing PCA.", "right", options = list(container = "body")),
+                               tipify(prettyCheckbox("keep.top.n", strong("Limit by top N features"), FALSE, bigger = FALSE,
+                                                     animation = "smooth", status = "success",
+                                                     icon = icon("check"), width = "100%"),
+                                      "Limit PCA to top N features ranked by variance.", "right", options = list(container = "body"))
+                        ),
+                        column(6,
+                               tipify(prettyCheckbox("scale", strong("Scale data"), TRUE, bigger = FALSE,
+                                                     animation = "smooth", status = "success",
+                                                     icon = icon("check"), width = "100%"),
+                                      "Scale the data to have unit variance before performing PCA.", "right", options = list(container = "body"))
+                        )
+                      ),
+                      tipify(prettyCheckbox("meta.filt", strong("Filter via metadata table"), TRUE, bigger = FALSE,
+                                            animation = "smooth", status = "success",
+                                            icon = icon("check"), width = "100%"),
+                             "Filter PCA samples to those in metadata table.", "right", options = list(container = "body")),
+                      fluidRow(
+                        column(6, tipify(selectizeInput("bip.color", "Color by:",
+                                                        choices = summ.choices),
+                                         "Metadata variable by which samples are colored.", "right", options = list(container = "body"))),
+                        column(6, tipify(selectizeInput("bip.shape", "Shape by:",
+                                                        choices = summ.choices),
+                                         "Metadata variable by which samples are shaped.", "right", options = list(container = "body")))
+                      ),
+                      fluidRow(
+                        column(6,
+                               tipify(prettyCheckbox("bip.twod", strong("Limit to 2D"), TRUE, bigger = FALSE,
+                                                     animation = "smooth", status = "success",
+                                                     icon = icon("check"), width = "100%"),
+                                      "Limit PCA biplot to 2D.", "right", options = list(container = "body"))
+                        ),
+                        column(6,
+                               tipify(prettyCheckbox("bip.loadings", strong("Plot Loadings"), FALSE, bigger = FALSE,
+                                                     animation = "smooth", status = "success",
+                                                     icon = icon("check"), width = "100%"),
+                                      "Plot top PCA loadings for each PC.", "right", options = list(container = "body")
+                               )
+                        ),
+                        column(12,
+                          tipify(numericInput("bip.n.loadings", "Loadings:",
+                                              min = 0, max = 100, step = 1, value = 5),
+                                 "Number of PCA loadings to plot (if checked).", "right", options = list(container = "body")
+                          )
+                        ),
+                        div(actionButton("pca.update", "Update PCA"), align = "center")
+                      )
+                    )
+         )
+       ),
+       mainPanel(
+         width = 10,
+         fluidRow(
+           column(width = 4,
+                  span(popify(icon("info-circle", style="font-size: 20px"), "Gini Index",
+                              c("This plot shows the gini index for each sample, ",
+                                "which is a measure of read count inequality between guides. ",
+                                "For initial timepoints and early passages, this should usually be <0.1, ",
+                                "but should increase as selection occurs."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       jqui_resizable(plotlyOutput("qc.gini"))),
+                  span(popify(icon("info-circle", style="font-size: 20px"), "Read Distributions",
+                              c("This plot shows the read distribution across guides for each sample. ",
+                                "The distribution should be normal and relatively tight for initial ",
+                                "timepoints and early passages. As selection occurs, the ",
+                                "distribution will begin to spread, and there may be buildup at the extremes."),
+                              placement = "top", trigger = "hover", options = list(container = "body")),
+                       jqui_resizable(plotOutput("qc.histplot")))
+           ),
+           column(width = 4,
+                  span(popify(icon("info-circle", style="font-size: 20px"), "Zero Count gRNAs",
+                              c("This plot shows the number of guides with zero reads for each sample. ",
+                                "For early passages and initial timepoints, this count should ideally be zero ",
+                                "but should increase as selection occurs. Useful for assessing library quality."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       jqui_resizable(plotlyOutput("qc.missed"))),
+                  span(popify(icon("info-circle", style="font-size: 20px"), "Sample Correlations",
+                              c("This plot shows correlation between samples. Typically, initial timepoints ",
+                                "and early passages, even from different tissues or conditions, correlate well, ",
+                                "but diverge more and more as selection occurs."),
+                              placement = "top", trigger = "hover", options = list(container = "body")),
+                       jqui_resizable(plotOutput("qc.corr")))
+           ),
+           column(width = 4,
+                  span(popify(icon("info-circle", style="font-size: 20px"), "Mapping Rates",
+                              c("This plot shows read mapping rates for each sample. 50-75% mapped is typical."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       jqui_resizable(plotOutput("qc.map"))),
+                  span(popify(icon("info-circle", style="font-size: 20px"), "Principal Componenet Analysis",
+                              c("This biplot shows two (or three) PCs from a principal component analysis. ",
+                                "For initial timepoints, libraries should be nearly identical, even for different tissues or cell lines. ",
+                                "As selection occurs, samples should diverge."),
+                              placement = "top", trigger = "hover", options = list(container = "body")),
+                       withSpinner(jqui_resizable(plotlyOutput("qc.pca")))),
+           )
+         )
+       )
+      )
     ),
     # -------------------QC Table----------------
-    tabPanel(title = "QC Table",
-             id = "qc-table",
-             br(),
-             DTOutput("count.summary")
+    tabPanel(
+      title = "QC Table",
+      id = "qc-table",
+      br(),
+      DTOutput("count.summary")
     ),
     # ------------------Gene (Overview)-------------
-    tabPanel(title = "Gene (Overview)",
-             id = "gene-overview",
-             sidebarLayout(
-               sidebarPanel(
-                 width = 2,
-                 h4("Plot Controls"),
-                 hr(),
-                 div(
-                   fluidRow(
-                     column(6,
-                            tipify(selectizeInput("gene.sel1", "Dataset 1:", choices = gene.choices),
-                                   "Dataset shown in top row.", "right", options = list(container = "body")),
-                            numericInput("gene.fdr.th", "FDR threshold:",
-                                         min = 0, max = 1, step = 0.01, value = 0.05)
-                     ),
-                     column(6,
-                            tipify(selectizeInput("gene.sel2", "Dataset 2:", choices = gene.choices),
-                                   "Dataset shown in bottom row.", "right", options = list(container = "body")),
-                            numericInput("gene.lfc.th", "log2FC threshold:",
-                                         min = 0, max = Inf, step = 0.05, value = 0.5)
-                     )
-                   ),
-                   fluidRow(
-                     column(12,
-                            tipify(prettyCheckbox("rem.ess", label = "Remove essential genes", value = FALSE,
-                                                  animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                   "Remove essential genes if any provided to function.", "right", options = list(container = "body")),
-                            tipify(prettyCheckbox("dep.crispr.ess", label = "Remove DepMap CRISPR essential genes", value = FALSE,
-                                                  animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                   "Remove DepMap Chronos Combined, Score, and Achilles common essential genes from latest release.",
-                                   "right", options = list(container = "body")),
-                            tipify(prettyCheckbox("dep.rnai.ess", label = "Remove DepMap RNAi essential genes", value = FALSE,
-                                                  animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                   "Remove RNAi common essential genes from latest DepMap release.", "right", options = list(container = "body")),
-                            tipify(prettyCheckbox("dep.crispr.sel", label = "Remove DepMap CRISPR selective genes", value = FALSE,
-                                                  animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                   "Remove DepMap Chronos Combined, Score, and Achilles strongly selective genes from latest release.", "right",
-                                   options = list(container = "body")),
-                            tipify(prettyCheckbox("dep.rnai.sel", label = "Remove DepMap RNAi selective genes", value = FALSE,
-                                                  animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                   "Remove DepMap RNAi strongly selective genes from latest release.", "right", options = list(container = "body")),
-                            tipify(prettyCheckbox("rem.pos", label = "Remove positive control genes", value = FALSE,
-                                                  animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                   "Remove positive control genes if provided to function.", "right", options = list(container = "body")),
-                            tipify(prettyCheckbox("highlight.common", label = "Highlight common hits", value = FALSE,
-                                                  animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                   "Highlight common hits between datasets.", "right", options = list(container = "body"))
-                     )
-                   ),
-                   style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
-                 bsCollapse(open = NULL,
-                            bsCollapsePanel(
-                              title = span(icon("plus"), "Common Plot Settings"), value = "com.settings", style = "info",
-                              fluidRow(
-                                column(width = 6,
-                                       tipify(colourInput("down.color", "Down colour", value = "#0026ff"),
-                                              "Color of negatively selected genes.", "right", options = list(container = "body")),
-                                       tipify(colourInput("up.color", "Up colour", value = "red"),
-                                              "Color of positively selected genes.", "right", options = list(container = "body")),
-                                       tipify(colourInput("insig.color", "Insig colour", value = "#A6A6A6"),
-                                              "Color of insignificant genes.", "right", options = list(container = "body")),
-                                       tipify(numericInput("sig.opa", label = "Sig opacity:", value = 1, step = 0.05, min = 0),
-                                              "Opacity of significantly selected genes.", "right", options = list(container = "body"))
-                                ),
-                                column(width = 6,
-                                       tipify(numericInput("sig.size", label = "Sig pt size:", value = 6, step = 0.1, min = 0),
-                                              "Point size of significantly selected genes.", "right", options = list(container = "body")),
-                                       tipify(numericInput("lab.size", label = "Label size:", value = 10, step = 0.5, min = 1),
-                                              "Label size of significantly selected genes.", "right", options = list(container = "body")),
-                                       tipify(numericInput("insig.opa", label = "Insig opacity:", value = 0.5, step = 0.05, min = 0),
-                                              "Opacity of insignificant genes.", "right", options = list(container = "body")),
-                                       tipify(numericInput("insig.size", label = "Insig pt size:", value = 5, step = 0.1, min = 0),
-                                              "Point size of insignificant genes.", "right", options = list(container = "body"))
-                                )
-                              ),
-                              splitLayout(
-                                tipify(prettyCheckbox("counts", label = "Show counts", TRUE, bigger = TRUE,
-                                                      animation = "smooth", status = "success",
-                                                      icon = icon("check"), width = "100%"),
-                                       "Show hit counts on plot.", "right", options = list(container = "body")),
-                                tipify(prettyCheckbox("webgl", label = "Use webGL", FALSE, bigger = TRUE,
-                                                      animation = "smooth", status = "success",
-                                                      icon = icon("check"), width = "100%"),
-                                       "Use webGL for plot generation (faster to update, sometimes has visual artifacts).", "right", options = list(container = "body"))
-                              ),
-                              splitLayout(
-                                tipify(prettyCheckbox("hl.counts", label = "Show highlight counts", FALSE, bigger = TRUE,
-                                                      animation = "smooth", status = "success",
-                                                      icon = icon("check"), width = "100%"),
-                                       "Show highlighted gene counts on plot.", "right", options = list(container = "body"))
-                              ),
-                              splitLayout(
-                                tipify(numericInput("counts.size", label = "Counts size:", value = 8, step = 0.1, min = 0),
-                                       "Size of counts text.", "right", options = list(container = "body")),
-                                tipify(numericInput("webgl.ratio", label = "webGL pixel ratio:", value = 7, step = 0.1, min = 1),
-                                       "webGL rasterization ratio. Recommend leaving this alone for high-res rasterization.", "right", options = list(container = "body"))
-                              )
-                            ),
-                            bsCollapsePanel(
-                              title = span(icon("plus"), "Volcano Plot Settings"), value = "vol.settings", style = "info",
-                              fluidRow(
-                                column(width = 6,
-                                       numericInput("vol.x", label = "x-axis limits:", value = 5, step = 0.1, min = 0.1)
-                                ),
-                                column(width = 6,
-                                       numericInput("vol.y", label = "y-axis limits:", value = 5, step = 0.5, min = 1)
-                                )
-                              ),
-                              splitLayout(
-                                prettyCheckbox("vol.fcline", label = "Show FC threshold", value = TRUE,
-                                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                prettyCheckbox("vol.sigline", label = "Show Sig. threshold", value = TRUE,
-                                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check"))
-                              ),
-                              div(actionButton("vol.update", "Update Volcano Plots"), align = "center")
-                            ),
-                            bsCollapsePanel(
-                              title = span(icon("plus"), "Rank Plot Settings"), value = "rank.settings", style = "info",
-                              fluidRow(
-                                column(width = 6,
-                                       numericInput("rank.y.max", label = "y-axis max:", value = 2, step = 0.5),
-                                       prettyCheckbox("rank.fcline", label = "Show FC threshold", value = TRUE,
-                                                      animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                ),
-                                column(width = 6,
-                                       numericInput("rank.y.min", label = "y-axis min:", value = -10, step = 0.5, min = 1),
-                                )
-                              ),
-                              div(actionButton("rank.update", "Update Rank Plots"), align = "center")
-                            ),
-                            bsCollapsePanel(
-                              title = span(icon("plus"), "Lawn Plot Settings"), value = "lawn.settings", style = "info",
-                              splitLayout(
-                                prettyCheckbox("lawn.sigline", label = "Show Sig. threshold", value = TRUE,
-                                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                                numericInput("lawn.y", label = "y-axis limits:", value = 5, step = 0.5, min = 1)
-                              ),
-                              div(actionButton("lawn.update", "Update Lawn Plots"), align = "center")
-                            ),
-                            bsCollapsePanel(title = span(icon("plus"), "Highlight Gene(sets)"), value = "highlight.settings", style = "info",
-                                            tipify(textAreaInput("hl.genes", "Highlight Genes:", value = "", rows = 4,
-                                                                 placeholder = "Enter space, comma, or newline delimited genes"),
-                                                   "Genes to highlight on plots.", "right", options = list(container = "body")),
-                                            tipify(pickerInput("hl.genesets", "Highlight Genesets:", choices = c("", names(genesets)),
-                                                               multiple = TRUE, options = list(`live-search` = TRUE, `actions-box` = TRUE)),
-                                                   "If provided, genesets available to highlight on plots.", "right", options = list(container = "body")),
-                                            fluidRow(
-                                              column(6,
-                                                     tipify(numericInput("hl.genes.opa", label = "Genes opacity:", value = 1, step = 0.05, min = 0),
-                                                            "Opacity of highlighted genes.", "right", options = list(container = "body")),
-                                                     tipify(numericInput("hl.genes.size", label = "Genes pt size:", value = 7, step = 0.1, min = 0),
-                                                            "Point size of highlighted genes.", "right", options = list(container = "body")),
-                                                     tipify(numericInput("hl.genes.lw", label = "Genes border width:", value = 1, step = 0.05, min = 0),
-                                                            "Border width of highlighted genes.", "right", options = list(container = "body")),
-                                                     tipify(colourInput("hl.genes.col", "Genes color:", value = "#E69F00"),
-                                                            "Fill color of highlighted genes.", "right", options = list(container = "body")),
-                                                     tipify(colourInput("hl.genes.lcol", "Genes border:", value = "#000000"),
-                                                            "Border color of highlighted genes.", "right", options = list(container = "body")))
-                                              ,
-                                              column(6,
-                                                     tipify(numericInput("hl.genesets.opa", label = "Sets opacity:", value = 1, step = 0.05, min = 0),
-                                                            "Opacity of genes in highlighted geneset(s).", "right", options = list(container = "body")),
-                                                     tipify(numericInput("hl.genesets.size", label = "Sets pt size:", value = 7, step = 0.1, min = 0),
-                                                            "Point size of genes in highlighted geneset(s).", "right", options = list(container = "body")),
-                                                     tipify(numericInput("hl.genesets.lw", label = "Sets border width:", value = 1, step = 0.05, min = 0),
-                                                            "Border width genes in of highlighted geneset(s).", "right", options = list(container = "body")),
-                                                     tipify(colourInput("hl.genesets.col", "Sets color:", value = "#009E73"),
-                                                            "Fill color of genes in highlighted geneset(s).", "right", options = list(container = "body")),
-                                                     tipify(colourInput("hl.genesets.lcol", "Sets border:", value = "#000000"),
-                                                            "Border color of genes in highlighted geneset(s).", "right", options = list(container = "body")))
-                                            )
-                            )
-                 ),
-                 div(actionButton("gene.update", "Update Plots"), align = "center")
-               ),
-               mainPanel(
-                 width = 10,
-                 fluidRow(
-                   column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), title = "Volcano Plot",
-                                      c("This volcano plot shows the log2 fold change on the x-axis and the -log10(FDR) value on the y-axis. ",
-                                        "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
-                                        "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
-                                        "Click and drag to zoom in. Hover over a point for additional info.",
-                                        "Genes with full sgRNA depletion tend to all have the same significance value, forming a shelf-like max y-axis value."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               withSpinner(jqui_resizable(plotlyOutput("gene1.vol"))))
-                   ),
-                   column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), title = "Rank Plot",
-                                      c("This rank plot shows the log2 fold change on the y-axis and the gene rank on the x-axis. ",
-                                        "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
-                                        "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
-                                        "Click and drag to zoom in. Hover over a point for additional info."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               withSpinner(jqui_resizable(plotlyOutput("gene1.rank"))))
-                   ),
-                   column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), title = "Lawn Plot",
-                                      c("This plot shows the log2 fold change on the y-axis and the genes randomly ordered on the x-axis. ",
-                                        "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
-                                        "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
-                                        "Click and drag to zoom in. Hover over a point for additional info."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               withSpinner(jqui_resizable(plotlyOutput("gene1.lawn"))))
-                   )
-                 ),
-                 hr(),
-                 fluidRow(
-                   column(width = 4,
-                          withSpinner(jqui_resizable(plotlyOutput("gene2.vol")))
-                   ),
-                   column(width = 4,
-                          withSpinner(jqui_resizable(plotlyOutput("gene2.rank")))
-                   ),
-                   column(width = 4,
-                          withSpinner(jqui_resizable(plotlyOutput("gene2.lawn")))
-                   )
-                 )
-               )
+    tabPanel(
+      title = "Gene (Overview)",
+      id = "gene-overview",
+      sidebarLayout(
+       sidebarPanel(
+         width = 2,
+         h4("Plot Controls"),
+         hr(),
+         div(
+           fluidRow(
+             column(6,
+                    tipify(selectizeInput("gene.sel1", "Dataset 1:", choices = gene.choices),
+                           "Dataset shown in top row.", "right", options = list(container = "body")),
+                    numericInput("gene.fdr.th", "FDR threshold:",
+                                 min = 0, max = 1, step = 0.01, value = 0.05)
+             ),
+             column(6,
+                    tipify(selectizeInput("gene.sel2", "Dataset 2:", choices = gene.choices),
+                           "Dataset shown in bottom row.", "right", options = list(container = "body")),
+                    numericInput("gene.lfc.th", "log2FC threshold:",
+                                 min = 0, max = Inf, step = 0.05, value = 0.5)
              )
+           ),
+           fluidRow(
+             column(12,
+                    tipify(prettyCheckbox("rem.ess", label = "Remove essential genes", value = FALSE,
+                                          animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                           "Remove essential genes if any provided to function.", "right", options = list(container = "body")),
+                    tipify(prettyCheckbox("dep.crispr.ess", label = "Remove DepMap CRISPR essential genes", value = FALSE,
+                                          animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                           "Remove DepMap Chronos Combined, Score, and Achilles common essential genes from latest release.",
+                           "right", options = list(container = "body")),
+                    tipify(prettyCheckbox("dep.rnai.ess", label = "Remove DepMap RNAi essential genes", value = FALSE,
+                                          animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                           "Remove RNAi common essential genes from latest DepMap release.", "right", options = list(container = "body")),
+                    tipify(prettyCheckbox("dep.crispr.sel", label = "Remove DepMap CRISPR selective genes", value = FALSE,
+                                          animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                           "Remove DepMap Chronos Combined, Score, and Achilles strongly selective genes from latest release.", "right",
+                           options = list(container = "body")),
+                    tipify(prettyCheckbox("dep.rnai.sel", label = "Remove DepMap RNAi selective genes", value = FALSE,
+                                          animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                           "Remove DepMap RNAi strongly selective genes from latest release.", "right", options = list(container = "body")),
+                    tipify(prettyCheckbox("rem.pos", label = "Remove positive control genes", value = FALSE,
+                                          animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                           "Remove positive control genes if provided to function.", "right", options = list(container = "body")),
+                    tipify(prettyCheckbox("highlight.common", label = "Highlight common hits", value = FALSE,
+                                          animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                           "Highlight common hits between datasets.", "right", options = list(container = "body"))
+             )
+           ),
+           style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
+         bsCollapse(open = NULL,
+                    bsCollapsePanel(
+                      title = span(icon("plus"), "Common Plot Settings"), value = "com.settings", style = "info",
+                      fluidRow(
+                        column(width = 6,
+                               tipify(colourInput("down.color", "Down colour", value = "#0026ff"),
+                                      "Color of negatively selected genes.", "right", options = list(container = "body")),
+                               tipify(colourInput("up.color", "Up colour", value = "red"),
+                                      "Color of positively selected genes.", "right", options = list(container = "body")),
+                               tipify(colourInput("insig.color", "Insig colour", value = "#A6A6A6"),
+                                      "Color of insignificant genes.", "right", options = list(container = "body")),
+                               tipify(numericInput("sig.opa", label = "Sig opacity:", value = 1, step = 0.05, min = 0),
+                                      "Opacity of significantly selected genes.", "right", options = list(container = "body"))
+                        ),
+                        column(width = 6,
+                               tipify(numericInput("sig.size", label = "Sig pt size:", value = 6, step = 0.1, min = 0),
+                                      "Point size of significantly selected genes.", "right", options = list(container = "body")),
+                               tipify(numericInput("lab.size", label = "Label size:", value = 10, step = 0.5, min = 1),
+                                      "Label size of significantly selected genes.", "right", options = list(container = "body")),
+                               tipify(numericInput("insig.opa", label = "Insig opacity:", value = 0.5, step = 0.05, min = 0),
+                                      "Opacity of insignificant genes.", "right", options = list(container = "body")),
+                               tipify(numericInput("insig.size", label = "Insig pt size:", value = 5, step = 0.1, min = 0),
+                                      "Point size of insignificant genes.", "right", options = list(container = "body"))
+                        )
+                      ),
+                      splitLayout(
+                        tipify(prettyCheckbox("counts", label = "Show counts", TRUE, bigger = TRUE,
+                                              animation = "smooth", status = "success",
+                                              icon = icon("check"), width = "100%"),
+                               "Show hit counts on plot.", "right", options = list(container = "body")),
+                        tipify(prettyCheckbox("webgl", label = "Use webGL", FALSE, bigger = TRUE,
+                                              animation = "smooth", status = "success",
+                                              icon = icon("check"), width = "100%"),
+                               "Use webGL for plot generation (faster to update, sometimes has visual artifacts).", "right", options = list(container = "body"))
+                      ),
+                      splitLayout(
+                        tipify(prettyCheckbox("hl.counts", label = "Show highlight counts", FALSE, bigger = TRUE,
+                                              animation = "smooth", status = "success",
+                                              icon = icon("check"), width = "100%"),
+                               "Show highlighted gene counts on plot.", "right", options = list(container = "body"))
+                      ),
+                      splitLayout(
+                        tipify(numericInput("counts.size", label = "Counts size:", value = 8, step = 0.1, min = 0),
+                               "Size of counts text.", "right", options = list(container = "body")),
+                        tipify(numericInput("webgl.ratio", label = "webGL pixel ratio:", value = 7, step = 0.1, min = 1),
+                               "webGL rasterization ratio. Recommend leaving this alone for high-res rasterization.", "right", options = list(container = "body"))
+                      )
+                    ),
+                    bsCollapsePanel(
+                      title = span(icon("plus"), "Volcano Plot Settings"), value = "vol.settings", style = "info",
+                      fluidRow(
+                        column(width = 6,
+                               numericInput("vol.x", label = "x-axis limits:", value = 5, step = 0.1, min = 0.1)
+                        ),
+                        column(width = 6,
+                               numericInput("vol.y", label = "y-axis limits:", value = 5, step = 0.5, min = 1)
+                        )
+                      ),
+                      splitLayout(
+                        prettyCheckbox("vol.fcline", label = "Show FC threshold", value = TRUE,
+                                       animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                        prettyCheckbox("vol.sigline", label = "Show Sig. threshold", value = TRUE,
+                                       animation = "smooth", status = "success", bigger = TRUE, icon = icon("check"))
+                      ),
+                      div(actionButton("vol.update", "Update Volcano Plots"), align = "center")
+                    ),
+                    bsCollapsePanel(
+                      title = span(icon("plus"), "Rank Plot Settings"), value = "rank.settings", style = "info",
+                      fluidRow(
+                        column(width = 6,
+                               numericInput("rank.y.max", label = "y-axis max:", value = 2, step = 0.5),
+                               prettyCheckbox("rank.fcline", label = "Show FC threshold", value = TRUE,
+                                              animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                        ),
+                        column(width = 6,
+                               numericInput("rank.y.min", label = "y-axis min:", value = -10, step = 0.5, min = 1),
+                        )
+                      ),
+                      div(actionButton("rank.update", "Update Rank Plots"), align = "center")
+                    ),
+                    bsCollapsePanel(
+                      title = span(icon("plus"), "Lawn Plot Settings"), value = "lawn.settings", style = "info",
+                      splitLayout(
+                        prettyCheckbox("lawn.sigline", label = "Show Sig. threshold", value = TRUE,
+                                       animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                        numericInput("lawn.y", label = "y-axis limits:", value = 5, step = 0.5, min = 1)
+                      ),
+                      div(actionButton("lawn.update", "Update Lawn Plots"), align = "center")
+                    ),
+                    bsCollapsePanel(title = span(icon("plus"), "Highlight Gene(sets)"), value = "highlight.settings", style = "info",
+                                    tipify(textAreaInput("hl.genes", "Highlight Genes:", value = "", rows = 4,
+                                                         placeholder = "Enter space, comma, or newline delimited genes"),
+                                           "Genes to highlight on plots.", "right", options = list(container = "body")),
+                                    tipify(pickerInput("hl.genesets", "Highlight Genesets:", choices = c("", names(genesets)),
+                                                       multiple = TRUE, options = list(`live-search` = TRUE, `actions-box` = TRUE)),
+                                           "If provided, genesets available to highlight on plots.", "right", options = list(container = "body")),
+                                    fluidRow(
+                                      column(6,
+                                             tipify(numericInput("hl.genes.opa", label = "Genes opacity:", value = 1, step = 0.05, min = 0),
+                                                    "Opacity of highlighted genes.", "right", options = list(container = "body")),
+                                             tipify(numericInput("hl.genes.size", label = "Genes pt size:", value = 7, step = 0.1, min = 0),
+                                                    "Point size of highlighted genes.", "right", options = list(container = "body")),
+                                             tipify(numericInput("hl.genes.lw", label = "Genes border width:", value = 1, step = 0.05, min = 0),
+                                                    "Border width of highlighted genes.", "right", options = list(container = "body")),
+                                             tipify(colourInput("hl.genes.col", "Genes color:", value = "#E69F00"),
+                                                    "Fill color of highlighted genes.", "right", options = list(container = "body")),
+                                             tipify(colourInput("hl.genes.lcol", "Genes border:", value = "#000000"),
+                                                    "Border color of highlighted genes.", "right", options = list(container = "body")))
+                                      ,
+                                      column(6,
+                                             tipify(numericInput("hl.genesets.opa", label = "Sets opacity:", value = 1, step = 0.05, min = 0),
+                                                    "Opacity of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+                                             tipify(numericInput("hl.genesets.size", label = "Sets pt size:", value = 7, step = 0.1, min = 0),
+                                                    "Point size of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+                                             tipify(numericInput("hl.genesets.lw", label = "Sets border width:", value = 1, step = 0.05, min = 0),
+                                                    "Border width genes in of highlighted geneset(s).", "right", options = list(container = "body")),
+                                             tipify(colourInput("hl.genesets.col", "Sets color:", value = "#009E73"),
+                                                    "Fill color of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+                                             tipify(colourInput("hl.genesets.lcol", "Sets border:", value = "#000000"),
+                                                    "Border color of genes in highlighted geneset(s).", "right", options = list(container = "body")))
+                                    )
+                    )
+         ),
+         div(actionButton("gene.update", "Update Plots"), align = "center")
+       ),
+       mainPanel(
+         width = 10,
+         fluidRow(
+           column(width = 4,
+                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Volcano Plot",
+                              c("This volcano plot shows the log2 fold change on the x-axis and the -log10(FDR) value on the y-axis. ",
+                                "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
+                                "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
+                                "Click and drag to zoom in. Hover over a point for additional info.",
+                                "Genes with full sgRNA depletion tend to all have the same significance value, forming a shelf-like max y-axis value."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       withSpinner(jqui_resizable(plotlyOutput("gene1.vol"))))
+           ),
+           column(width = 4,
+                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Rank Plot",
+                              c("This rank plot shows the log2 fold change on the y-axis and the gene rank on the x-axis. ",
+                                "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
+                                "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
+                                "Click and drag to zoom in. Hover over a point for additional info."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       withSpinner(jqui_resizable(plotlyOutput("gene1.rank"))))
+           ),
+           column(width = 4,
+                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Lawn Plot",
+                              c("This plot shows the log2 fold change on the y-axis and the genes randomly ordered on the x-axis. ",
+                                "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
+                                "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
+                                "Click and drag to zoom in. Hover over a point for additional info."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       withSpinner(jqui_resizable(plotlyOutput("gene1.lawn"))))
+           )
+         ),
+         hr(),
+         fluidRow(
+           column(width = 4,
+                  withSpinner(jqui_resizable(plotlyOutput("gene2.vol")))
+           ),
+           column(width = 4,
+                  withSpinner(jqui_resizable(plotlyOutput("gene2.rank")))
+           ),
+           column(width = 4,
+                  withSpinner(jqui_resizable(plotlyOutput("gene2.lawn")))
+           )
+         )
+       )
+      )
     ),
     # ----------------Gene Summary Tables--------------
-    tabPanel(title = "Gene Summary Tables",
-             id = 'gene-summ',
-             br(),
-             div(DT::dataTableOutput("gene1.summary"), style = "font-size:80%;"),
-             br(),
-             div(DT::dataTableOutput("gene2.summary"), style = "font-size:80%;")
+    tabPanel(
+      title = "Gene Summary Tables",
+      id = "gene-summ",
+      br(),
+      div(DT::dataTableOutput("gene1.summary"), style = "font-size:80%;"),
+      br(),
+      div(DT::dataTableOutput("gene2.summary"), style = "font-size:80%;")
     ),
     # ----------------sgRNA---------------------
-    tabPanel(title = "sgRNA",
-             id = 'sgrna',
-             sidebarLayout(
-               sidebarPanel(
-                 width = 2,
-                 h4("Plot Controls"),
-                 hr(),
-                 div(
-                   fluidRow(
-                     column(6,
-                            tipify(selectizeInput("sgrna.sel1", "Dataset 1:", choices = sgrna.choices),
-                                   "Dataset shown in top row.", "right", options = list(container = "body"))
-                     ),
-                     column(6,
-                            tipify(selectizeInput("sgrna.sel2", "Dataset 2:", choices = sgrna.choices),
-                                   "Dataset shown in bottom row.", "right", options = list(container = "body"))
-                     )
-                   ),
-                   fluidRow(
-                     column(12,
-                            pickerInput("sgrna.gene", "Choose gene:", choices = sgrna.gene,
-                                        multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE))
-                     )
-                   ),
-                   style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
-               ),
-               mainPanel(
-                 width = 10,
-                 fluidRow(
-                   column(width = 2,
-                          span(popify(icon("info-circle", style="font-size: 20px"), title = "Counts Plot",
-                                      c("This rank plot shows the normalized counts for each sgRNA for the ",
-                                        "specified gene across the samples that make up the dataset comparision. ",
-                                        "Hover over a point for additional info."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               withSpinner(jqui_resizable(plotlyOutput("sgrna1.counts"))))
-                   ),
-                   column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), title = "Rank Plot",
-                                      c("This rank plot shows the log2 fold change on the y-axis and the sgRNA rank on the x-axis. ",
-                                        "sgRNAs for the selected gene will be highlighted. ",
-                                        "Click and drag to zoom in. Hover over a point for additional info."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               withSpinner(jqui_resizable(plotlyOutput("sgrna1.rank"))))
-                   ),
-                   column(width = 6,
-                          jqui_resizable(div(DT::dataTableOutput("sgrna1.detail"), style = "font-size:80%;"))
-                   )
-                 ),
-                 hr(),
-                 fluidRow(
-                   column(width = 2,
-                          withSpinner(jqui_resizable(plotlyOutput("sgrna2.counts")))
-                   ),
-                   column(width = 4,
-                          withSpinner(jqui_resizable(plotlyOutput("sgrna2.rank")))
-                   ),
-                   column(width = 6,
-                          jqui_resizable(div(DT::dataTableOutput("sgrna2.detail"), style = "font-size:80%;"))
-                   )
-                 )
-               )
+    tabPanel(
+      title = "sgRNA",
+      id = "sgrna",
+      sidebarLayout(
+       sidebarPanel(
+         width = 2,
+         h4("Plot Controls"),
+         hr(),
+         div(
+           fluidRow(
+             column(6,
+                    tipify(selectizeInput("sgrna.sel1", "Dataset 1:", choices = sgrna.choices),
+                           "Dataset shown in top row.", "right", options = list(container = "body"))
+             ),
+             column(6,
+                    tipify(selectizeInput("sgrna.sel2", "Dataset 2:", choices = sgrna.choices),
+                           "Dataset shown in bottom row.", "right", options = list(container = "body"))
              )
+           ),
+           fluidRow(
+             column(12,
+                    pickerInput("sgrna.gene", "Choose gene:", choices = sgrna.gene,
+                                multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE))
+             )
+           ),
+           style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
+       ),
+       mainPanel(
+         width = 10,
+         fluidRow(
+           column(width = 2,
+                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Counts Plot",
+                              c("This rank plot shows the normalized counts for each sgRNA for the ",
+                                "specified gene across the samples that make up the dataset comparision. ",
+                                "Hover over a point for additional info."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       withSpinner(jqui_resizable(plotlyOutput("sgrna1.counts"))))
+           ),
+           column(width = 4,
+                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Rank Plot",
+                              c("This rank plot shows the log2 fold change on the y-axis and the sgRNA rank on the x-axis. ",
+                                "sgRNAs for the selected gene will be highlighted. ",
+                                "Click and drag to zoom in. Hover over a point for additional info."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       withSpinner(jqui_resizable(plotlyOutput("sgrna1.rank"))))
+           ),
+           column(width = 6,
+                  jqui_resizable(div(DT::dataTableOutput("sgrna1.detail"), style = "font-size:80%;"))
+           )
+         ),
+         hr(),
+         fluidRow(
+           column(width = 2,
+                  withSpinner(jqui_resizable(plotlyOutput("sgrna2.counts")))
+           ),
+           column(width = 4,
+                  withSpinner(jqui_resizable(plotlyOutput("sgrna2.rank")))
+           ),
+           column(width = 6,
+                  jqui_resizable(div(DT::dataTableOutput("sgrna2.detail"), style = "font-size:80%;"))
+           )
+         )
+       )
+      )
     ),
     # --------------------sgRNA Summary Tables----------------
-    tabPanel(title = "sgRNA Summary Tables",
-             id = 'sgrna-tables',
-             br(),
-             div(DT::dataTableOutput("sgrna1.summary"), style = "font-size:80%;"),
-             br(),
-             div(DT::dataTableOutput("sgrna2.summary"), style = "font-size:80%;")
+    tabPanel(
+      title = "sgRNA Summary Tables",
+      id = "sgrna-tables",
+      br(),
+      div(DT::dataTableOutput("sgrna1.summary"), style = "font-size:80%;"),
+      br(),
+      div(DT::dataTableOutput("sgrna2.summary"), style = "font-size:80%;")
     ),
     # -----------------DepMap-------------------
-    tabPanel(title = "DepMap",
-             id = 'depmap',
-             sidebarLayout(
-               sidebarPanel(
-                 width = 2,
-                 h4("Plot Controls"),
-                 hr(),
-                 div(
-                   fluidRow(
-                     column(12,
-                            pickerInput("depmap.gene", "Choose gene:", choices = unique(c(sgrna.data[[1]]$Gene)),
-                                        multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE))
-                     )
-                   ),
-                   style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
-
-               ),
-               mainPanel(
-                 width = 10,
-                 fluidRow(
-                   column(width = 4,
-                          span(h3("Dependent Cell Lines", popify(icon("info-circle", style="font-size: 20px"), "Dependent Cell Lines",
-                                                                 c("This plot shows DepMap dependency scores for the selected gene. ",
-                                                                   "A cell line is considered dependent if it has a probability of dependency ",
-                                                                   "greater than 50%. <br><br>",
-                                                                   "Probabilities of dependency are calculated for each gene score in a cell ",
-                                                                   "line as the probability that score arises from the distribution of essential ",
-                                                                   "gene scores rather than nonessential gene scores.",
-                                                                   "See the <a href=https://www.biorxiv.org/content/10.1101/720243v1>DepMap preprint</a> ",
-                                                                   "for more info. <br><br>",
-                                                                   "<b>Gene Effect</b><br>",
-                                                                   "Outcome from <a href=https://www.nature.com/articles/s41467-018-06916-5>DEMETER2</a>",
-                                                                   " or <a href=https://www.biorxiv.org/content/10.1101/2021.02.25.432728v1>Chronos</a>. ",
-                                                                   "A lower score means that a gene is more likely to be dependent in a given cell line. ",
-                                                                   "A score of 0 is equivalent to a gene that is not essential whereas a score of -1 corresponds ",
-                                                                   "to the median of all common essential genes."),
-                                                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
-                               uiOutput("depmap.deplines"),
-                               jqui_resizable(plotlyOutput("depmap.essplot", height = 250))),
-
-                          span(h3("Expression", popify(icon("info-circle", style="font-size: 20px"), "Gene Expression",
-                                                       c("RNASeq files are aligned with STAR and quantified with RSEM, then TPM-normalized. ",
-                                                         "Reported values are log2(TPM+1)."),
-                                                       placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
-                               jqui_resizable(plotlyOutput("depmap.expplot", height = 200))),
-                          span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
-                                                        c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
-                                                          "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
-                                                          "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
-                                                          "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
-                                                          "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
-                                                          "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
-                                                          "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
-                                                        placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
-                               jqui_resizable(plotlyOutput("depmap.cnplot", height = 200)))
-                   ),
-                   column(width = 4,
-                          span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
-                                                        c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
-                                                          "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
-                                                          "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
-                                                          "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
-                                                          "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
-                                                          "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
-                                                          "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
-                                                        placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
-                               jqui_resizable(plotlyOutput("depmap.cnnplot", height = 350))),
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Sample Correlations",
-                                      c("This plot shows correlation between samples. Typically, initial timepoints ",
-                                        "and early passages, even from different tissues or conditions, correlate well, ",
-                                        "but diverge more and more as selection occurs."),
-                                      placement = "top", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotOutput("depmap.corr", height = 350)))
-                   ),
-                   column(width = 4,
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Mapping Rates",
-                                      c("This plot shows read mapping rates for each sample. 50-75% mapped is typical."),
-                                      placement = "bottom", trigger = "hover", options = list(container = "body")),
-                               jqui_resizable(plotOutput("depmap.map", height = 300))),
-                          span(popify(icon("info-circle", style="font-size: 20px"), "Principal Componenet Analysis",
-                                      c("This biplot shows two (or three) PCs from a principal component analysis. ",
-                                        "For early passages and initial timepoints, this count should ideally be zero ",
-                                        "but should increase as selection occurs. Useful for assessing library quality."),
-                                      placement = "top", trigger = "hover", options = list(container = "body")),
-                               withSpinner(jqui_resizable(plotlyOutput("depmap.pca", height = 300))))
-                   )
-                 )
-               )
+    tabPanel(
+      title = "DepMap",
+      id = "depmap",
+      sidebarLayout(
+        sidebarPanel(
+         width = 2,
+         h4("Plot Controls"),
+         hr(),
+         div(
+           fluidRow(
+             column(6,
+                    pickerInput("depmap.gene", "Choose gene:", choices = unique(c(sgrna.data[[1]]$Gene)),
+                                multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE))
+             ),
+             column(6,
+                    pickerInput("depmap.data", "Choose dataset:", 
+                                choices = c("crispr", "rnai", "cn", "ccle_tpm"),
+                                multiple = FALSE)
              )
+           ),
+           style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
+         bsCollapse(
+           open = NULL,
+            bsCollapsePanel(
+              title = span(icon("plus"), "Dependency Plot Settings"), value = "dm.dep.settings", style = "info",
+              fluidRow(
+                column(width = 6,
+                       tipify(colourInput("depmap.crispr.color", "CRISPR color:", value = "#3584B5"),
+                              "Fill color of CRISPR rug and density plots.", "right", options = list(container = "body")),
+                       tipify(colourInput("depmap.rnai.color", "CRISPR color:", value = "#52288E"),
+                              "Fill color of CRISPR rug and density plots.", "right", options = list(container = "body"))
+                ),
+                column(width = 6,
+                       prettyCheckbox("depmap.depline", label = "Show dep threshold", value = TRUE,
+                                      animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                )
+              ),
+              splitLayout(
+                prettyCheckbox("vol.fcline", label = "Show FC threshold", value = TRUE,
+                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                prettyCheckbox("vol.sigline", label = "Show Sig. threshold", value = TRUE,
+                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check"))
+              ),
+              div(actionButton("dm.dep.update", "Update Dependency Plot"), align = "center")
+            ),
+            bsCollapsePanel(
+              title = span(icon("plus"), "Expression Plot Settings"), value = "dm.exp.settings", style = "info",
+              fluidRow(
+                column(width = 6,
+                       numericInput("rank.y.max", label = "y-axis max:", value = 2, step = 0.5),
+                       prettyCheckbox("rank.fcline", label = "Show FC threshold", value = TRUE,
+                                      animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                ),
+                column(width = 6,
+                       numericInput("rank.y.min", label = "y-axis min:", value = -10, step = 0.5, min = 1),
+                )
+              ),
+              div(actionButton("dm.exp.update", "Update Expression Plot"), align = "center")
+            ),
+            bsCollapsePanel(
+              title = span(icon("plus"), "Copy Number Plot Settings"), value = "dm.cn.settings", style = "info",
+              splitLayout(
+                prettyCheckbox("lawn.sigline", label = "Show Sig. threshold", value = TRUE,
+                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                numericInput("lawn.y", label = "y-axis limits:", value = 5, step = 0.5, min = 1)
+              ),
+              div(actionButton("dm.cn.update", "Update Copy Number Plot"), align = "center")
+            ),
+           bsCollapsePanel(
+             title = span(icon("plus"), "Lineage Plot Settings"), value = "dm.lin.settings", style = "info",
+             fluidRow(
+               column(width = 12,
+                      pickerInput("depmap.group", "Group by:", 
+                                  choices = c("lineage", "primary_disease", "lineage_subtype"),
+                                  multiple = FALSE),
+               )
+             ),
+             div(actionButton("dm.lineage.update", "Update Lineage Plot"), align = "center")
+           ),
+            bsCollapsePanel(
+              title = span(icon("plus"), "Highlight Gene(sets)"), value = "highlight.settings", style = "info",
+              tipify(textAreaInput("hl.genes", "Highlight Genes:", value = "", rows = 4,
+                                   placeholder = "Enter space, comma, or newline delimited genes"),
+                     "Genes to highlight on plots.", "right", options = list(container = "body")),
+              tipify(pickerInput("hl.genesets", "Highlight Genesets:", choices = c("", names(genesets)),
+                                 multiple = TRUE, options = list(`live-search` = TRUE, `actions-box` = TRUE)),
+                     "If provided, genesets available to highlight on plots.", "right", options = list(container = "body")),
+              fluidRow(
+                column(6,
+                       tipify(numericInput("hl.genes.opa", label = "Genes opacity:", value = 1, step = 0.05, min = 0),
+                              "Opacity of highlighted genes.", "right", options = list(container = "body")),
+                       tipify(numericInput("hl.genes.size", label = "Genes pt size:", value = 7, step = 0.1, min = 0),
+                              "Point size of highlighted genes.", "right", options = list(container = "body")),
+                       tipify(numericInput("hl.genes.lw", label = "Genes border width:", value = 1, step = 0.05, min = 0),
+                              "Border width of highlighted genes.", "right", options = list(container = "body")),
+                       tipify(colourInput("hl.genes.col", "Genes color:", value = "#E69F00"),
+                              "Fill color of highlighted genes.", "right", options = list(container = "body")),
+                       tipify(colourInput("hl.genes.lcol", "Genes border:", value = "#000000"),
+                              "Border color of highlighted genes.", "right", options = list(container = "body"))
+                ),
+                column(6,
+                       tipify(numericInput("hl.genesets.opa", label = "Sets opacity:", value = 1, step = 0.05, min = 0),
+                              "Opacity of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+                       tipify(numericInput("hl.genesets.size", label = "Sets pt size:", value = 7, step = 0.1, min = 0),
+                              "Point size of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+                       tipify(numericInput("hl.genesets.lw", label = "Sets border width:", value = 1, step = 0.05, min = 0),
+                              "Border width genes in of highlighted geneset(s).", "right", options = list(container = "body")),
+                       tipify(colourInput("hl.genesets.col", "Sets color:", value = "#009E73"),
+                              "Fill color of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+                       tipify(colourInput("hl.genesets.lcol", "Sets border:", value = "#000000"),
+                              "Border color of genes in highlighted geneset(s).", "right", options = list(container = "body")))
+              )
+            )
+         )
+        ),
+        mainPanel(
+          width = 10,
+          fluidRow(
+           column(width = 4,
+                  span(h3("Dependent Cell Lines", popify(icon("info-circle", style="font-size: 20px"), "Dependent Cell Lines",
+                                                         c("This plot shows DepMap dependency scores for the selected gene. ",
+                                                           "A cell line is considered dependent if it has a probability of dependency ",
+                                                           "greater than 50%. <br><br>",
+                                                           "Probabilities of dependency are calculated for each gene score in a cell ",
+                                                           "line as the probability that score arises from the distribution of essential ",
+                                                           "gene scores rather than nonessential gene scores.",
+                                                           "See the <a href=https://www.biorxiv.org/content/10.1101/720243v1>DepMap preprint</a> ",
+                                                           "for more info. <br><br>",
+                                                           "<b>Gene Effect</b><br>",
+                                                           "Outcome from <a href=https://www.nature.com/articles/s41467-018-06916-5>DEMETER2</a>",
+                                                           " or <a href=https://www.biorxiv.org/content/10.1101/2021.02.25.432728v1>Chronos</a>. ",
+                                                           "A lower score means that a gene is more likely to be dependent in a given cell line. ",
+                                                           "A score of 0 is equivalent to a gene that is not essential whereas a score of -1 corresponds ",
+                                                           "to the median of all common essential genes."),
+                                                         placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
+                       uiOutput("depmap.deplines"),
+                       jqui_resizable(plotlyOutput("depmap.essplot", height = 250))),
+          
+                  span(h3("Expression", popify(icon("info-circle", style="font-size: 20px"), "Gene Expression",
+                                               c("RNASeq files are aligned with STAR and quantified with RSEM, then TPM-normalized. ",
+                                                 "Reported values are log2(TPM+1)."),
+                                               placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
+                       jqui_resizable(plotlyOutput("depmap.expplot", height = 200))),
+                  span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
+                                                c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
+                                                  "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
+                                                  "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
+                                                  "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
+                                                  "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
+                                                  "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
+                                                  "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
+                                                placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
+                       jqui_resizable(plotlyOutput("depmap.cnplot", height = 200)))
+           ),
+           column(width = 4,
+                  span(h3("Lineage", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
+                                                c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
+                                                  "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
+                                                  "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
+                                                  "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
+                                                  "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
+                                                  "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
+                                                  "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
+                                                placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
+                       jqui_resizable(plotlyOutput("depmap.lineages", height = 800)))
+           ),
+           column(width = 4,
+                  span(popify(icon("info-circle", style="font-size: 20px"), "Gene Info",
+                              c("Gene info and accessions."),
+                              placement = "bottom", trigger = "hover", options = list(container = "body")),
+                       uiOutput("depmap.geneinfo", height = 300))
+           )
+          )
+        )
+      )
     )
   )
 
@@ -2080,20 +2172,40 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         dep.release <- depmap::depmap_release()
         .make_dependency_tag(dep.info, dep.release)
       })
+      
       # Dependency
       output$depmap.essplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
+        input$dm.dep.update
+        
         dep.info <- plot_depmap_dependency(input$depmap.gene, depmap.meta, pool)
       })
+      
       # Expression
       output$depmap.expplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
+        input$dm.exp.update
+        
         dep.info <- plot_depmap_expression(input$depmap.gene, depmap.meta, pool)
       })
+      
       # Copy number.
       output$depmap.cnplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
+        input$dm.cn.update
+        
         dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)
+      })
+      
+      # Lineage info.
+      output$depmap.lineages <- renderPlotly({
+        req(input$depmap.gene, depmap.meta)
+        input$dm.lineage.update
+        dep.info <- plot_depmap_lineages(input$depmap.gene, 
+                                         data.type = isolate(input$depmap.data),
+                                         group.by = isolate(input$depmap.group),
+                                         depmap.meta, 
+                                         pool)
       })
     }
   }
