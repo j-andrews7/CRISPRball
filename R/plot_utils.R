@@ -277,7 +277,7 @@
                           highlight.feats.linecolor, highlight.feats.linewidth,
                           highlight.featsets.color, highlight.featsets.size, highlight.featsets.opac,
                           highlight.featsets.linecolor, highlight.featsets.linewidth, h.id.suffix = "_rank") {
-
+  
   # Styling.
   df$col <- rep(insig.color, nrow(df))
   df$cex <- rep(insig.size, nrow(df))

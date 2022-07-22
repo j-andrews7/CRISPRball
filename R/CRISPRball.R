@@ -397,7 +397,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                               animation = "smooth", status = "success",
                                               icon = icon("check"), width = "100%"),
                                "Show hit counts on plot.", "right", options = list(container = "body")),
-                        tipify(prettyCheckbox("webgl", label = "Use webGL", FALSE, bigger = TRUE,
+                        tipify(prettyCheckbox("webgl", label = "Use webGL", TRUE, bigger = TRUE,
                                               animation = "smooth", status = "success",
                                               icon = icon("check"), width = "100%"),
                                "Use webGL for plot generation (faster to update, sometimes has visual artifacts).", "right", options = list(container = "body"))
