@@ -761,12 +761,16 @@
 #' @param gene Character scalar for gene symbol.
 #' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
 #'   of the SQLite database built by \code{\link{build_depmap_db}}.
+#' @param depmap.crispr.color Character scalar for CRISPR trace color.
+#' @param depmap.rnai.color Character scalar for RNAi trace color.
+#' @param depmap.depline Boolean indicating whether to show the dependency line.
 #' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
 #' @return plotly object
 #'   
 #' @export
 #' @author Jared Andrews  
-plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
+plot_depmap_dependency <- function(gene, depmap.meta, depmap.crispr.color, 
+                                   depmap.rnai.color, depmap.depline, depmap.pool) {
 
   df.c <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "crispr" WHERE "gene_name" == (:x)', params = list(x = gene))
   df.r <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "rnai" WHERE "gene_name" == (:x)', params = list(x = gene))
@@ -806,10 +810,15 @@ plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
       ylab("") +
       xlab("") +
       theme_bw() +
-      scale_color_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) +
-      scale_fill_manual(values=c("#3584B5", "#52288E"), breaks = c("CRISPR", "RNAi")) +
-      geom_vline(xintercept = 0) +
-      geom_vline(xintercept = -1, color = "red", linetype = "dashed")
+      scale_color_manual(values=c(depmap.crispr.color, depmap.rnai.color), 
+                         breaks = c("CRISPR", "RNAi")) +
+      scale_fill_manual(values=c(depmap.crispr.color, depmap.rnai.color), 
+                        breaks = c("CRISPR", "RNAi")) +
+      geom_vline(xintercept = 0) 
+
+    if (depmap.depline) {
+      gg <- gg + geom_vline(xintercept = -1, color = "red", linetype = "dashed")
+    }
 
     gg <- ggplotly(gg, tooltip = "text") %>%
       layout(
@@ -834,11 +843,13 @@ plot_depmap_dependency <- function(gene, depmap.meta, depmap.pool) {
 #' Plot gene expression information from DepMap, mostly from CCLE.
 #' 
 #' @inheritParams plot_depmap_dependency
+#' @param color Character scalar for trace color.
+#' 
 #' @return plotly object
-#'   
+#' 
 #' @export
 #' @author Jared Andrews  
-plot_depmap_expression <- function(gene, depmap.meta, depmap.pool) {
+plot_depmap_expression <- function(gene, depmap.meta, depmap.pool, color) {
   
   df <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "ccle_tpm" WHERE "gene_name" == (:x)', params = list(x = gene))
   
@@ -852,16 +863,16 @@ plot_depmap_expression <- function(gene, depmap.meta, depmap.pool) {
                               "</br><b>log2(TPM+1):</b> ", format(round(df$rna_expression, 3), nsmall = 3),
                               "</br><b>Lineage:</b> ", df$lineage,
                               "</br><b>Disease:</b> ", df$primary_disease)
-    df$color <- "#7B8CB2"
+    df$color <- color
     
     gg <- ggplot(show.legend = FALSE) +
       geom_density(data = df, aes(x=rna_expression, color=color, fill=color)) +
       geom_rug(data = df, aes(x=rna_expression, color=color, text=hover.string, fill=color), outside = FALSE) +
       ylab("Density") +
-      xlab("log2(TPM+1") +
+      xlab("log2(TPM+1)") +
       theme_bw() +
-      scale_color_manual(values=c("#7B8CB2"), breaks = c("#7B8CB2")) +
-      scale_fill_manual(values=c("#7B8CB2"), breaks = c("#7B8CB2")) + theme(legend.position="none")
+      scale_color_manual(values=c(color), breaks = c(color)) +
+      scale_fill_manual(values=c(color), breaks = c(color)) + theme(legend.position="none")
     
     gg <- ggplotly(gg, tooltip = "text")
     

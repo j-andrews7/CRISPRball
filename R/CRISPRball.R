@@ -637,11 +637,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
              column(6,
                     pickerInput("depmap.gene", "Choose gene:", choices = unique(c(sgrna.data[[1]]$Gene)),
                                 multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE))
-             ),
-             column(6,
-                    pickerInput("depmap.data", "Choose dataset:", 
-                                choices = c("crispr", "rnai", "cn", "ccle_tpm"),
-                                multiple = FALSE)
              )
            ),
            style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
@@ -651,34 +646,24 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
               title = span(icon("plus"), "Dependency Plot Settings"), value = "dm.dep.settings", style = "info",
               fluidRow(
                 column(width = 6,
-                       tipify(colourInput("depmap.crispr.color", "CRISPR color:", value = "#3584B5"),
-                              "Fill color of CRISPR rug and density plots.", "right", options = list(container = "body")),
-                       tipify(colourInput("depmap.rnai.color", "CRISPR color:", value = "#52288E"),
+                       tipify(colourInput("dep.crispr.color", "CRISPR color:", value = "#3584B5"),
                               "Fill color of CRISPR rug and density plots.", "right", options = list(container = "body"))
                 ),
                 column(width = 6,
-                       prettyCheckbox("depmap.depline", label = "Show dep threshold", value = TRUE,
+                       prettyCheckbox("dep.depline", label = "Show dep threshold", value = TRUE,
                                       animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                       tipify(colourInput("dep.rnai.color", "RNAi color:", value = "#52288E"),
+                              "Fill color of RNAi rug and density plots.", "right", options = list(container = "body"))
                 )
-              ),
-              splitLayout(
-                prettyCheckbox("vol.fcline", label = "Show FC threshold", value = TRUE,
-                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                prettyCheckbox("vol.sigline", label = "Show Sig. threshold", value = TRUE,
-                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check"))
               ),
               div(actionButton("dm.dep.update", "Update Dependency Plot"), align = "center")
             ),
             bsCollapsePanel(
               title = span(icon("plus"), "Expression Plot Settings"), value = "dm.exp.settings", style = "info",
               fluidRow(
-                column(width = 6,
-                       numericInput("rank.y.max", label = "y-axis max:", value = 2, step = 0.5),
-                       prettyCheckbox("rank.fcline", label = "Show FC threshold", value = TRUE,
-                                      animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                ),
-                column(width = 6,
-                       numericInput("rank.y.min", label = "y-axis min:", value = -10, step = 0.5, min = 1),
+                column(width = 12,
+                       tipify(colourInput("dep.exp.color", "Expression color:", value = "#3584B5"),
+                              "Fill color of expression rug and density plot.", "right", options = list(container = "body"))
                 )
               ),
               div(actionButton("dm.exp.update", "Update Expression Plot"), align = "center")
@@ -695,10 +680,15 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
            bsCollapsePanel(
              title = span(icon("plus"), "Lineage Plot Settings"), value = "dm.lin.settings", style = "info",
              fluidRow(
-               column(width = 12,
+               column(width = 6,
                       pickerInput("depmap.group", "Group by:", 
                                   choices = c("lineage", "primary_disease", "lineage_subtype"),
                                   multiple = FALSE),
+               ),
+               column(6,
+                      pickerInput("depmap.data", "Choose dataset:", 
+                                  choices = c("crispr", "rnai", "cn", "ccle_tpm"),
+                                  multiple = FALSE)
                )
              ),
              div(actionButton("dm.lineage.update", "Update Lineage Plot"), align = "center")
@@ -2168,9 +2158,14 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     if (!is.null(depmap.gene)) {
       output$depmap.deplines <- renderUI({
         req(input$depmap.gene, depmap.gene)
+        input$dm.dep.update
+
         dep.info <- get_depmap_essentiality(input$depmap.gene, depmap.gene)
         dep.release <- depmap::depmap_release()
-        .make_dependency_tag(dep.info, dep.release)
+        .make_dependency_tag(dep.info = dep.info, 
+                             dep.release = dep.release, 
+                             crispr.color = isolate(input$dep.crispr.color), 
+                             rnai.color = isolate(input$dep.rnai.color))
       })
       
       # Dependency
@@ -2178,7 +2173,12 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         req(input$depmap.gene, depmap.meta)
         input$dm.dep.update
         
-        dep.info <- plot_depmap_dependency(input$depmap.gene, depmap.meta, pool)
+        dep.info <- plot_depmap_dependency(gene = input$depmap.gene, 
+                                           depmap.crispr.color = isolate(input$dep.crispr.color),
+                                           depmap.rnai.color = isolate(input$dep.rnai.color),
+                                           depmap.depline = isolate(input$dep.depline),
+                                           depmap.meta = depmap.meta, 
+                                           depmap.pool = pool)
       })
       
       # Expression
@@ -2186,7 +2186,10 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         req(input$depmap.gene, depmap.meta)
         input$dm.exp.update
         
-        dep.info <- plot_depmap_expression(input$depmap.gene, depmap.meta, pool)
+        dep.info <- plot_depmap_expression(gene = input$depmap.gene, 
+                                           depmap.meta = depmap.meta, 
+                                           depmap.pool = pool,
+                                           color = isolate(input$dep.exp.color))
       })
       
       # Copy number.
@@ -2199,13 +2202,13 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       
       # Lineage info.
       output$depmap.lineages <- renderPlotly({
-        req(input$depmap.gene, depmap.meta)
+        req(input$depmap.gene, depmap.meta, input$depmap.data)
         input$dm.lineage.update
-        dep.info <- plot_depmap_lineages(input$depmap.gene, 
+        dep.info <- plot_depmap_lineages(gene = input$depmap.gene, 
                                          data.type = isolate(input$depmap.data),
                                          group.by = isolate(input$depmap.group),
-                                         depmap.meta, 
-                                         pool)
+                                         depmap.meta = depmap.meta, 
+                                         depmap.pool = pool)
       })
     }
   }

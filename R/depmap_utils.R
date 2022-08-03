@@ -58,7 +58,11 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
 #' Generate dependency summary info tagList
 #' @param dep.info Named list containing summary CRISPR and RNAi info.
 #' @param dep.release Character scalar for DepMap release as returned by \code{\link[depmap]{depmap_release}}.
-.make_dependency_tag <- function(dep.info, dep.release) {  
+#' @param crispr.color Character scalar for color to use for CRISPR title.
+#' @param rnai.color Character scalar for color to use for RNAi title.
+#' 
+#' @return TagList containing dependency summary information.
+.make_dependency_tag <- function(dep.info, dep.release, crispr.color, rnai.color) {  
   cinfo <- "N/A"
   if (dep.info$crispr$avail) {
     cinfo <- paste0(dep.info$crispr$dep_lines, "/", dep.info$crispr$total_lines)
@@ -85,7 +89,7 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
     c.lab <- span(strong(dep.info$crispr$label), 
                   popify(icon("info-circle", style="font-size: 12px"), dep.info$crispr$label,
                         outpop, placement = "right", trigger = c("hover", "click"), options = list(container = "body")), br(), 
-                  style = "background: #3584B5; color: #ffffff; border-radius: 5px; padding: 3px;")
+                  style = paste0("background: ", crispr.color,"; color: #ffffff; border-radius: 5px; padding: 3px;"))
   }
   
   if (!is.null(dep.info$rnai$label)) {
@@ -93,14 +97,14 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
     r.lab <- span(strong(dep.info$rnai$label), 
                   popify(icon("info-circle", style="font-size: 12px"), dep.info$rnai$label,
                          outpop, placement = "right", trigger = c("hover", "click"), options = list(container = "body")), br(), 
-                  style = "background: #52288E; color: #ffffff; border-radius: 5px; padding: 3px;")
+                  style = paste0("background: ", rnai.color, "; color: #ffffff; border-radius: 5px; padding: 3px;"))
   }
   
   out <- tagList(div(span(strong(paste0("CRISPR (DepMap ", dep.release, ", ", dep.info$crispr$dataset, "): ", cinfo)), 
-                          style = "color: #3584B5;"), style = "margin-bottom: 7px;"),
+                          style = paste0("color: ", crispr.color, ";")), style = "margin-bottom: 7px;"),
                  c.lab,
                  div(span(strong(paste0("RNAi (DepMap ", dep.release, ", ", dep.info$rnai$dataset, "): ", rinfo)), 
-                          style = "color: #52288E;"), style = "margin-bottom: 7px; margin-top: 8px"),
+                          style = paste0("color: ", rnai.color, ";")), style = "margin-bottom: 7px; margin-top: 8px"),
                  r.lab)
   
   return(out)

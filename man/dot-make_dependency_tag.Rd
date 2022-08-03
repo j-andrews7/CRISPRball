@@ -4,12 +4,19 @@
 \alias{.make_dependency_tag}
 \title{Generate dependency summary info tagList}
 \usage{
-.make_dependency_tag(dep.info, dep.release)
+.make_dependency_tag(dep.info, dep.release, crispr.color, rnai.color)
 }
 \arguments{
 \item{dep.info}{Named list containing summary CRISPR and RNAi info.}
 
 \item{dep.release}{Character scalar for DepMap release as returned by \code{\link[depmap]{depmap_release}}.}
+
+\item{crispr.color}{Character scalar for color to use for CRISPR title.}
+
+\item{rnai.color}{Character scalar for color to use for RNAi title.}
+}
+\value{
+TagList containing dependency summary information.
 }
 \description{
 Generate dependency summary info tagList

@@ -4,13 +4,26 @@
 \alias{plot_depmap_dependency}
 \title{Plot gene dependency information from DepMap CRISPR and RNAi tables.}
 \usage{
-plot_depmap_dependency(gene, depmap.meta, depmap.pool)
+plot_depmap_dependency(
+  gene,
+  depmap.meta,
+  depmap.crispr.color,
+  depmap.rnai.color,
+  depmap.depline,
+  depmap.pool
+)
 }
 \arguments{
 \item{gene}{Character scalar for gene symbol.}
 
 \item{depmap.meta}{data.frame of DepMap cell line metadata, as stored in the 'meta' table
 of the SQLite database built by \code{\link{build_depmap_db}}.}
+
+\item{depmap.crispr.color}{Character scalar for CRISPR trace color.}
+
+\item{depmap.rnai.color}{Character scalar for RNAi trace color.}
+
+\item{depmap.depline}{Boolean indicating whether to show the dependency line.}
 
 \item{depmap.pool}{pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.}
 }
