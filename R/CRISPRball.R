@@ -720,6 +720,34 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
              ),
              div(actionButton("dm.lineage.update", "Update Lineage Plot"), align = "center")
            ),
+           bsCollapsePanel(
+             title = span(icon("plus"), "Characterization Subplot Settings"), value = "dm.subchar.settings", style = "info",
+             fluidRow(
+               column(width = 6,
+                      tipify(selectInput("sub.lineage", "Lineage:", choices = unique(depmap.meta$lineage)),
+                              "Choose lineage for which to plot sublineages.", "right", options = list(container = "body")),
+                      numericInput("sub.pt.size", "Point size:",
+                                   min = 0, step = 0.1, value = 5),
+                      tipify(numericInput("sub.label.size", "Label font size:",
+                                          min = 0, step = 0.1, value = 12),
+                              "Font size of labels. Useful for fitting more labels into subtype plots", 
+                                "right", options = list(container = "body")),
+                      tipify(prettyCheckbox("sub.depline", label = "Show dep threshold", value = TRUE,
+                             animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                             "Plot vertical dependency line threshold (if 'crispr' or 'rnai' dataset selected).", 
+                             "right", options = list(container = "body"))
+               ),
+               column(6,
+                      tipify(colourInput("sub.box.color", "Boxplot line color:", value = "#000000"),
+                             "Color of boxplot lines.", "right", options = list(container = "body")),
+                      tipify(colourInput("sub.box.fill", "Boxplot fill color:", value = "#E2E2E2"),
+                             "Color of boxplot fill.", "right", options = list(container = "body")),
+                      tipify(colourInput("sub.pt.color", "Point color:", value = "#56B4E9"),
+                             "Color of points.", "right", options = list(container = "body")),
+               )
+             ),
+             div(actionButton("dm.sublineage.update", "Update Sublineage Plot"), align = "center")
+           ),
             bsCollapsePanel(
               title = span(icon("plus"), "Highlight Gene(sets)"), value = "highlight.settings", style = "info",
               tipify(textAreaInput("hl.genes", "Highlight Genes:", value = "", rows = 4,
@@ -807,10 +835,19 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                        jqui_resizable(plotlyOutput("depmap.lineages", height = 800)))
            ),
            column(width = 4,
-                  span(popify(icon("info-circle", style="font-size: 20px"), "Gene Info",
+                  span(h3("Sublineages", popify(icon("info-circle", style="font-size: 20px"), "Sublineage",
+                                                c("This plot shows the distribution of values for the selected gene for the sublineages of the chosen lineage. ",
+                                                  "<br><br><b>crispr</b> will display CRISPR dependency scores from Public, Chronos. <br><br><b>rnai</b> will display ",
+                                                  "RNAi perturbation data from Achilles+DRIVE+Marcotte, DEMETER2. ",
+                                                  "<br><br><b>cn</b> will display copy number data from Sanger WES or Broad WES.",
+                                                  "<br><br><b>ccle_tpm</b> will display gene expression data from CCLE in log2(TPM+1).<br><br>",
+                                                  "The grouping can be changed between lineage subtypes."),
+                                                placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
+                       jqui_resizable(plotlyOutput("depmap.sublineage", height = 300))),
+                  span(h3("Gene Info",popify(icon("info-circle", style="font-size: 20px"), "Gene Info",
                               c("Gene info and accessions."),
-                              placement = "bottom", trigger = "hover", options = list(container = "body")),
-                       uiOutput("depmap.geneinfo", height = 300))
+                              placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
+                       uiOutput("depmap.geneinfo", height = 300)),
            )
           )
         )
@@ -2220,7 +2257,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                            plot.grid = isolate(input$exp.plot.grid))
       })
       
-      # Copy number.
+      # Copy number
       output$depmap.cnplot <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
         input$dm.cn.update
@@ -2232,7 +2269,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                    plot.grid = isolate(input$cn.plot.grid))
       })
       
-      # Lineage info.
+      # Lineage info
       output$depmap.lineages <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
         input$dm.lineage.update
@@ -2246,6 +2283,25 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                          boxplot.fill = isolate(input$lin.box.fill),
                                          boxplot.line.color = isolate(input$lin.box.color),
                                          depline = isolate(input$lin.depline),
+                                         depmap.meta = depmap.meta, 
+                                         depmap.pool = pool)
+      })
+
+      # Sublineage plot
+      output$depmap.sublineage <- renderPlotly({
+        req(input$depmap.gene, depmap.meta)
+        input$dm.sublineage.update
+
+        dep.info <- plot_depmap_lineages(gene = input$depmap.gene, 
+                                         data.type = isolate(input$lin.data),
+                                         group.by = "lineage_subtype",
+                                         lineage = isolate(input$sub.lineage),
+                                         label.size = isolate(input$sub.label.size),
+                                         pt.color = isolate(input$sub.pt.color),
+                                         pt.size = isolate(input$sub.pt.size),
+                                         boxplot.fill = isolate(input$sub.box.fill),
+                                         boxplot.line.color = isolate(input$sub.box.color),
+                                         depline = isolate(input$sub.depline),
                                          depmap.meta = depmap.meta, 
                                          depmap.pool = pool)
       })

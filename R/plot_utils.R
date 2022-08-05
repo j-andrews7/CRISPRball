@@ -962,13 +962,15 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool, color, plot.grid) {
 #' @export
 #' @author Jared Andrews
 plot_depmap_lineages <- function(gene, data.type, group.by, depmap.meta, depmap.pool, 
-                                 depline, label.size = 12, pt.size = 5, pt.color = "#56B4E9", boxplot.fill = "#E2E2E2", 
+                                 lineage = NULL,
+                                 depline = TRUE, label.size = 12, pt.size = 5, pt.color = "#56B4E9", 
+                                 boxplot.fill = "#E2E2E2", 
                                  boxplot.line.color = "#000000") {
   
   # Get correct table.
   query <- sprintf('SELECT * FROM "%s" WHERE "gene_name" == (:x)', data.type)
   df <- pool::dbGetQuery(depmap.pool, query, params = list(x = gene))
-  
+
   # Get appropriate plot stuff based on datatype.
   switch(data.type,
          crispr={
@@ -994,6 +996,11 @@ plot_depmap_lineages <- function(gene, data.type, group.by, depmap.meta, depmap.
     df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
     df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
 
+    # Get correct lineage.
+    if (!is.null(lineage)) {
+      df <- df[df$lineage == lineage,]
+    }
+
     df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
                               "</br><b>", h.text, ":</b> ", format(round(df[[colname]], 3), nsmall = 3),
                               "</br><b>Lineage:</b> ", df$lineage,
@@ -1016,7 +1023,9 @@ plot_depmap_lineages <- function(gene, data.type, group.by, depmap.meta, depmap.
       tickvals = names(table(df[[group.by]])),
       ticktext = ylabs,
       tickfont = list(size = label.size),
-      range = ~ c(-1, length(unique(df[[group.by]])))
+
+      # Fix extra whitespace at top and bottom of plot
+      range = ~ c(-1, length(unique(df[[group.by]])) - 0.5)
     )
 
     ax <- list(
