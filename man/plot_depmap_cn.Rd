@@ -4,7 +4,7 @@
 \alias{plot_depmap_cn}
 \title{Plot gene CN information from DepMap, mostly from CCLE.}
 \usage{
-plot_depmap_cn(gene, depmap.meta, depmap.pool)
+plot_depmap_cn(gene, depmap.meta, depmap.pool, color, plot.grid)
 }
 \arguments{
 \item{gene}{Character scalar for gene symbol.}
@@ -13,6 +13,10 @@ plot_depmap_cn(gene, depmap.meta, depmap.pool)
 of the SQLite database built by \code{\link{build_depmap_db}}.}
 
 \item{depmap.pool}{pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.}
+
+\item{color}{Character scalar for trace color.}
+
+\item{plot.grid}{Boolean indicating whether to plot gridlines.}
 }
 \value{
 plotly object

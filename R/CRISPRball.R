@@ -12,7 +12,7 @@
 #' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
 #' @importFrom ComplexHeatmap Heatmap pheatmap
 #' @import DT
-#' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations config toRGB event_data
+#' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations config toRGB event_data add_trace
 #' @import ggplot2
 #' @importFrom shinyWidgets prettyCheckbox dropdownButton tooltipOptions pickerInput updatePickerInput
 #' @importFrom shinycssloaders withSpinner
@@ -634,7 +634,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
          hr(),
          div(
            fluidRow(
-             column(6,
+             column(12,
                     pickerInput("depmap.gene", "Choose gene:", choices = unique(c(sgrna.data[[1]]$Gene)),
                                 multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE))
              )
@@ -647,13 +647,17 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
               fluidRow(
                 column(width = 6,
                        tipify(colourInput("dep.crispr.color", "CRISPR color:", value = "#3584B5"),
-                              "Fill color of CRISPR rug and density plots.", "right", options = list(container = "body"))
+                              "Fill color of CRISPR rug and density plots.", "right", options = list(container = "body")),
+                        tipify(prettyCheckbox("dep.plot.grid", label = "Show gridlines", value = TRUE,
+                              animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                              "Plot gridlines.", "right", options = list(container = "body"))
                 ),
                 column(width = 6,
-                       prettyCheckbox("dep.depline", label = "Show dep threshold", value = TRUE,
-                                      animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
                        tipify(colourInput("dep.rnai.color", "RNAi color:", value = "#52288E"),
-                              "Fill color of RNAi rug and density plots.", "right", options = list(container = "body"))
+                              "Fill color of RNAi rug and density plots.", "right", options = list(container = "body")),
+                       tipify(prettyCheckbox("dep.depline", label = "Show dep threshold", value = TRUE,
+                                      animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                                      "Plot vertical dependency line threshold.", "right", options = list(container = "body"))
                 )
               ),
               div(actionButton("dm.dep.update", "Update Dependency Plot"), align = "center")
@@ -662,7 +666,10 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
               title = span(icon("plus"), "Expression Plot Settings"), value = "dm.exp.settings", style = "info",
               fluidRow(
                 column(width = 12,
-                       tipify(colourInput("dep.exp.color", "Expression color:", value = "#3584B5"),
+                       tipify(prettyCheckbox("exp.plot.grid", label = "Show gridlines", value = TRUE,
+                              animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                              "Plot gridlines.", "right", options = list(container = "body")),
+                       tipify(colourInput("exp.color", "Expression color:", value = "#7B8CB2"),
                               "Fill color of expression rug and density plot.", "right", options = list(container = "body"))
                 )
               ),
@@ -670,25 +677,45 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
             ),
             bsCollapsePanel(
               title = span(icon("plus"), "Copy Number Plot Settings"), value = "dm.cn.settings", style = "info",
-              splitLayout(
-                prettyCheckbox("lawn.sigline", label = "Show Sig. threshold", value = TRUE,
-                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
-                numericInput("lawn.y", label = "y-axis limits:", value = 5, step = 0.5, min = 1)
+              fluidRow(
+                column(width = 12,
+                        tipify(prettyCheckbox("cn.plot.grid", label = "Show gridlines", value = TRUE,
+                                animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                                "Plot gridlines.", "right", options = list(container = "body")),
+                       tipify(colourInput("cn.color", "Copy number color:", value = "#CEA3CB"),
+                              "Fill color of copy number rug and density plot.", "right", options = list(container = "body"))
+                )
               ),
               div(actionButton("dm.cn.update", "Update Copy Number Plot"), align = "center")
             ),
            bsCollapsePanel(
-             title = span(icon("plus"), "Lineage Plot Settings"), value = "dm.lin.settings", style = "info",
+             title = span(icon("plus"), "Characterization Plot Settings"), value = "dm.char.settings", style = "info",
              fluidRow(
                column(width = 6,
-                      pickerInput("depmap.group", "Group by:", 
+                      pickerInput("lin.group", "Group by:", 
                                   choices = c("lineage", "primary_disease", "lineage_subtype"),
                                   multiple = FALSE),
+                      tipify(colourInput("lin.box.color", "Boxplot line color:", value = "#000000"),
+                             "Color of boxplot lines.", "right", options = list(container = "body")),
+                      numericInput("lin.pt.size", "Point size:",
+                                   min = 0, step = 0.1, value = 5),
+                      tipify(numericInput("lin.label.size", "Label font size:",
+                                          min = 0, step = 0.1, value = 12),
+                              "Font size of labels. Useful for fitting more labels into subtype plots", 
+                                "right", options = list(container = "body")),
+                      tipify(prettyCheckbox("lin.depline", label = "Show dep threshold", value = TRUE,
+                             animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
+                             "Plot vertical dependency line threshold (if 'crispr' or 'rnai' dataset selected).", 
+                             "right", options = list(container = "body"))
                ),
                column(6,
-                      pickerInput("depmap.data", "Choose dataset:", 
+                      pickerInput("lin.data", "Choose dataset:", 
                                   choices = c("crispr", "rnai", "cn", "ccle_tpm"),
-                                  multiple = FALSE)
+                                  multiple = FALSE),
+                      tipify(colourInput("lin.box.fill", "Boxplot fill color:", value = "#E2E2E2"),
+                             "Color of boxplot fill.", "right", options = list(container = "body")),
+                      tipify(colourInput("lin.pt.color", "Point color:", value = "#56B4E9"),
+                             "Color of points.", "right", options = list(container = "body")),
                )
              ),
              div(actionButton("dm.lineage.update", "Update Lineage Plot"), align = "center")
@@ -769,14 +796,13 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                        jqui_resizable(plotlyOutput("depmap.cnplot", height = 200)))
            ),
            column(width = 4,
-                  span(h3("Lineage", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
-                                                c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
-                                                  "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
-                                                  "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
-                                                  "array data as explained in <a href=https://doi.org/10.1038/s41586-019-1186-3 target=_blank rel=noopener>",
-                                                  "10.1038/s41586-019-1186-3</a>. See <a href=https://doi.org/10.1101/720243 target=_blank ",
-                                                  "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
-                                                  "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
+                  span(h3("Characterization", popify(icon("info-circle", style="font-size: 20px"), "Characterization",
+                                                c("This plot shows the distribution of values for the selected gene from the chosen dataset. ",
+                                                  "<br><br><b>crispr</b> will display CRISPR dependency scores from Public, Chronos. <br><br><b>rnai</b> will display ",
+                                                  "RNAi perturbation data from Achilles+DRIVE+Marcotte, DEMETER2. ",
+                                                  "<br><br><b>cn</b> will display copy number data from Sanger WES or Broad WES.",
+                                                  "<br><br><b>ccle_tpm</b> will display gene expression data from CCLE in log2(TPM+1).<br><br>",
+                                                  "The grouping can be changed between lineage, disease, and lineage subtypes."),
                                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
                        jqui_resizable(plotlyOutput("depmap.lineages", height = 800)))
            ),
@@ -2174,9 +2200,10 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         input$dm.dep.update
         
         dep.info <- plot_depmap_dependency(gene = input$depmap.gene, 
-                                           depmap.crispr.color = isolate(input$dep.crispr.color),
-                                           depmap.rnai.color = isolate(input$dep.rnai.color),
-                                           depmap.depline = isolate(input$dep.depline),
+                                           crispr.color = isolate(input$dep.crispr.color),
+                                           rnai.color = isolate(input$dep.rnai.color),
+                                           depline = isolate(input$dep.depline),
+                                           plot.grid = isolate(input$dep.plot.grid),
                                            depmap.meta = depmap.meta, 
                                            depmap.pool = pool)
       })
@@ -2189,7 +2216,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         dep.info <- plot_depmap_expression(gene = input$depmap.gene, 
                                            depmap.meta = depmap.meta, 
                                            depmap.pool = pool,
-                                           color = isolate(input$dep.exp.color))
+                                           color = isolate(input$exp.color),
+                                           plot.grid = isolate(input$exp.plot.grid))
       })
       
       # Copy number.
@@ -2197,16 +2225,27 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         req(input$depmap.gene, depmap.meta)
         input$dm.cn.update
         
-        dep.info <- plot_depmap_cn(input$depmap.gene, depmap.meta, pool)
+        dep.info <- plot_depmap_cn(gene = input$depmap.gene, 
+                                   depmap.meta = depmap.meta, 
+                                   depmap.pool = pool,
+                                   color = isolate(input$cn.color),
+                                   plot.grid = isolate(input$cn.plot.grid))
       })
       
       # Lineage info.
       output$depmap.lineages <- renderPlotly({
-        req(input$depmap.gene, depmap.meta, input$depmap.data)
+        req(input$depmap.gene, depmap.meta)
         input$dm.lineage.update
+
         dep.info <- plot_depmap_lineages(gene = input$depmap.gene, 
-                                         data.type = isolate(input$depmap.data),
-                                         group.by = isolate(input$depmap.group),
+                                         data.type = isolate(input$lin.data),
+                                         group.by = isolate(input$lin.group),
+                                         label.size = isolate(input$lin.label.size),
+                                         pt.color = isolate(input$lin.pt.color),
+                                         pt.size = isolate(input$lin.pt.size),
+                                         boxplot.fill = isolate(input$lin.box.fill),
+                                         boxplot.line.color = isolate(input$lin.box.color),
+                                         depline = isolate(input$lin.depline),
                                          depmap.meta = depmap.meta, 
                                          depmap.pool = pool)
       })

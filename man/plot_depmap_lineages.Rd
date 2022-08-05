@@ -10,7 +10,12 @@ plot_depmap_lineages(
   group.by,
   depmap.meta,
   depmap.pool,
-  jitter = 0
+  depline,
+  label.size = 12,
+  pt.size = 5,
+  pt.color = "#56B4E9",
+  boxplot.fill = "#E2E2E2",
+  boxplot.line.color = "#000000"
 )
 }
 \arguments{
@@ -18,10 +23,24 @@ plot_depmap_lineages(
 
 \item{data.type}{One of "crispr", "rnai", "cn", or "ccle_tpm".}
 
+\item{group.by}{Character scalar of column name to group by.}
+
 \item{depmap.meta}{data.frame of DepMap cell line metadata, as stored in the 'meta' table
 of the SQLite database built by \code{\link{build_depmap_db}}.}
 
 \item{depmap.pool}{pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.}
+
+\item{depline}{Boolean indicating whether to show the dependency line.}
+
+\item{pt.size}{Numeric scalar for point size.}
+
+\item{pt.color}{Character scalar for point color.}
+
+\item{boxplot.fill}{Character scalar for boxplot fill color.}
+
+\item{boxplot.line.color}{Character scalar for boxplot line color.}
+
+\item{jitter}{Numeric scalar for point jitter.}
 }
 \value{
 plotly object
