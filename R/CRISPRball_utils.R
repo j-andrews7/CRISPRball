@@ -1,3 +1,33 @@
+.utils.js <- "
+shinyjs.disableTab = function(name) {
+  var tab = $('.nav.navbar-nav li a[data-value=\"' + name + '\"]');
+  tab.bind('click.tab', function(e) {
+    e.preventDefault();
+    return false;
+  });
+  tab.addClass('disabled');
+}
+
+shinyjs.enableTab = function(name) {
+  var tab = $('.nav.navbar-nav li a[data-value=\"' + name + '\"]');
+  tab.unbind('click.tab');
+  tab.removeClass('disabled');
+}
+"
+
+# File upload ingress to appropriate named list structure.
+.gene_summ_ingress <- function(fileList) {
+  out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
+  names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', replacement='', fixed=TRUE)
+  return(out)
+}
+
+.sgrna_summ_ingress <- function(fileList) {
+  out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
+  names(out) <- sapply(fileList$name, gsub, pattern='.sgrna_summary.txt', replacement='', fixed=TRUE)
+  return(out)
+}
+
 # Generate easier columns for plotting for various data summaries.
 .gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL, essential.genes = NULL, depmap.genes = NULL) {
 
@@ -10,15 +40,20 @@
   }
 
   if (!is.null(depmap.genes)) {
-    df$DepMap_CRISPR_Essential <- df$id %in% depmap.genes$Gene[depmap.genes$Dataset == "DependencyEnum.Chronos_Combined" &
-                                                                 depmap.genes$Common.Essential == "True"]
-    df$DepMap_CRISPR_Selective <- df$id %in% depmap.genes$Gene[depmap.genes$Dataset == "DependencyEnum.Chronos_Combined" &
-                                                                 depmap.genes$Strongly.Selective == "True"]
+    df$DepMap_CRISPR_Essential <- df$id %in%
+      depmap.genes$gene_name[depmap.genes$dataset %in%
+                               c("Chronos_Combined", "Chronos_Score", "Chronos_Achilles") &
+                               depmap.genes$common_essential == TRUE]
 
-    df$DepMap_RNAi_Essential <- df$id %in% depmap.genes$Gene[depmap.genes$Dataset == "DependencyEnum.RNAi_merged" &
-                                                               depmap.genes$Common.Essential == "True"]
-    df$DepMap_RNAi_Selective <- df$id %in% depmap.genes$Gene[depmap.genes$Dataset == "DependencyEnum.RNAi_merged" &
-                                                               depmap.genes$Strongly.Selective == "True"]
+    df$DepMap_CRISPR_Selective <- df$id %in%
+      depmap.genes$gene_name[depmap.genes$dataset %in%
+                               c("Chronos_Combined", "Chronos_Score", "Chronos_Achilles") &
+                               depmap.genes$strongly_selective == TRUE]
+
+    df$DepMap_RNAi_Essential <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
+                                                                    depmap.genes$common_essential == TRUE]
+    df$DepMap_RNAi_Selective <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
+                                                                    depmap.genes$strongly_selective == TRUE]
   }
 
   df$LFC <- as.numeric(df$`neg|lfc`)
@@ -54,41 +89,4 @@
   df$RandomIndex <- sample(1:nrow(df), nrow(df))
 
   df
-}
-
-# sgRNA pair plot.
-.make_sgrna_pairplot <- function(df) {
-  gene <- df$Gene[1]
-  df <- data.frame(group = c(rep("control", nrow(df)), rep("treatment", nrow(df))), counts = c(df$control_count, df$treatment_count), id = rep(df$sgrna, 2))
-  df$hover.string <- paste0("</br><b>Control counts:</b> ", df$counts[df$group == "control"],
-                            "</br><b>Treatment counts:</b> ", df$counts[df$group == "treatment"],
-                            "</br><b>sgRNA:</b> ", df$id)
-
-  plot_ly(df,
-          x = ~group,
-          y = ~counts + 1,
-          split = ~id,
-          type = "scatter",
-          mode = "lines+markers",
-          text = ~hover.string,
-          hoverinfo = "text") %>%
-    layout(showlegend = FALSE, title = paste0(gene, " sgRNAs"),
-           yaxis = list(range = c(log10(0.8), log10(max(df$counts+100))),
-                        type = "log",
-                        rangemode = "tozero",
-                        zerolinecolor = "black",
-                        ticks = "outside",
-                        showline = TRUE,
-                        mirror = TRUE,
-                        zerolinewidth = 2,
-                        gridcolor = "#ffff",
-                        title = "Normalized Counts + 1"),
-           xaxis = list(ticks = "outside",
-                        showline = TRUE,
-                        mirror = TRUE,
-                        title = "",
-                        showgrid = FALSE)) %>%
-    config(toImageButtonOptions = list(format = "svg"),
-           displaylogo = FALSE,
-           plotGlPixelRatio = 7)
 }

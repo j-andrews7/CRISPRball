@@ -82,14 +82,6 @@
   res$order[dn.feats] <- 1
   res$opacity[dn.feats] <- sig.opacity
 
-  # LFC filter.
-  if(fc.thresh > 0) {
-    fc.threshed <- abs(res[[lfc.term]]) < fc.thresh
-    res$col[fc.threshed] <- insig.color
-    res$cex[fc.threshed] <- insig.size
-    res$order[fc.threshed] <- 0
-  }
-
   res$x <- res[[lfc.term]]
   res$y <- -log10(res[[sig.term]])
 
@@ -285,7 +277,7 @@
                           highlight.feats.linecolor, highlight.feats.linewidth,
                           highlight.featsets.color, highlight.featsets.size, highlight.featsets.opac,
                           highlight.featsets.linecolor, highlight.featsets.linewidth, h.id.suffix = "_rank") {
-
+  
   # Styling.
   df$col <- rep(insig.color, nrow(df))
   df$cex <- rep(insig.size, nrow(df))
@@ -331,14 +323,6 @@
   df$cex[dn.feats] <- sig.size
   df$order[dn.feats] <- 1
   df$opacity[dn.feats] <- sig.opacity
-
-  # LFC filter.
-  if(y.thresh > 0) {
-    y.threshed <- abs(df[[y.term]]) < y.thresh
-    df$col[y.threshed] <- insig.color
-    df$cex[y.threshed] <- insig.size
-    df$order[y.threshed] <- 0
-  }
 
   df$x <- df[[x.term]]
   df$y <- df[[y.term]]
@@ -560,14 +544,6 @@
   res$order[dn.feats] <- 1
   res$opacity[dn.feats] <- sig.opacity
 
-  # LFC filter.
-  if(fc.thresh > 0) {
-    fc.threshed <- abs(res[[lfc.term]]) < fc.thresh
-    res$col[fc.threshed] <- insig.color
-    res$cex[fc.threshed] <- insig.size
-    res$order[fc.threshed] <- 0
-  }
-
   res$x <- res[[x.term]]
   res$y <- -log10(res[[sig.term]])
 
@@ -737,4 +713,405 @@
   }
 
   fig
+}
+
+# sgRNA pair plot.
+.make_sgrna_pairplot <- function(df) {
+  gene <- df$Gene[1]
+
+  df <- data.frame(group = c(rep("control", nrow(df)), rep("treatment", nrow(df))), 
+                   counts = c(df$control_mean, df$treat_mean), id = rep(df$sgrna, 2))
+  
+  df$hover.string <- paste0("</br><b>Control counts:</b> ", df$counts[df$group == "control"],
+                            "</br><b>Treatment counts:</b> ", df$counts[df$group == "treatment"],
+                            "</br><b>sgRNA:</b> ", df$id)
+  
+  plot_ly(df,
+          x = ~group,
+          y = ~counts + 1,
+          split = ~id,
+          type = "scatter",
+          mode = "lines+markers",
+          text = ~hover.string,
+          hoverinfo = "text") %>%
+    layout(showlegend = FALSE, title = paste0(gene, " sgRNAs"),
+           yaxis = list(range = c(log10(0.8), log10(max(df$counts+100))),
+                        type = "log",
+                        rangemode = "tozero",
+                        zerolinecolor = "black",
+                        ticks = "outside",
+                        showline = TRUE,
+                        mirror = TRUE,
+                        zerolinewidth = 2,
+                        gridcolor = "#ffff",
+                        title = "Normalized Counts + 1"),
+           xaxis = list(ticks = "outside",
+                        showline = TRUE,
+                        mirror = TRUE,
+                        title = "",
+                        showgrid = FALSE)) %>%
+    config(toImageButtonOptions = list(format = "svg"),
+           displaylogo = FALSE,
+           plotGlPixelRatio = 7)
+}
+
+
+#' Plot gene dependency information from DepMap CRISPR and RNAi tables.
+#' 
+#' @param gene Character scalar for gene symbol.
+#' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
+#'   of the SQLite database built by \code{\link{build_depmap_db}}.
+#' @param crispr.color Character scalar for CRISPR trace color.
+#' @param rnai.color Character scalar for RNAi trace color.
+#' @param depline Boolean indicating whether to show the dependency line.
+#' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
+#' @param plot.grid Boolean indicating whether to plot gridlines.
+#' @return plotly object
+#'   
+#' @export
+#' @author Jared Andrews  
+plot_depmap_dependency <- function(gene, depmap.meta, crispr.color, 
+                                   rnai.color, depline, depmap.pool, plot.grid) {
+
+  df.c <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "crispr" WHERE "gene_name" == (:x)', params = list(x = gene))
+  df.r <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "rnai" WHERE "gene_name" == (:x)', params = list(x = gene))
+
+  df <- data.frame()
+
+  if (nrow(df.c) > 0) {
+    df.c$dataset <- "CRISPR"
+    df <- df.c
+  }
+  
+  if (nrow(df.r) > 0) {
+    df.r$dataset <- "RNAi"
+
+    if(nrow(df) > 0) {
+      df <- rbind(df, df.r)
+    } else {
+      df <- df.r
+    }
+  }
+
+  if (nrow(df) > 0) {
+    df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
+    
+    df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
+                              "</br><b>Gene Effect:</b> ", format(round(df$dependency, 3), nsmall = 3),
+                              "</br><b>Lineage:</b> ", df$lineage,
+                              "</br><b>Disease:</b> ", df$primary_disease)
+
+    gg <- ggplot() +
+      geom_density(data = df, aes(x=dependency, color=dataset, fill=dataset), alpha = 0.6) +
+      geom_rug(data = df[df$dataset == "CRISPR",], aes(x=dependency, color=dataset, text=hover.string), outside = FALSE) +
+      geom_rug(data = df[df$dataset == "RNAi",], aes(x=dependency, color=dataset, text=hover.string), sides = "t") +
+      ylab("") +
+      xlab("") +
+      theme_bw() +
+      scale_color_manual(values=c(crispr.color, rnai.color), 
+                         breaks = c("CRISPR", "RNAi")) +
+      scale_fill_manual(values=c(crispr.color, rnai.color), 
+                        breaks = c("CRISPR", "RNAi")) +
+      geom_vline(xintercept = 0) + theme(legend.position="none")
+
+    if (!plot.grid) {
+      gg <- gg + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+    }
+
+    if (depline) {
+      gg <- gg + geom_vline(xintercept = -1, color = "red", linetype = "dashed")
+    }
+
+    gg <- ggplotly(gg, tooltip = "text") %>%
+      layout(
+        xaxis = list(
+          title="Gene Effect"
+        ),
+        yaxis = list(
+          title="Density"))
+    
+    gg %>%
+      config(edits = list(annotationPosition = TRUE,
+                          annotationTail = TRUE),
+             toImageButtonOptions = list(format = "svg"),
+             displaylogo = FALSE,
+             plotGlPixelRatio = 7)
+  } else {
+    .plot_gene_not_found(gene)
+  }
+}
+
+
+#' Plot gene expression information from DepMap, mostly from CCLE.
+#' 
+#' @inheritParams plot_depmap_dependency
+#' @param color Character scalar for trace color.
+#' 
+#' @return plotly object
+#' 
+#' @export
+#' @author Jared Andrews  
+plot_depmap_expression <- function(gene, depmap.meta, depmap.pool, color, plot.grid) {
+  
+  df <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "ccle_tpm" WHERE "gene_name" == (:x)', params = list(x = gene))
+  
+  if (nrow(df) > 0) {
+    df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
+    
+    df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
+                              "</br><b>log2(TPM+1):</b> ", format(round(df$rna_expression, 3), nsmall = 3),
+                              "</br><b>Lineage:</b> ", df$lineage,
+                              "</br><b>Disease:</b> ", df$primary_disease)
+    df$color <- color
+    
+    gg <- ggplot(show.legend = FALSE) +
+      geom_density(data = df, aes(x=rna_expression, color=color, fill=color)) +
+      geom_rug(data = df, aes(x=rna_expression, color=color, text=hover.string, fill=color), outside = FALSE) +
+      ylab("Density") +
+      xlab("log2(TPM+1)") +
+      theme_bw() +
+      scale_color_manual(values=c(color), breaks = c(color)) +
+      scale_fill_manual(values=c(color), breaks = c(color)) + theme(legend.position="none")
+    
+    if (!plot.grid) {
+      gg <- gg + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+    }
+
+    gg <- ggplotly(gg, tooltip = "text")
+    
+    gg %>%
+      config(edits = list(annotationPosition = TRUE,
+                          annotationTail = TRUE),
+             toImageButtonOptions = list(format = "svg"),
+             displaylogo = FALSE,
+             plotGlPixelRatio = 7)
+  } else {
+    .plot_gene_not_found(gene)
+  }
+}
+
+
+#' Plot gene CN information from DepMap, mostly from CCLE.
+#' 
+#' @inheritParams plot_depmap_dependency
+#' @param color Character scalar for trace color.
+#' @return plotly object
+#'   
+#' @export
+#' @author Jared Andrews  
+plot_depmap_cn <- function(gene, depmap.meta, depmap.pool, color, plot.grid) {
+  
+  df <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "cn" WHERE "gene_name" == (:x)', params = list(x = gene))
+  
+  if (nrow(df) > 0) {
+    df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
+    
+    df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
+                              "</br><b>Copy Number (log2):</b> ", format(round(df$log_copy_number, 3), nsmall = 3),
+                              "</br><b>Lineage:</b> ", df$lineage,
+                              "</br><b>Disease:</b> ", df$primary_disease)
+    df$color <- color
+    
+    gg <- ggplot(show.legend = FALSE) +
+      geom_density(data = df, aes(x=log_copy_number, color=color, fill=color)) +
+      geom_rug(data = df, aes(x=log_copy_number, color=color, text=hover.string, fill=color), outside = FALSE) +
+      ylab("Density") +
+      xlab("log2(Copy Number)") +
+      theme_bw() +
+      scale_color_manual(values=c(color), breaks = c(color)) +
+      scale_fill_manual(values=c(color), breaks = c(color)) + theme(legend.position="none")
+    
+    if (!plot.grid) {
+      gg <- gg + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+    }
+
+    gg <- ggplotly(gg, tooltip = "text")
+    
+    gg %>%
+      config(edits = list(annotationPosition = TRUE,
+                          annotationTail = TRUE),
+             toImageButtonOptions = list(format = "svg"),
+             displaylogo = FALSE,
+             plotGlPixelRatio = 7)
+  } else {
+    .plot_gene_not_found(gene)
+  }
+}
+
+#' Plot selected information across lineages from DepMap.
+#'
+#' @inheritParams plot_depmap_dependency
+#' @param data.type One of "crispr", "rnai", "cn", or "ccle_tpm".
+#' @param group.by Character scalar of column name to group by.
+#' @param jitter Numeric scalar for point jitter.
+#' @param pt.size Numeric scalar for point size.
+#' @param pt.color Character scalar for point color.
+#' @param boxplot.fill Character scalar for boxplot fill color.
+#' @param boxplot.line.color Character scalar for boxplot line color.
+#' @return plotly object
+#'
+#' @export
+#' @author Jared Andrews
+plot_depmap_lineages <- function(gene, data.type, group.by, depmap.meta, depmap.pool, 
+                                 lineage = NULL,
+                                 depline = TRUE, label.size = 12, pt.size = 5, pt.color = "#56B4E9", 
+                                 boxplot.fill = "#E2E2E2", 
+                                 boxplot.line.color = "#000000") {
+  
+  # Get correct table.
+  query <- sprintf('SELECT * FROM "%s" WHERE "gene_name" == (:x)', data.type)
+  df <- pool::dbGetQuery(depmap.pool, query, params = list(x = gene))
+
+  # Get appropriate plot stuff based on datatype.
+  switch(data.type,
+         crispr={
+           h.text <- "Dependency"
+           colname <- "dependency"
+         },
+         rnai={
+           h.text <- "Dependency"
+           colname <- "dependency"
+         },
+         cn={
+           h.text <- "log2(Copy Number)"
+           colname <- "log_copy_number"
+         },
+         ccle_tpm={
+           h.text <- "log2(TPM+1)"
+           colname <- "rna_expression"
+         })
+  
+  if (nrow(df) > 0) {
+    df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage <- depmap.meta$lineage[match(df$depmap_id, depmap.meta$depmap_id)]
+    df$lineage_subtype <- depmap.meta$lineage_subtype[match(df$depmap_id, depmap.meta$depmap_id)]
+
+    # Get correct lineage.
+    if (!is.null(lineage)) {
+      df <- df[df$lineage == lineage,]
+    }
+
+    df$hover.string <- paste0("</br><b>Cell Line:</b> ", df$cell_line_name,
+                              "</br><b>", h.text, ":</b> ", format(round(df[[colname]], 3), nsmall = 3),
+                              "</br><b>Lineage:</b> ", df$lineage,
+                              "</br><b>Disease:</b> ", df$primary_disease)
+
+    # Get counts in each group and add to labels.
+    ylabs <- paste0(names(table(df[[group.by]]))," (",table(df[[group.by]]),")")
+
+    # Add plot border.
+    ay <- list(
+      showline = TRUE,
+      mirror = TRUE,
+      linecolor = toRGB("black"),
+      linewidth = 0.5,
+      showgrid = FALSE,
+      layer = "below traces",
+      zeroline = FALSE,
+      ticks = "outside",
+      zerolinewidth = 0.5,
+      tickvals = names(table(df[[group.by]])),
+      ticktext = ylabs,
+      tickfont = list(size = label.size),
+
+      # Fix extra whitespace at top and bottom of plot
+      range = ~ c(-1, length(unique(df[[group.by]])) - 0.5)
+    )
+
+    ax <- list(
+      showline = TRUE,
+      mirror = TRUE,
+      linecolor = toRGB("black"),
+      linewidth = 0.5,
+      zeroline = TRUE,
+      showgrid = FALSE,
+      layer = "below traces",
+      ticks = "outside",
+      zerolinewidth = 0.5
+    )
+
+    fig <- plot_ly(df, 
+                   x = as.formula(paste0("~", colname)), 
+                   y = as.formula(paste0("~", group.by)), 
+                   fillcolor = boxplot.fill,
+                   color = I(boxplot.line.color),
+                   type = "box", 
+                   boxpoints = FALSE, 
+                   alpha = 1)
+
+    fig <- fig %>% add_trace(type = "scatter",
+                            x = as.formula(paste0("~", colname)), 
+                            y = as.formula(paste0("~", group.by)), 
+                            mode = "markers", 
+                            text = ~hover.string,
+                            hoverinfo = "text",
+                            marker = list(color = pt.color,
+                                          size = pt.size))
+
+    if (depline & data.type %in% c("crispr", "rnai")) {
+      dline <- .vline(x = -1, dash = "longdash", width = 1)
+    } else {
+      dline <- NULL
+    }
+
+    fig <- fig %>% layout(showlegend = FALSE,
+                          shapes = list(dline),
+                          xaxis = ax,
+                          yaxis = ay)
+
+    fig %>%
+      config(edits = list(annotationPosition = TRUE,
+                          annotationTail = TRUE),
+             toImageButtonOptions = list(format = "svg"),
+             displaylogo = FALSE,
+             plotGlPixelRatio = 7)
+  } else {
+    .plot_gene_not_found(gene)
+  }
+}
+
+.plot_gene_not_found <- function(gene) {
+  # Just plots text for when a gene isn't found in depmap.
+  fig <- plot_ly()
+  fig <- fig %>%
+    add_trace(
+      mode = "text",
+      text = paste0(gene, " not found in DepMap."),
+      type = "scattergl",
+      textfont = list(
+        size = 20
+      ),
+      x = 2,
+      y = 2
+    )
+  
+  fig <- fig %>%
+    layout(
+      xaxis = list(
+        range = c(0, 4),
+        showline = FALSE,
+        zeroline = FALSE,
+        showgrid = FALSE,
+        showticklabels = FALSE
+      ),
+      yaxis = list(
+        range = c(0, 4),
+        showline = FALSE,
+        zeroline = FALSE,
+        showgrid = FALSE,
+        showticklabels = FALSE
+      )
+    )
+  
+  fig %>% style(hoverinfo = 'none')
 }

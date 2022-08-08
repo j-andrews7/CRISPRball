@@ -12,3 +12,11 @@ Name of SQLite database containing DepMap data.
 \description{
 Build SQLite database of DepMap data
 }
+\examples{
+\dontrun{
+build_depmap_db()
+}
+}
+\author{
+Jared Andrews
+}
