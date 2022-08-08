@@ -110,3 +110,32 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
   return(out)
 }
 
+.error_if_no_mygene <- function() {
+  if (!requireNamespace("mygene", quietly = TRUE)) {
+    stop("'mygene' installation required to display gene information.")
+  }
+}
+
+#' Generate gene tagList via mygene API
+#' @param gene Character scalar for gene symbol.
+#' 
+#' @return TagList containing dependency summary information.
+.make_gene_tag <- function(gene) { 
+  .error_if_no_mygene()
+  info <- mygene::query(gene, fields = "all", size = 1)
+
+  if (length(info) > 0) {
+    info <- info$hits
+    out <- tagList(splitLayout(span("Gene: ", info$symbol), span("Aliases: ", paste0(unlist(info$alias), collapse = ", "))),
+                   splitLayout(span("Position: ", paste0(info$genomic_pos$chr, ":", info$genomic_pos$start, "-", info$genomic_pos$end)),
+                               span("Gene type: ", info$type_of_gene)),
+                   splitLayout(span("Entrez: ", a(info$entrezgene, href = paste0("https://www.ncbi.nlm.nih.gov/gene/", info$entrezgene))),
+                               span("Ensembl: ", a(info$ensembl$gene, href = paste0("http://www.ensembl.org/id/", info$ensembl$gene)))),
+                   div(br(), span("Summary: ", info$summary))
+                   )
+  } else {
+    out <- tagList(div(span("Unable to find gene information.")))
+  }
+
+  return(out)
+}

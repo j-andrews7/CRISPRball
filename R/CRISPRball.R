@@ -847,7 +847,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                   span(h3("Gene Info",popify(icon("info-circle", style="font-size: 20px"), "Gene Info",
                               c("Gene info and accessions."),
                               placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
-                       uiOutput("depmap.geneinfo", height = 300)),
+                       uiOutput("depmap.geneinfo")),
            )
           )
         )
@@ -2269,7 +2269,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                    plot.grid = isolate(input$cn.plot.grid))
       })
       
-      # Lineage info
+      # Lineage plot
       output$depmap.lineages <- renderPlotly({
         req(input$depmap.gene, depmap.meta)
         input$dm.lineage.update
@@ -2304,6 +2304,13 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                          depline = isolate(input$sub.depline),
                                          depmap.meta = depmap.meta, 
                                          depmap.pool = pool)
+      })
+
+      # Gene info
+      output$depmap.geneinfo <- renderUI({
+        req(input$depmap.gene, depmap.gene)
+
+        .make_gene_tag(input$depmap.gene)
       })
     }
   }
