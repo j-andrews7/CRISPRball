@@ -379,7 +379,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
              )
            ),
            style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
-         bsCollapse(open = NULL,
+         bsCollapse(open = "com.settings",
                     bsCollapsePanel(
                       title = span(icon("plus"), "Common Plot Settings"), value = "com.settings", style = "info",
                       fluidRow(
@@ -449,7 +449,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                       title = span(icon("plus"), "Rank Plot Settings"), value = "rank.settings", style = "info",
                       fluidRow(
                         column(width = 6,
-                               numericInput("rank.y.max", label = "y-axis max:", value = 2, step = 0.5),
+                               numericInput("rank.y.max", label = "y-axis max:", value = 10, step = 0.5),
                                prettyCheckbox("rank.fcline", label = "Show FC threshold", value = TRUE,
                                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
                         ),
@@ -653,7 +653,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
            ),
            style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
          bsCollapse(
-           open = NULL,
+           open = "dm.dep.settings",
             bsCollapsePanel(
               title = span(icon("plus"), "Dependency Plot Settings"), value = "dm.dep.settings", style = "info",
               fluidRow(
@@ -759,7 +759,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                )
              ),
              div(actionButton("dm.sublineage.update", "Update Sublineage Plot"), align = "center")
-           ),
+           )
             # bsCollapsePanel(
             #   title = span(icon("plus"), "Highlight Gene(sets)"), value = "highlight.settings", style = "info",
             #   tipify(textAreaInput("hl.genes", "Highlight Genes:", value = "", rows = 4,
