@@ -772,7 +772,8 @@
 #' @author Jared Andrews  
 plot_depmap_dependency <- function(gene, depmap.meta, crispr.color, 
                                    rnai.color, depline, depmap.pool, plot.grid) {
-
+  
+  # Data pull and aggregation.
   df.c <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "crispr" WHERE "gene_name" == (:x)', params = list(x = gene))
   df.r <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "rnai" WHERE "gene_name" == (:x)', params = list(x = gene))
 
@@ -793,6 +794,7 @@ plot_depmap_dependency <- function(gene, depmap.meta, crispr.color,
     }
   }
 
+  # Plot construction.
   if (nrow(df) > 0) {
     df$cell_line_name <- depmap.meta$cell_line_name[match(df$depmap_id, depmap.meta$depmap_id)]
     df$primary_disease <- depmap.meta$primary_disease[match(df$depmap_id, depmap.meta$depmap_id)]

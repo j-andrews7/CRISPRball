@@ -180,6 +180,18 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
           )
         )
       ),
+      fluidRow(
+        column(12,
+          wellPanel(
+            h3("How to Use CRISPRball"),
+            div(
+              "CRISPRball is a web application for visualizing MAGeCK RRA analysis results.",
+              span("All plots have explanations that can be accessed by hovering and/or clicking the ", 
+                   icon("info-circle", style="font-size: 14px"), " icon above each plot."),
+            )
+          )
+        )
+      )
     ),
     # ----------------QC--------------------
     tabPanel(
@@ -367,7 +379,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
              )
            ),
            style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
-         bsCollapse(open = NULL,
+         bsCollapse(open = "com.settings",
                     bsCollapsePanel(
                       title = span(icon("plus"), "Common Plot Settings"), value = "com.settings", style = "info",
                       fluidRow(
@@ -437,7 +449,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                       title = span(icon("plus"), "Rank Plot Settings"), value = "rank.settings", style = "info",
                       fluidRow(
                         column(width = 6,
-                               numericInput("rank.y.max", label = "y-axis max:", value = 2, step = 0.5),
+                               numericInput("rank.y.max", label = "y-axis max:", value = 10, step = 0.5),
                                prettyCheckbox("rank.fcline", label = "Show FC threshold", value = TRUE,
                                               animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")),
                         ),
@@ -641,7 +653,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
            ),
            style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "),
          bsCollapse(
-           open = NULL,
+           open = "dm.dep.settings",
             bsCollapsePanel(
               title = span(icon("plus"), "Dependency Plot Settings"), value = "dm.dep.settings", style = "info",
               fluidRow(
@@ -747,41 +759,41 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                )
              ),
              div(actionButton("dm.sublineage.update", "Update Sublineage Plot"), align = "center")
-           ),
-            bsCollapsePanel(
-              title = span(icon("plus"), "Highlight Gene(sets)"), value = "highlight.settings", style = "info",
-              tipify(textAreaInput("hl.genes", "Highlight Genes:", value = "", rows = 4,
-                                   placeholder = "Enter space, comma, or newline delimited genes"),
-                     "Genes to highlight on plots.", "right", options = list(container = "body")),
-              tipify(pickerInput("hl.genesets", "Highlight Genesets:", choices = c("", names(genesets)),
-                                 multiple = TRUE, options = list(`live-search` = TRUE, `actions-box` = TRUE)),
-                     "If provided, genesets available to highlight on plots.", "right", options = list(container = "body")),
-              fluidRow(
-                column(6,
-                       tipify(numericInput("hl.genes.opa", label = "Genes opacity:", value = 1, step = 0.05, min = 0),
-                              "Opacity of highlighted genes.", "right", options = list(container = "body")),
-                       tipify(numericInput("hl.genes.size", label = "Genes pt size:", value = 7, step = 0.1, min = 0),
-                              "Point size of highlighted genes.", "right", options = list(container = "body")),
-                       tipify(numericInput("hl.genes.lw", label = "Genes border width:", value = 1, step = 0.05, min = 0),
-                              "Border width of highlighted genes.", "right", options = list(container = "body")),
-                       tipify(colourInput("hl.genes.col", "Genes color:", value = "#E69F00"),
-                              "Fill color of highlighted genes.", "right", options = list(container = "body")),
-                       tipify(colourInput("hl.genes.lcol", "Genes border:", value = "#000000"),
-                              "Border color of highlighted genes.", "right", options = list(container = "body"))
-                ),
-                column(6,
-                       tipify(numericInput("hl.genesets.opa", label = "Sets opacity:", value = 1, step = 0.05, min = 0),
-                              "Opacity of genes in highlighted geneset(s).", "right", options = list(container = "body")),
-                       tipify(numericInput("hl.genesets.size", label = "Sets pt size:", value = 7, step = 0.1, min = 0),
-                              "Point size of genes in highlighted geneset(s).", "right", options = list(container = "body")),
-                       tipify(numericInput("hl.genesets.lw", label = "Sets border width:", value = 1, step = 0.05, min = 0),
-                              "Border width genes in of highlighted geneset(s).", "right", options = list(container = "body")),
-                       tipify(colourInput("hl.genesets.col", "Sets color:", value = "#009E73"),
-                              "Fill color of genes in highlighted geneset(s).", "right", options = list(container = "body")),
-                       tipify(colourInput("hl.genesets.lcol", "Sets border:", value = "#000000"),
-                              "Border color of genes in highlighted geneset(s).", "right", options = list(container = "body")))
-              )
-            )
+           )
+            # bsCollapsePanel(
+            #   title = span(icon("plus"), "Highlight Gene(sets)"), value = "highlight.settings", style = "info",
+            #   tipify(textAreaInput("hl.genes", "Highlight Genes:", value = "", rows = 4,
+            #                        placeholder = "Enter space, comma, or newline delimited genes"),
+            #          "Genes to highlight on plots.", "right", options = list(container = "body")),
+            #   tipify(pickerInput("hl.genesets", "Highlight Genesets:", choices = c("", names(genesets)),
+            #                      multiple = TRUE, options = list(`live-search` = TRUE, `actions-box` = TRUE)),
+            #          "If provided, genesets available to highlight on plots.", "right", options = list(container = "body")),
+            #   fluidRow(
+            #     column(6,
+            #            tipify(numericInput("hl.genes.opa", label = "Genes opacity:", value = 1, step = 0.05, min = 0),
+            #                   "Opacity of highlighted genes.", "right", options = list(container = "body")),
+            #            tipify(numericInput("hl.genes.size", label = "Genes pt size:", value = 7, step = 0.1, min = 0),
+            #                   "Point size of highlighted genes.", "right", options = list(container = "body")),
+            #            tipify(numericInput("hl.genes.lw", label = "Genes border width:", value = 1, step = 0.05, min = 0),
+            #                   "Border width of highlighted genes.", "right", options = list(container = "body")),
+            #            tipify(colourInput("hl.genes.col", "Genes color:", value = "#E69F00"),
+            #                   "Fill color of highlighted genes.", "right", options = list(container = "body")),
+            #            tipify(colourInput("hl.genes.lcol", "Genes border:", value = "#000000"),
+            #                   "Border color of highlighted genes.", "right", options = list(container = "body"))
+            #     ),
+            #     column(6,
+            #            tipify(numericInput("hl.genesets.opa", label = "Sets opacity:", value = 1, step = 0.05, min = 0),
+            #                   "Opacity of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+            #            tipify(numericInput("hl.genesets.size", label = "Sets pt size:", value = 7, step = 0.1, min = 0),
+            #                   "Point size of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+            #            tipify(numericInput("hl.genesets.lw", label = "Sets border width:", value = 1, step = 0.05, min = 0),
+            #                   "Border width genes in of highlighted geneset(s).", "right", options = list(container = "body")),
+            #            tipify(colourInput("hl.genesets.col", "Sets color:", value = "#009E73"),
+            #                   "Fill color of genes in highlighted geneset(s).", "right", options = list(container = "body")),
+            #            tipify(colourInput("hl.genesets.lcol", "Sets border:", value = "#000000"),
+            #                   "Border color of genes in highlighted geneset(s).", "right", options = list(container = "body")))
+            #   )
+            # )
          )
         ),
         mainPanel(
@@ -844,10 +856,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                                   "The grouping can be changed between lineage subtypes."),
                                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
                        jqui_resizable(plotlyOutput("depmap.sublineage", height = 300))),
-                  span(h3("Gene Info",popify(icon("info-circle", style="font-size: 20px"), "Gene Info",
+                       br(),
+                  wellPanel(span(h3("Gene Info",popify(icon("info-circle", style="font-size: 20px"), "Gene Info",
                               c("Gene info and accessions."),
                               placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
-                       uiOutput("depmap.geneinfo")),
+                       uiOutput("depmap.geneinfo")))
            )
           )
         )
