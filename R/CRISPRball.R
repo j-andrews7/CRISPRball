@@ -1402,7 +1402,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     # Summary table and plots.
-    output$gene1.summary <- renderDT({
+    output$gene1.summary <- renderDT(server = FALSE, {
       req(set1.genes)
       # Remove columns that are redundant or confusing.
       target <- which(names(set1.genes()) %in% c("neg|score", "neg|p-value", "neg|rank",
@@ -1700,7 +1700,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # If only one dataset provided, don't render second dataset.
     observe({if (length(gene.data()) > 1) {
-      output$gene2.summary <- renderDT({
+      output$gene2.summary <- renderDT(server = FALSE, {
         req(set2.genes)
         # Remove columns that are redundant or confusing.
         target <- which(names(set2.genes()) %in% c("neg|score", "neg|p-value", "neg|rank",
