@@ -67,6 +67,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
   sgrna.choices <- NULL
   summ.choices <- NULL
   sgrna.gene <- NULL
+
+  default.tab <- NULL
   
   if (!is.null(gene.data)) {
     gene.choices <- names(gene.data)
@@ -79,6 +81,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
   
   if (!is.null(count.summary)) {
     summ.choices <- colnames(count.summary)
+    default.tab <- "QC"
   }
   
   # Load cell line metadata and gene summaries if depmap db provided.
@@ -99,6 +102,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
   ui <- navbarPage(
     "CRISPRball",
+    selected = default.tab,
     useShinyjs(),
     extendShinyjs(text=.utils.js, functions = c('disableTab','enableTab')),
     tags$head(
