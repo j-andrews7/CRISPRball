@@ -18,18 +18,21 @@ shinyjs.enableTab = function(name) {
 # File upload ingress to appropriate named list structure.
 .gene_summ_ingress <- function(fileList) {
   out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-  names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', replacement='', fixed=TRUE)
+  names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', 
+                       replacement='', fixed=TRUE)
   return(out)
 }
 
 .sgrna_summ_ingress <- function(fileList) {
   out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-  names(out) <- sapply(fileList$name, gsub, pattern='.sgrna_summary.txt', replacement='', fixed=TRUE)
+  names(out) <- sapply(fileList$name, gsub, pattern='.sgrna_summary.txt', 
+                       replacement='', fixed=TRUE)
   return(out)
 }
 
 # Generate easier columns for plotting for various data summaries.
-.gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL, essential.genes = NULL, depmap.genes = NULL) {
+.gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL, 
+                          essential.genes = NULL, depmap.genes = NULL) {
 
   if (!is.null(essential.genes)) {
     df$essential <- df$id %in% essential.genes
@@ -76,12 +79,14 @@ shinyjs.enableTab = function(name) {
 
   df$pval <- apply(df, 1, function(x) {
     x <- split(unname(x),names(x))
-    as.numeric(ifelse(as.numeric(x$`neg|p-value`) < as.numeric(x$`pos|p-value`), x$`neg|p-value`, x$`pos|p-value`))
+    as.numeric(ifelse(as.numeric(x$`neg|p-value`) < as.numeric(x$`pos|p-value`), 
+                      x$`neg|p-value`, x$`pos|p-value`))
   })
 
   df$goodsgrna <- apply(df, 1, function(x) {
     x <- split(unname(x),names(x))
-    as.integer(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`), x$`neg|goodsgrna`, x$`pos|goodsgrna`))
+    as.integer(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`), 
+                      x$`neg|goodsgrna`, x$`pos|goodsgrna`))
   })
 
   df$Rank <- rank(df$LFC)

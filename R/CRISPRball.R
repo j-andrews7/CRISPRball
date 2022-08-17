@@ -821,13 +821,13 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                                            "to the median of all common essential genes."),
                                                          placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
                        uiOutput("depmap.deplines"),
-                       jqui_resizable(plotlyOutput("depmap.essplot", height = 250))),
+                       withSpinner(jqui_resizable(plotlyOutput("depmap.essplot", height = 250)))),
           
                   span(h3("Expression", popify(icon("info-circle", style="font-size: 20px"), "Gene Expression",
                                                c("RNASeq files are aligned with STAR and quantified with RSEM, then TPM-normalized. ",
                                                  "Reported values are log2(TPM+1)."),
                                                placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
-                       jqui_resizable(plotlyOutput("depmap.expplot", height = 200))),
+                       withSpinner(jqui_resizable(plotlyOutput("depmap.expplot", height = 200)))),
                   span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
                                                 c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
                                                   "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
@@ -837,7 +837,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                                   "rel=noopener>10.1101/720243</a> for details on how CN source is chosen per line. Lines with ",
                                                   "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."),
                                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
-                       jqui_resizable(plotlyOutput("depmap.cnplot", height = 200)))
+                       withSpinner(jqui_resizable(plotlyOutput("depmap.cnplot", height = 200))))
            ),
            column(width = 4,
                   span(h3("Characterization", popify(icon("info-circle", style="font-size: 20px"), "Characterization",
@@ -848,7 +848,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                                   "<br><br><b>ccle_tpm</b> will display gene expression data from CCLE in log2(TPM+1).<br><br>",
                                                   "The grouping can be changed between lineage, disease, and lineage subtypes."),
                                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
-                       jqui_resizable(plotlyOutput("depmap.lineages", height = 800)))
+                       withSpinner(jqui_resizable(plotlyOutput("depmap.lineages", height = 800))))
            ),
            column(width = 4,
                   span(h3("Sublineages", popify(icon("info-circle", style="font-size: 20px"), "Sublineage",
@@ -859,12 +859,12 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                                   "<br><br><b>ccle_tpm</b> will display gene expression data from CCLE in log2(TPM+1).<br><br>",
                                                   "The grouping can be changed between lineage subtypes."),
                                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
-                       jqui_resizable(plotlyOutput("depmap.sublineage", height = 300))),
+                       withSpinner(jqui_resizable(plotlyOutput("depmap.sublineage", height = 300)))),
                        br(),
                   wellPanel(span(h3("Gene Info",popify(icon("info-circle", style="font-size: 20px"), "Gene Info",
                               c("Gene info and accessions."),
                               placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
-                       uiOutput("depmap.geneinfo")))
+                       withSpinner(uiOutput("depmap.geneinfo"))))
            )
           )
         )
