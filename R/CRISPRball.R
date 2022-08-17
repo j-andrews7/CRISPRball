@@ -166,7 +166,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     ),
     # ---------------Data Upload-----------------
     tabPanel(
-      title = "Data Upload",
+      title = "Data Upload & Usage",
       id = "upload",
       fluidRow(
         column(6,
@@ -232,7 +232,20 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
               h3("Downloading Data & Plots"),
               span("All data in tables can be easily filtered via the buttons above the table. Filtering will be applied. ",
                    "Plots can be downloaded as SVG files by clicking the ", strong("Download Plot"), 
-                   " button above the plot visible on hover. ")
+                   " button above the plot visible on hover. "),
+              br(),
+              br(),
+              br(),
+              h3("DepMap Integration"),
+              span("If provided, the ", strong("DepMap"), " tab will contain plots for the DepMap data. ",
+                   "This can be useful to explore potential ",
+                   "hits for selectivity, expression, and copy number in a given lineage or disease. ",
+                   "Common essential genes from DepMap's CRISPR and/or RNAi screens can be removed from the gene plots by ",
+                   "checking the appropriate box in the sidebar. ",
+                   br(),
+                   br(),
+                   "See the ", a("DepMap site", href="http://depmap.org/"), " for more information, additional tools, and ",
+                   "the appropriate ", a("publication to cite", href="http://depmap.org/publications/"), " if you utilize this data."),
             )
           )
         )
