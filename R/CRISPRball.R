@@ -187,11 +187,52 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       fluidRow(
         column(12,
           wellPanel(
-            h3("How to Use CRISPRball"),
+            h2("Getting Started with CRISPRball"),
+            hr(),
             div(
               "CRISPRball is a web application for visualizing MAGeCK RRA analysis results.",
-              span("All plots have explanations that can be accessed by hovering and/or clicking the ", 
+              "For more information on running the analysis, see the ",
+              a("MAGeCK RRA Analysis User Guide", href="https://sourceforge.net/p/mageck/wiki/Home/"),
+              br(),
+              br(),
+              br(),
+              h3("Data Upload"),
+              span("The ", strong("Data Upload"), "tab allows you to upload a normalized counts file, a count summary file, and gene and sgRNA summary files."),
+              span("The normalized counts and count summary files should be tab-delimited text files returned by ", code("mageck count"),
+                   " with *.countsummary.txt and *.count_norm.txt extensions, respectively. ",
+                   "The gene and sgRNA summary files should be tab-delimited text files with *.gene_summary.txt and *.sgrna_summary.txt extensions, ",
+                   "multiple sets of which can be uploaded. The prefixes of the gene summary and sgrna summary files should match, ",
+                   "e.g. P7.gene_summary.txt and P7.sgrna_summary.txt."),
+              br(),
+              br(),
+              br(),
+              h3("Plot Content, Gene(set) Highlighting, and Labeling"),
+              span("All plots have explanations of their context that can be accessed by hovering and/or clicking the ", 
                    icon("info-circle", style="font-size: 14px"), " icon above each plot."),
+              br(),
+              br(),
+              br(),
+              span("In the", strong("Gene (Overview)"), " tab, labels can be added on click to each point in the plot. These labels can also be ",
+                   "dragged around the plot to change their position. Double clicking the plot will remove all labels. ",
+                   "Individual labels can be removed by clicking the same point. ",
+                   "The other text annotations can also be re-positioned by dragging. ",
+                   "Genes or genesets (if provided) can be highlighted on the plots using the ",
+                   "'Highlight Gene(sets)' inputs in the sidebar", 
+                   "button that can be used to highlight a set of genes in the plot. "),
+              br(),
+              br(),
+              br(),
+              h3("Adjusting Plot Settings/Appearance"),
+              "Nearly all plots have adjustable settings that can be adjusted by adjusting the input in the sidebar for each tab. ",
+              "Hovering over an input field will display a tooltip with a description of the input and how it affects the plot.",
+              span("After tweaking the settings for a given, click the ", strong("Update Plot"), " button to update the plot."),
+              br(),
+              br(),
+              br(),
+              h3("Downloading Data & Plots"),
+              span("All data in tables can be easily filtered via the buttons above the table. Filtering will be applied. ",
+                   "Plots can be downloaded as SVG files by clicking the ", strong("Download Plot"), 
+                   " button above the plot visible on hover. ")
             )
           )
         )
@@ -868,6 +909,24 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
            )
           )
         )
+      )
+    ),
+    # -----------------About-------------------
+    tabPanel(
+      title = "About",
+      id = "about",
+      fluidRow(
+        column(width = 12,
+          h2("About CRISPRball"),
+          hr(),
+          HTML("<p>CRISPRball was developed by <a href='https://github.com/j-andrews7' target=_blank>Jared Andrews</a> ",
+            "in the Department of Developmental Neurobiology and <a href='https://github.com/jake-steele' target=_blank>Jake Steele</a> ",
+            "in the Center for Advanced Genome Engineering (CAGE) at St. Jude Children's Research Hospital.</p>"),
+          br(),
+          HTML("<p>CRISPRball is released under the <a href='https://github.com/j-andrews7' target=_blank>MIT license</a> and should ",
+            "be used only for research purposes. The CRISPRball package is developed and available on ",
+            "<a href='https://github.com/j-andrews7/CRISPRball' target=_blank>Github</a>.</p>"),
+        )  
       )
     )
   )
