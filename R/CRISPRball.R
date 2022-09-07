@@ -12,7 +12,7 @@
 #' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
 #' @importFrom ComplexHeatmap Heatmap pheatmap
 #' @import DT
-#' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations config toRGB event_data add_trace
+#' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations add_segments config toRGB event_data add_trace
 #' @import ggplot2
 #' @importFrom shinyWidgets prettyCheckbox dropdownButton tooltipOptions pickerInput updatePickerInput
 #' @importFrom shinycssloaders withSpinner
@@ -276,7 +276,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       }
     })
 
-    # Hide depmap tab if database not provided. Tried disable, still looks/feels selectable which may be confusing.
+    # Hide depmap tab if database not provided. 
+    # Tried disable, still looks/feels selectable which may be confusing.
     if (is.null(depmap.db)) {
       shinyjs::hide(selector = '.navbar-nav a[data-value="DepMap"')
     }
