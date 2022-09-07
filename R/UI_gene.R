@@ -179,7 +179,7 @@
          width = 10,
          fluidRow(
            column(width = 4,
-                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Volcano Plot",
+                  span(popify(icon("circle-info", style="font-size: 20px"), title = "Volcano Plot",
                               c("This volcano plot shows the log2 fold change on the x-axis and the -log10(FDR) value on the y-axis. ",
                                 "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
                                 "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
@@ -189,7 +189,7 @@
                        withSpinner(jqui_resizable(plotlyOutput("gene1.vol"))))
            ),
            column(width = 4,
-                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Rank Plot",
+                  span(popify(icon("circle-info", style="font-size: 20px"), title = "Rank Plot",
                               c("This rank plot shows the log2 fold change on the y-axis and the gene rank on the x-axis. ",
                                 "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
                                 "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
@@ -198,7 +198,7 @@
                        withSpinner(jqui_resizable(plotlyOutput("gene1.rank"))))
            ),
            column(width = 4,
-                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Lawn Plot",
+                  span(popify(icon("circle-info", style="font-size: 20px"), title = "Lawn Plot",
                               c("This plot shows the log2 fold change on the y-axis and the genes randomly ordered on the x-axis. ",
                                 "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
                                 "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",

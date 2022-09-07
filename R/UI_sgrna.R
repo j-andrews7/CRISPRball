@@ -30,7 +30,7 @@
          width = 10,
          fluidRow(
            column(width = 2,
-                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Counts Plot",
+                  span(popify(icon("circle-info", style="font-size: 20px"), title = "Counts Plot",
                               c("This rank plot shows the normalized counts for each sgRNA for the ",
                                 "specified gene across the samples that make up the dataset comparision. ",
                                 "Hover over a point for additional info."),
@@ -38,7 +38,7 @@
                        withSpinner(jqui_resizable(plotlyOutput("sgrna1.counts"))))
            ),
            column(width = 4,
-                  span(popify(icon("info-circle", style="font-size: 20px"), title = "Rank Plot",
+                  span(popify(icon("circle-info", style="font-size: 20px"), title = "Rank Plot",
                               c("This rank plot shows the log2 fold change on the y-axis and the sgRNA rank on the x-axis. ",
                                 "sgRNAs for the selected gene will be highlighted. ",
                                 "Click and drag to zoom in. Hover over a point for additional info."),

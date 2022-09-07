@@ -41,7 +41,7 @@ tab_data_upload <- tabPanel(
               br(),
               h3("Plot Content, Gene(set) Highlighting, and Labeling"),
               span("All plots have explanations of their context that can be accessed by hovering and/or clicking the ", 
-                   icon("info-circle", style="font-size: 14px"), " icon above each plot."),
+                   icon("circle-info", style="font-size: 14px"), " icon above each plot."),
               br(),
               br(),
               br(),

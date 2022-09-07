@@ -129,7 +129,7 @@
           width = 10,
           fluidRow(
            column(width = 4,
-                  span(h3("Dependent Cell Lines", popify(icon("info-circle", style="font-size: 20px"), "Dependent Cell Lines",
+                  span(h3("Dependent Cell Lines", popify(icon("circle-info", style="font-size: 20px"), "Dependent Cell Lines",
                                                          c("This plot shows DepMap dependency scores for the selected gene. ",
                                                            "A cell line is considered dependent if it has a probability of dependency ",
                                                            "greater than 50%. <br><br>",
@@ -148,12 +148,12 @@
                        uiOutput("depmap.deplines"),
                        withSpinner(jqui_resizable(plotlyOutput("depmap.essplot", height = 250)))),
           
-                  span(h3("Expression", popify(icon("info-circle", style="font-size: 20px"), "Gene Expression",
+                  span(h3("Expression", popify(icon("circle-info", style="font-size: 20px"), "Gene Expression",
                                                c("RNASeq files are aligned with STAR and quantified with RSEM, then TPM-normalized. ",
                                                  "Reported values are log2(TPM+1)."),
                                                placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
                        withSpinner(jqui_resizable(plotlyOutput("depmap.expplot", height = 200)))),
-                  span(h3("Copy Number", popify(icon("info-circle", style="font-size: 20px"), "Copy Number",
+                  span(h3("Copy Number", popify(icon("circle-info", style="font-size: 20px"), "Copy Number",
                                                 c("The <a href=https://forum.depmap.org/t/what-is-relative-copy-number-copy-number-ratio/104/2 target=_blank>relative ",
                                                   "copy number</a> pipeline used varies by cell line. For around 1000 lines, Sanger WES data ",
                                                   "was used, while for around 700 lines, Broad WES data was used. The remaining lines use SNP ",
@@ -165,7 +165,7 @@
                        withSpinner(jqui_resizable(plotlyOutput("depmap.cnplot", height = 200))))
            ),
            column(width = 4,
-                  span(h3("Characterization", popify(icon("info-circle", style="font-size: 20px"), "Characterization",
+                  span(h3("Characterization", popify(icon("circle-info", style="font-size: 20px"), "Characterization",
                                                 c("This plot shows the distribution of values for the selected gene from the chosen dataset. ",
                                                   "<br><br><b>crispr</b> will display CRISPR dependency scores from Public, Chronos. <br><br><b>rnai</b> will display ",
                                                   "RNAi perturbation data from Achilles+DRIVE+Marcotte, DEMETER2. ",
@@ -176,7 +176,7 @@
                        withSpinner(jqui_resizable(plotlyOutput("depmap.lineages", height = 800))))
            ),
            column(width = 4,
-                  span(h3("Sublineages", popify(icon("info-circle", style="font-size: 20px"), "Sublineage",
+                  span(h3("Sublineages", popify(icon("circle-info", style="font-size: 20px"), "Sublineage",
                                                 c("This plot shows the distribution of values for the selected gene for the sublineages of the chosen lineage. ",
                                                   "<br><br><b>crispr</b> will display CRISPR dependency scores from Public, Chronos. <br><br><b>rnai</b> will display ",
                                                   "RNAi perturbation data from Achilles+DRIVE+Marcotte, DEMETER2. ",
@@ -186,7 +186,7 @@
                                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")), .noWS="outside"),
                        withSpinner(jqui_resizable(plotlyOutput("depmap.sublineage", height = 300)))),
                        br(),
-                  wellPanel(span(h3("Gene Info",popify(icon("info-circle", style="font-size: 20px"), "Gene Info",
+                  wellPanel(span(h3("Gene Info",popify(icon("circle-info", style="font-size: 20px"), "Gene Info",
                               c("Gene info and accessions."),
                               placement = "bottom", trigger = "hover", options = list(container = "body")), .noWS="outside"),
                        withSpinner(uiOutput("depmap.geneinfo"))))
