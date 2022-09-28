@@ -45,10 +45,10 @@
                                     "Filter PCA samples to those in metadata table.", "right", options = list(container = "body")),
                             fluidRow(
                             column(6, tipify(selectizeInput("bip.color", "Color by:",
-                                                            choices = summ.choices),
+                                                            choices = c("", summ.choices), selected = ifelse("Label" %in% summ.choices, "Label", NULL)),
                                                 "Metadata variable by which samples are colored.", "right", options = list(container = "body"))),
                             column(6, tipify(selectizeInput("bip.shape", "Shape by:",
-                                                            choices = summ.choices),
+                                                            choices = c("", summ.choices)),
                                                 "Metadata variable by which samples are shaped.", "right", options = list(container = "body")))
                             ),
                             fluidRow(

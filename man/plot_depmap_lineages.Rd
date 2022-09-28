@@ -31,7 +31,11 @@ of the SQLite database built by \code{\link{build_depmap_db}}.}
 
 \item{depmap.pool}{pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.}
 
+\item{lineage}{Character scalar of lineage for which to plot sub-lineage data.}
+
 \item{depline}{Boolean indicating whether to show the dependency line.}
+
+\item{label.size}{Numeric scaler for axis label size.}
 
 \item{pt.size}{Numeric scalar for point size.}
 
@@ -40,8 +44,6 @@ of the SQLite database built by \code{\link{build_depmap_db}}.}
 \item{boxplot.fill}{Character scalar for boxplot fill color.}
 
 \item{boxplot.line.color}{Character scalar for boxplot line color.}
-
-\item{jitter}{Numeric scalar for point jitter.}
 }
 \value{
 plotly object

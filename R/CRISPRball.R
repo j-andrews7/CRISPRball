@@ -12,13 +12,13 @@
 #' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
 #' @importFrom ComplexHeatmap Heatmap pheatmap
 #' @import DT
-#' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations add_segments config toRGB event_data add_trace
+#' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations add_segments config toRGB event_data add_trace style
 #' @import ggplot2
 #' @importFrom shinyWidgets prettyCheckbox dropdownButton tooltipOptions pickerInput updatePickerInput
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable
 #' @importFrom shinyjs show useShinyjs hidden disable click extendShinyjs js
-#' @importFrom shinyBS tipify popify
+#' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
 #' @importFrom colourpicker colourInput
 #' @importFrom MAGeCKFlute BarView MapRatesView
 #' @importFrom PCAtools pca
@@ -26,8 +26,8 @@
 #' @importFrom grid grid.newpage grid.text
 #' @importFrom matrixStats rowVars rowMaxs rowMins
 #' @importFrom graphics hist legend lines
-#' @importFrom stats cor
-#' @importFrom utils read.csv
+#' @importFrom stats cor as.formula
+#' @importFrom utils read.csv read.delim
 #'
 #' @param gene.data A named list containing \code{gene_summary.txt} tables as data.frames.
 #'   Multiple data.frames may be provided, one per element of the list.
@@ -382,7 +382,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$qc.map <- renderPlot({
-      MapRatesView(count.summary())
+      MapRatesView(count.summary()) + scale_x_discrete(guide = guide_axis(angle = 45))
+      
     })
 
     # TODO: rewrite this.

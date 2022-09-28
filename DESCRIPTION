@@ -28,28 +28,24 @@ Imports:
     grid,
     ComplexHeatmap,
     graphics,
-    grDevices,
     stats,
     ggplot2,
     plotly,
-    shinydashboard,
     shinyWidgets,
-    dashboardthemes,
     shinycssloaders,
     shinyjqui,
     dittoSeq,
     matrixStats,
     colourpicker,
     shinyjs,
-    methods,
     MAGeCKFlute,
-    PCAtools,
-    htmlwidgets
+    PCAtools
 Suggests:
     BiocStyle,
     msigdbr,
     depmap,
     pool,
-    RSQLite
+    RSQLite,
+    mygene
 Depends:
     shinyBS
