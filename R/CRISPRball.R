@@ -105,65 +105,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     selected = default.tab,
     useShinyjs(),
     extendShinyjs(text=.utils.js, functions = c('disableTab','enableTab')),
-    tags$head(
-      # Note the wrapping of the string in HTML()
-      tags$style(HTML("
-          .panel-body {
-            padding: 5px;
-          }
-          .form-group {
-            margin-bottom: 3px;
-            padding-bottom: 2px !important;
-            padding-top: 2px !important;
-            font-size: 10px;
-            line-height: 1.1;
-          }
-          .well {
-            padding: 5px;
-            margin-bottom: 10px;
-          }
-          .form-control, .selectize-input {
-            padding-bottom: 2px !important;
-            padding-top: 2px !important;
-            font-size: 10px;
-            height: 24px;
-            min-height: 24px;
-            line-height: 1.1;
-          }
-          .control-label {
-            font-size: 10px;
-            margin-bottom: 2px;
-          }
-          .panel-heading {
-            padding: 5px 10px;
-          }
-          .selectize-control {
-            margin-bottom: 0px;
-          }
-          .btn-file {
-            padding: 1px 12px;
-          }
-          body {
-            line-height: 1.1;
-          }
-          hr{
-            margin-top: 3px;
-            margin-bottom: 3px;
-          }
-          .panel-group {
-            margin-bottom: 8px;
-          }
-          h3 {
-            margin-top: 0px;
-          }
-          .nav li a.disabled {
-            background-color: #aaa !important;
-            color: #333 !important;
-            cursor: not-allowed !important;
-            border-color: #aaa !important;
-          }
-        "))
-    ),
+    css,
     # ---------------Data Upload-----------------
     tab_data_upload,
     # ----------------QC--------------------
@@ -178,25 +120,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # ------------------Gene (Overview)-------------
     .tab_gene(gene.choices, genesets),
     # ----------------Gene Summary Tables--------------
-    tabPanel(
-      title = "Gene Summary Tables",
-      id = "gene-summ",
-      br(),
-      div(DT::dataTableOutput("gene1.summary"), style = "font-size:80%;"),
-      br(),
-      div(DT::dataTableOutput("gene2.summary"), style = "font-size:80%;")
-    ),
+    tab_gene_summary,
     # ----------------sgRNA---------------------
     .tab_sgrna(sgrna.choices, sgrna.gene),
     # --------------------sgRNA Summary Tables----------------
-    tabPanel(
-      title = "sgRNA Summary Tables",
-      id = "sgrna-tables",
-      br(),
-      div(DT::dataTableOutput("sgrna1.summary"), style = "font-size:80%;"),
-      br(),
-      div(DT::dataTableOutput("sgrna2.summary"), style = "font-size:80%;")
-    ),
+    tab_sgrna_summary,
     # -----------------DepMap-------------------
     .tab_depmap(sgrna.data, depmap.meta),
     # -----------------About-------------------

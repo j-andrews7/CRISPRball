@@ -223,3 +223,12 @@
       )
     )
 }
+
+tab_gene_summary <- tabPanel(
+  title = "Gene Summary Tables",
+  id = "gene-summ",
+  br(),
+  div(DT::dataTableOutput("gene1.summary"), style = "font-size:80%;"),
+  br(),
+  div(DT::dataTableOutput("gene2.summary"), style = "font-size:80%;")
+)

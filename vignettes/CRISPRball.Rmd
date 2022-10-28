@@ -88,7 +88,8 @@ One can also pass their input data directly as input - all that are needed
 are file paths to the MAGeCK RRA output files. 
 In this case, we'll use the example data from the 
 [third MAGeCK tutorial](https://sourceforge.net/p/mageck/wiki/demo/#the-third-tutorial-going-through-a-public-crisprcas9-screening-dataset). 
-In this example, the two datasets are just reverse comparisons (ESC vs plasmid & plasmid vs ESC).
+
+In this example, the two datasets are just reverse comparisons (ESC vs plasmid & plasmid vs ESC) where DDX27 has been altered in the ESC vs plasmid comparison to no longer be a significant hit.
 
 ```{r}
 # Create lists of results summaries for each dataset.

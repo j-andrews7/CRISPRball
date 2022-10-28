@@ -65,3 +65,12 @@
       )
     )
 }
+
+tab_sgrna_summary <- tabPanel(
+  title = "sgRNA Summary Tables",
+  id = "sgrna-tables",
+  br(),
+  div(DT::dataTableOutput("sgrna1.summary"), style = "font-size:80%;"),
+  br(),
+  div(DT::dataTableOutput("sgrna2.summary"), style = "font-size:80%;")
+)
