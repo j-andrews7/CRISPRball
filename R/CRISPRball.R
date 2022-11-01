@@ -31,7 +31,7 @@
 #'
 #' @param gene.data A named list containing \code{gene_summary.txt} tables as data.frames.
 #'   Multiple data.frames may be provided, one per element of the list.
-#'   Users will be able to swap between them within the app. List element names should match names of \code{grna.data} list elements.
+#'   Users will be able to swap between them within the app. List element names should match names of \code{sgrna.data} list elements.
 #' @param sgrna.data A named list containing \code{sgrna_summary.txt} tables as data.frames.
 #'   Multiple data.frames may be provided, one per element of the list.
 #'   Users will be able to swap between them within the app. List element names should match names of \code{gene.data} list elements.
@@ -154,52 +154,51 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # -------------Reactive Values---------------
 
-    gene.data <- reactiveVal(gene.data)
-    sgrna.data <- reactiveVal(sgrna.data)
-    count.summary <- reactiveVal(count.summary)
-    norm.counts <- reactiveVal(norm.counts)
-
+    robjects <- reactiveValues(gene.data = gene.data, sgrna.data = sgrna.data, 
+                               count.summary = count.summary, norm.counts = norm.counts,
+                               depmap.meta = depmap.meta, depmap.gene = depmap.gene,
+                               clicked = list(volc1 = NULL, rank1 = NULL, lawn1 = NULL, volc2 = NULL, rank2 = NULL, lawn2 = NULL))
 
     # -----------Loading Files In----------------
     # Update inputs and data reactives as necessary.
     observeEvent(input$geneSummaryFiles, {
       new.data <- .gene_summ_ingress(input$geneSummaryFiles)
-      gene.data(new.data)
-      if (!is.null(gene.data())) {
+      robjects$gene.data <- new.data
+      if (!is.null(robjects$gene.data)) {
         js$enableTab('Gene (Overview)')
         js$enableTab('Gene Summary Tables')
-        updateSelectizeInput(session, 'gene.sel1', choices = names(gene.data()), server = TRUE)
-        updateSelectizeInput(session, 'gene.sel2', choices = names(gene.data()), server = TRUE)
+        updateSelectizeInput(session, 'gene.sel1', choices = names(robjects$gene.data), server = TRUE)
+        updateSelectizeInput(session, 'gene.sel2', choices = names(robjects$gene.data), server = TRUE)
       }
     })
 
     observeEvent(input$sgrnaSummaryFiles, {
       new.data <- .sgrna_summ_ingress(input$sgrnaSummaryFiles)
-      sgrna.data(new.data)
-      if (!is.null(sgrna.data())) {
+      robjects$sgrna.data <- new.data
+      if (!is.null(robjects$sgrna.data)) {
         js$enableTab('sgRNA')
         js$enableTab('sgRNA Summary Tables')
-        updateSelectizeInput(session, 'sgrna.sel1', choices = names(sgrna.data()), server = TRUE)
-        updateSelectizeInput(session, 'sgrna.sel2', choices = names(sgrna.data()), server = TRUE)
-        updatePickerInput(session, 'sgrna.gene', choices = unique(c(sgrna.data()[[1]]$Gene)))
+        updateSelectizeInput(session, 'sgrna.sel1', choices = names(robjects$sgrna.data), server = TRUE)
+        updateSelectizeInput(session, 'sgrna.sel2', choices = names(robjects$sgrna.data), server = TRUE)
+        updatePickerInput(session, 'sgrna.gene', choices = unique(c(robjects$sgrna.data[[1]]$Gene)))
       }
     })
 
     observeEvent(input$countSummary, {
       new.data <- read.delim(input$countSummary$datapath)
-      count.summary(new.data)
-      if (!is.null(count.summary())) {
+      robjects$count.summary <- new.data
+      if (!is.null(robjects$count.summary)) {
         js$enableTab('QC')
         js$enableTab('QC Table')
-        updateSelectizeInput(session, 'bip.color', choices = c('', colnames(count.summary())), server = TRUE)
-        updateSelectizeInput(session, 'bip.shape', choices = c('', colnames(count.summary())), server = TRUE)
+        updateSelectizeInput(session, 'bip.color', choices = c('', colnames(robjects$count.summary)), server = TRUE)
+        updateSelectizeInput(session, 'bip.shape', choices = c('', colnames(robjects$count.summary)), server = TRUE)
       }
     })
 
     observeEvent(input$countNormFile, {
       new.data <- read.delim(input$countNormFile$datapath)
-      norm.counts(new.data)
-      if (!is.null(norm.counts())) {
+      robjects$norm.counts <- new.data
+      if (!is.null(robjects$norm.counts)) {
         js$enableTab('QC')
       }
     })
@@ -214,21 +213,19 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # -----------QC & QC Summary Tabs------------
     # PCA.
 
-    pc <- reactive({
-      req(norm.counts)
-      req(count.summary)
+    observe({
+      req(robjects$norm.counts, robjects$count.summary)
 
-      slmed <- norm.counts()
+      slmed <- robjects$norm.counts
       slmat <- as.matrix(slmed[,c(-1,-2)])
       mat <- log2(slmat+1)
       rownames(mat) <- slmed$sgRNA
   
-      req(input$var.remove)
-      meta <- count.summary()
+      meta <- robjects$count.summary
 
       # Filter samples from QC table.
       if (!is.null(input$count.summary_rows_all) & input$meta.filt) {
-        meta <- count.summary()[input$count.summary_rows_all,]
+        meta <- robjects$count.summary[input$count.summary_rows_all,]
         mat <- mat[,input$count.summary_rows_all]
       }
 
@@ -248,24 +245,22 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       
       meta <- meta[colnames(mat),]
 
-      if (ncol(mat) > 1) {
+      robjects$pc <- NULL
 
-        pca(mat,
+      if (ncol(mat) > 1) {
+        robjects$pc <- pca(mat,
             metadata = meta,
             removeVar = var.remove,
             scale = input$scale,
             center = input$center)
-
-      } else {
-        NULL
-      }
+      } 
     })
 
     # Populate UI with all PCs.
     # TODO: Write check for only 2 PCs.
     output$pca.comps <- renderUI({
-      req(pc)
-      pcs <- pc()
+      req(robjects$pc)
+      pcs <- robjects$pc
 
       tagList(
         fluidRow(
@@ -277,7 +272,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$qc.gini <- renderPlotly({
-      gg <- BarView(count.summary(),
+      gg <- BarView(robjects$count.summary,
                     x = "Label",
                     y = "GiniIndex",
                     ylab = "Gini index",
@@ -287,7 +282,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  axis.text.y = element_text(size = 12))
 
       ggplotly(gg, tooltip = c("y")) %>%
-        layout(yaxis = list(range = list(0, max(count.summary()$GiniIndex) + .05)),
+        layout(yaxis = list(range = list(0, max(robjects$count.summary$GiniIndex) + .05)),
                xaxis = list(tickangle = 315)) %>%
         config(toImageButtonOptions = list(format = "svg"),
                displaylogo = FALSE,
@@ -295,14 +290,15 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$qc.missed <- renderPlotly({
-      gg <- BarView(count.summary(), x = "Label", y = "Zerocounts", fill = "#394E80",
+      gg <- BarView(robjects$count.summary, x = "Label", y = "Zerocounts", fill = "#394E80",
                     ylab = "Zero Count sgRNAs", main = "Fully Depleted sgRNAs")
 
       gg + theme_classic() + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 12),
-                                   axis.text.y = element_text(size = 12)) + ylim(0, max(count.summary()$Zerocounts) + 5)
+                                   axis.text.y = element_text(size = 12)) + 
+                                   ylim(0, max(robjects$count.summary$Zerocounts) + 5)
 
       ggplotly(gg, tooltip = c("y")) %>%
-        layout(yaxis = list(range = list(0, max(count.summary()$Zerocounts) + 5)),
+        layout(yaxis = list(range = list(0, max(robjects$count.summary$Zerocounts) + 5)),
                xaxis = list(tickangle = 315)) %>%
         config(toImageButtonOptions = list(format = "svg"),
                displaylogo = FALSE,
@@ -310,16 +306,16 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$qc.map <- renderPlot({
-      MapRatesView(count.summary()) + scale_x_discrete(guide = guide_axis(angle = 45))
+      MapRatesView(robjects$count.summary) + scale_x_discrete(guide = guide_axis(angle = 45))
       
     })
 
     # TODO: rewrite this.
-    observeEvent(norm.counts, {
+    observeEvent(robjects$norm.counts, {
       output$qc.histplot <- renderPlot({
         colors <- dittoColors()
 
-        slmed <- norm.counts()
+        slmed <- robjects$norm.counts
         tabsmat <- as.matrix(log2(slmed[,c(-1,-2)] + 1))
         colnames(tabsmat) <- colnames(slmed)[c(-1,-2)]
         samplecol <- colors[((1:ncol(tabsmat)) %% length(colors))]
@@ -347,7 +343,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
       # TODO: rewrite this, add color min/max/mid selectors.
       output$qc.corr <- renderPlot({
-        slmed <- norm.counts()
+        slmed <- robjects$norm.counts
         slmat <- as.matrix(slmed[,c(-1,-2)])
         slmat.log <- log2(slmat+1)
 
@@ -363,12 +359,12 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       })
     })
 
-    observeEvent(pc, {
+    observeEvent(robjects$pc, {
       output$qc.pca <- renderPlotly({
-        req(pc, input$dim1, input$dim2, input$dim3)
+        req(robjects$pc, input$dim1, input$dim2, input$dim3)
         input$pca.update
 
-        pc.res <- isolate(pc())
+        pc.res <- isolate(robjects$pc)
 
         pl.cols <- NULL
         pl.shapes <- NULL
@@ -481,9 +477,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       })
     })
 
-    observeEvent(count.summary, {
+    observeEvent(robjects$count.summary, {
       output$count.summary <- renderDT(server = FALSE, {
-        DT::datatable(count.summary(),
+        DT::datatable(robjects$count.summary,
                       rownames = FALSE,
                       filter = "top",
                       extensions = c("Buttons", "Scroller"),
@@ -502,7 +498,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # Initialize plots by simulating button click once.
     o <- observe({
-      req(pc, input$dim1, input$dim2, input$dim3)
+      req(robjects$pc, input$dim1, input$dim2, input$dim3)
       shinyjs::click("pca.update")
       o$destroy
     })
@@ -516,56 +512,48 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       shinyjs::hide("dep.rnai.sel")
     }
 
-
     if (is.null(essential.genes)) {
       shinyjs::hide("rem.ess")
     }
-
 
     if (is.null(positive.ctrl.genes)) {
       shinyjs::hide("rem.pos")
     }
 
-
     # Disable certain inputs if only one dataset provided.
     observe({
-      if (length(gene.data()) == 1) {
+      if (length(robjects$gene.data) == 1) {
         shinyjs::disable("gene.sel2")
         shinyjs::hide("highlight.common")
       }
     })
 
-
     # Load the gene summaries for easy plotting.
-    set1.genes <- reactive({
-      df <- gene.data()[[input$gene.sel1]]
-      .gene_ingress(df, sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
+    observe({
+      req(robjects$gene.data)
+      df <- robjects$gene.data[[input$gene.sel1]]
+      robjects$set1.genes <- .gene_ingress(df, sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
                     positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene)
-    })
-
-    set2.genes <- reactive({
-      if (length(gene.data()) > 1) {
-        df <- gene.data()[[input$gene.sel2]]
-        .gene_ingress(df, sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
+      
+      if (length(robjects$gene.data) > 1) {
+        df <- robjects$gene.data[[input$gene.sel2]]
+        robjects$set2.genes <- .gene_ingress(df, sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
                       positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene)
       }
     })
 
 
     # Get overlapping hits between sets if needed.
-    common.hits <- reactive({
-      req(set1.genes, set2.genes)
-      s1 <- set1.genes()
-      s2 <- set2.genes()
+    observe({
+      req(robjects$set1.genes, robjects$set2.genes)
+      s1 <- robjects$set1.genes
+      s2 <- robjects$set2.genes
 
       set1.hits <- s1$id[s1$hit_type %in% c("neg", "pos")]
       set2.hits <- s2$id[s2$hit_type %in% c("neg", "pos")]
 
-      set1.hits[set1.hits %in% set2.hits]
+      robjects$common.hits <- set1.hits[set1.hits %in% set2.hits]
     })
-
-    # Keep track of which genes have been clicked
-    clicked <- reactiveValues(volc1 = NULL, rank1 = NULL, lawn1 = NULL, volc2 = NULL, rank2 = NULL, lawn2 = NULL)
 
     # On click, the key field of the event data contains the gene symbol.
     # Add that gene to the set of all "selected" genes. Double click will clear all labels.
@@ -668,16 +656,16 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # Summary table and plots.
     output$gene1.summary <- renderDT(server = FALSE, {
-      req(set1.genes)
+      req(robjects$set1.genes)
       # Remove columns that are redundant or confusing.
-      target <- which(names(set1.genes()) %in% c("neg|score", "neg|p-value", "neg|rank",
+      target <- which(names(robjects$set1.genes) %in% c("neg|score", "neg|p-value", "neg|rank",
                                                  "neg|lfc", "pos|score", "pos|p-value", "pos|rank",
                                                  "pos|lfc", "RandomIndex", "Rank", "goodsgrna")) - 1
 
-      df <- set1.genes()
+      df <- robjects$set1.genes
 
-      if (!is.null(common.hits)) {
-        df$Overlap <- df$id %in% common.hits()
+      if (!is.null(robjects$common.hits)) {
+        df$Overlap <- df$id %in% robjects$common.hits
       }
 
       DT::datatable(df,
@@ -695,10 +683,10 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$gene1.vol <- renderPlotly({
-      req(set1.genes)
+      req(robjects$set1.genes)
       input$vol.update
 
-      df <- set1.genes()
+      df <- robjects$set1.genes
 
       hov.info <- c("hit_type", "num", "goodsgrna")
 
@@ -739,7 +727,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
       # Add common hits to highlight.
       if (isolate(input$highlight.common)) {
-        highlight <- unique(c(common.hits(), highlight))
+        highlight <- unique(c(robjects$common.hits, highlight))
       }
 
 
@@ -756,7 +744,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                     lfc.term = "LFC",
                     feat.term = "id",
                     hover.info = hov.info,
-                    fs = clicked$volc1,
+                    fs = robjects$clicked$volc1,
                     up.color = isolate(input$up.color),
                     down.color = isolate(input$down.color),
                     insig.color = isolate(input$insig.color),
@@ -786,10 +774,10 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$gene1.rank <- renderPlotly({
-      req(set1.genes)
+      req(robjects$set1.genes)
       input$rank.update
 
-      df <- set1.genes()
+      df <- robjects$set1.genes
 
       hov.info <- c("hit_type", "num", "goodsgrna")
 
@@ -830,7 +818,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
       # Add common hits to highlight.
       if (isolate(input$highlight.common)) {
-        highlight <- unique(c(common.hits(), highlight))
+        highlight <- unique(c(robjects$common.hits, highlight))
       }
 
       .make_rank(df = df,
@@ -845,7 +833,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  x.term = "Rank",
                  feat.term = "id",
                  hover.info = c("hit_type", "goodsgrna"),
-                 fs = clicked$rank1,
+                 fs = robjects$clicked$rank1,
                  up.color = isolate(input$up.color),
                  down.color = isolate(input$down.color),
                  insig.color = isolate(input$insig.color),
@@ -875,8 +863,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$gene1.lawn <- renderPlotly({
-      req(set1.genes)
-      df <- set1.genes()
+      req(robjects$set1.genes)
+      df <- robjects$set1.genes
       input$lawn.update
 
       hov.info <- c("hit_type", "num", "goodsgrna")
@@ -933,7 +921,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                  feat.term = "id",
                  x.term = "RandomIndex",
                  hover.info = hov.info,
-                 fs = clicked$lawn1,
+                 fs = robjects$clicked$lawn1,
                  up.color = isolate(input$up.color),
                  down.color = isolate(input$down.color),
                  insig.color = isolate(input$insig.color),
@@ -964,19 +952,19 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     # If only one dataset provided, don't render second dataset.
-    observe({if (length(gene.data()) > 1) {
+    observe({if (length(robjects$gene.data) > 1) {
       output$gene2.summary <- renderDT(server = FALSE, {
-        req(set2.genes)
+        req(robjects$set2.genes)
+        df <- robjects$set2.genes
+
         # Remove columns that are redundant or confusing.
-        target <- which(names(set2.genes()) %in% c("neg|score", "neg|p-value", "neg|rank",
+        target <- which(names(robjects$set2.genes) %in% c("neg|score", "neg|p-value", "neg|rank",
                                                    "neg|lfc", "pos|score", "pos|p-value", "pos|rank",
                                                    "pos|lfc", "RandomIndex", "Rank", "goodsgrna")) - 1
 
-        df <- set2.genes()
-
         # Label overlapping hits between datasets if available.
-        if (!is.null(common.hits())) {
-          df$Overlap <- df$id %in% common.hits()
+        if (!is.null(robjects$common.hits)) {
+          df$Overlap <- df$id %in% robjects$common.hits
         }
 
         DT::datatable(df,
@@ -994,10 +982,10 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       })
 
       output$gene2.vol <- renderPlotly({
-        req(set2.genes)
+        req(robjects$set2.genes)
         input$vol.update
 
-        df <- set2.genes()
+        df <- robjects$set2.genes
 
         hov.info <- c("hit_type", "num", "goodsgrna")
 
@@ -1038,7 +1026,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
         # Add common hits to highlight.
         if (isolate(input$highlight.common)) {
-          highlight <- unique(c(common.hits(), highlight))
+          highlight <- unique(c(robjects$common.hits, highlight))
         }
 
 
@@ -1055,7 +1043,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                       lfc.term = "LFC",
                       feat.term = "id",
                       hover.info = hov.info,
-                      fs = clicked$volc2,
+                      fs = robjects$clicked$volc2,
                       up.color = isolate(input$up.color),
                       down.color = isolate(input$down.color),
                       insig.color = isolate(input$insig.color),
@@ -1085,12 +1073,12 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       })
 
       output$gene2.rank <- renderPlotly({
-        req(set2.genes)
+        req(robjects$set2.genes)
         input$rank.update
 
         hov.info <- c("hit_type", "num", "goodsgrna")
 
-        df <- set2.genes()
+        df <- robjects$set2.genes
 
         # Remove common essential genes if needed.
         if (isolate(input$rem.ess) & !is.null(df$essential)) {
@@ -1129,7 +1117,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
         # Add common hits to highlight.
         if (isolate(input$highlight.common)) {
-          highlight <- unique(c(common.hits(), highlight))
+          highlight <- unique(c(robjects$common.hits, highlight))
         }
 
         .make_rank(df = df,
@@ -1144,7 +1132,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                    x.term = "Rank",
                    feat.term = "id",
                    hover.info = hov.info,
-                   fs = clicked$rank2,
+                   fs = robjects$clicked$rank2,
                    up.color = isolate(input$up.color),
                    down.color = isolate(input$down.color),
                    insig.color = isolate(input$insig.color),
@@ -1174,12 +1162,12 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       })
 
       output$gene2.lawn <- renderPlotly({
-        req(set2.genes)
+        req(robjects$set2.genes)
         input$lawn.update
 
         hov.info <- c("hit_type", "num", "goodsgrna")
 
-        df <- set2.genes()
+        df <- robjects$set2.genes
 
         # Remove common essential genes if needed.
         if (isolate(input$rem.ess) & !is.null(df$essential)) {
@@ -1218,7 +1206,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
         # Add common hits to highlight.
         if (isolate(input$highlight.common)) {
-          highlight <- unique(c(common.hits(), highlight))
+          highlight <- unique(c(robjects$common.hits, highlight))
         }
 
         .make_lawn(res = df,
@@ -1233,7 +1221,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                    feat.term = "id",
                    x.term = "RandomIndex",
                    hover.info = hov.info,
-                   fs = clicked$lawn2,
+                   fs = robjects$clicked$lawn2,
                    up.color = isolate(input$up.color),
                    down.color = isolate(input$down.color),
                    insig.color = isolate(input$insig.color),
@@ -1276,25 +1264,23 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     #---------------sgRNA Tab-----------------
 
     # Load the gene summaries for easy plotting.
-    set1.sgrnas <- reactive({
-      df <- sgrna.data()[[input$sgrna.sel1]]
+    observe({
+      df <- robjects$sgrna.data[[input$sgrna.sel1]]
       df$Rank <- rank(df$LFC)
-      df
-    })
+      robjects$set1.sgrnas <- df
 
-    set2.sgrnas <- reactive({
-      if (length(sgrna.data()) > 1) {
-        df <- sgrna.data()[[input$sgrna.sel2]]
+      if (length(robjects$sgrna.data) > 1) {
+        df <- robjects$sgrna.data[[input$sgrna.sel2]]
         df$Rank <- rank(df$LFC)
-        df
+        robjects$set2.sgrnas <- df
       }
     })
 
     # Summary tables and plots.
     output$sgrna1.summary <- renderDT(server = FALSE, {
-      req(set1.sgrnas)
+      req(robjects$set1.sgrnas)
 
-      df <- set1.sgrnas()
+      df <- robjects$set1.sgrnas
 
       DT::datatable(df,
                     rownames = FALSE,
@@ -1310,19 +1296,19 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$sgrna1.counts <- renderPlotly({
-      req(set1.sgrnas, input$sgrna.gene)
+      req(robjects$set1.sgrnas, input$sgrna.gene)
 
-      df <- set1.sgrnas()
+      df <- robjects$set1.sgrnas
       df <- df[df$Gene == input$sgrna.gene,]
 
       .make_sgrna_pairplot(df)
     })
 
     output$sgrna1.rank <- renderPlotly({
-      req(set1.sgrnas)
+      req(robjects$set1.sgrnas)
       input$rank.update
 
-      df <- set1.sgrnas()
+      df <- robjects$set1.sgrnas
 
       hov.info <- c("Gene")
 
@@ -1371,9 +1357,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     output$sgrna1.detail <- renderDT({
-      req(set1.sgrnas, input$sgrna.gene)
+      req(robjects$set1.sgrnas, input$sgrna.gene)
       
-      df <- set1.sgrnas()
+      df <- robjects$set1.sgrnas
       df <- df[df$Gene == input$sgrna.gene,]
       
       target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
@@ -1392,11 +1378,11 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     observe({
-      if (length(sgrna.data()) > 1) {
+      if (length(robjects$sgrna.data) > 1) {
         output$sgrna2.summary <- renderDT(server = FALSE, {
-          req(set2.sgrnas)
+          req(robjects$set2.sgrnas)
   
-          df <- set2.sgrnas()
+          df <- robjects$set2.sgrnas
   
           DT::datatable(df,
                         rownames = FALSE,
@@ -1412,19 +1398,19 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         })
   
         output$sgrna2.counts <- renderPlotly({
-          req(set2.sgrnas, input$sgrna.gene)
+          req(robjects$set2.sgrnas, input$sgrna.gene)
   
-          df <- set2.sgrnas()
+          df <- robjects$set2.sgrnas
           df <- df[df$Gene == input$sgrna.gene,]
   
           .make_sgrna_pairplot(df)
         })
   
         output$sgrna2.rank <- renderPlotly({
-          req(set2.sgrnas)
+          req(robjects$set2.sgrnas)
           input$rank.update
   
-          df <- set2.sgrnas()
+          df <- robjects$set2.sgrnas
   
           hov.info <- c("Gene")
   
@@ -1473,9 +1459,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         })
   
         output$sgrna2.detail <- renderDT({
-          req(set2.sgrnas, input$sgrna.gene)
+          req(robjects$set2.sgrnas, input$sgrna.gene)
   
-          df <- set2.sgrnas()
+          df <- robjects$set2.sgrnas
           df <- df[df$Gene == input$sgrna.gene,]
   
           target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1

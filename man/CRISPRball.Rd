@@ -20,7 +20,7 @@ CRISPRball(
 \arguments{
 \item{gene.data}{A named list containing \code{gene_summary.txt} tables as data.frames.
 Multiple data.frames may be provided, one per element of the list.
-Users will be able to swap between them within the app. List element names should match names of \code{grna.data} list elements.}
+Users will be able to swap between them within the app. List element names should match names of \code{sgrna.data} list elements.}
 
 \item{sgrna.data}{A named list containing \code{sgrna_summary.txt} tables as data.frames.
 Multiple data.frames may be provided, one per element of the list.
