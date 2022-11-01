@@ -52,7 +52,6 @@
 #'
 #' @return A Shiny app containing interactive visualizations of MAGeCK RRA analysis results.
 #'
-#'
 #' @author Jared Andrews
 #' @export
 CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL, norm.counts = NULL, h.id = "mag1",
@@ -160,48 +159,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                                clicked = list(volc1 = NULL, rank1 = NULL, lawn1 = NULL, volc2 = NULL, rank2 = NULL, lawn2 = NULL))
 
     # -----------Loading Files In----------------
-    # Update inputs and data reactives as necessary.
-    observeEvent(input$geneSummaryFiles, {
-      new.data <- .gene_summ_ingress(input$geneSummaryFiles)
-      robjects$gene.data <- new.data
-      if (!is.null(robjects$gene.data)) {
-        js$enableTab('Gene (Overview)')
-        js$enableTab('Gene Summary Tables')
-        updateSelectizeInput(session, 'gene.sel1', choices = names(robjects$gene.data), server = TRUE)
-        updateSelectizeInput(session, 'gene.sel2', choices = names(robjects$gene.data), server = TRUE)
-      }
-    })
-
-    observeEvent(input$sgrnaSummaryFiles, {
-      new.data <- .sgrna_summ_ingress(input$sgrnaSummaryFiles)
-      robjects$sgrna.data <- new.data
-      if (!is.null(robjects$sgrna.data)) {
-        js$enableTab('sgRNA')
-        js$enableTab('sgRNA Summary Tables')
-        updateSelectizeInput(session, 'sgrna.sel1', choices = names(robjects$sgrna.data), server = TRUE)
-        updateSelectizeInput(session, 'sgrna.sel2', choices = names(robjects$sgrna.data), server = TRUE)
-        updatePickerInput(session, 'sgrna.gene', choices = unique(c(robjects$sgrna.data[[1]]$Gene)))
-      }
-    })
-
-    observeEvent(input$countSummary, {
-      new.data <- read.delim(input$countSummary$datapath)
-      robjects$count.summary <- new.data
-      if (!is.null(robjects$count.summary)) {
-        js$enableTab('QC')
-        js$enableTab('QC Table')
-        updateSelectizeInput(session, 'bip.color', choices = c('', colnames(robjects$count.summary)), server = TRUE)
-        updateSelectizeInput(session, 'bip.shape', choices = c('', colnames(robjects$count.summary)), server = TRUE)
-      }
-    })
-
-    observeEvent(input$countNormFile, {
-      new.data <- read.delim(input$countNormFile$datapath)
-      robjects$norm.counts <- new.data
-      if (!is.null(robjects$norm.counts)) {
-        js$enableTab('QC')
-      }
-    })
+    # Create data upload observers.
+    .create_upload_observers(input, session, robjects)
 
     # Hide depmap tab if database not provided. 
     # Tried disable, still looks/feels selectable which may be confusing.
@@ -213,8 +172,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # -----------QC & QC Summary Tabs------------
     # PCA.
 
-    observe({
-      req(robjects$norm.counts, robjects$count.summary)
+    observeEvent(req(colnames(robjects$norm.counts[,c(-1,-2)]) == gsub("-", ".", robjects$count.summary$Label)), {
 
       slmed <- robjects$norm.counts
       slmat <- as.matrix(slmed[,c(-1,-2)])
@@ -225,7 +183,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
       # Filter samples from QC table.
       if (!is.null(input$count.summary_rows_all) & input$meta.filt) {
-        meta <- robjects$count.summary[input$count.summary_rows_all,]
+        meta <- meta[input$count.summary_rows_all,]
         mat <- mat[,input$count.summary_rows_all]
       }
 
@@ -504,7 +462,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     #---------Gene (Overview) & Summary Tables Tabs-------------
-    # Remove certain outputs if parameters for them are not provided.
+    # Remove certain inputs if parameters for them are not provided.
     if (is.null(depmap.gene)) {
       shinyjs::hide("dep.crispr.ess")
       shinyjs::hide("dep.crispr.sel")
@@ -529,30 +487,25 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     # Load the gene summaries for easy plotting.
-    observe({
-      req(robjects$gene.data)
+    observeEvent(c(input$gene.sel1, input$gene.sel2), {
       df <- robjects$gene.data[[input$gene.sel1]]
       robjects$set1.genes <- .gene_ingress(df, sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
                     positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene)
-      
+
       if (length(robjects$gene.data) > 1) {
         df <- robjects$gene.data[[input$gene.sel2]]
         robjects$set2.genes <- .gene_ingress(df, sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
                       positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene)
+        
+        # Get overlapping hits between sets if needed.
+        s1 <- robjects$set1.genes
+        s2 <- robjects$set2.genes
+
+        set1.hits <- s1$id[s1$hit_type %in% c("neg", "pos")]
+        set2.hits <- s2$id[s2$hit_type %in% c("neg", "pos")]
+
+        robjects$common.hits <- set1.hits[set1.hits %in% set2.hits]
       }
-    })
-
-
-    # Get overlapping hits between sets if needed.
-    observe({
-      req(robjects$set1.genes, robjects$set2.genes)
-      s1 <- robjects$set1.genes
-      s2 <- robjects$set2.genes
-
-      set1.hits <- s1$id[s1$hit_type %in% c("neg", "pos")]
-      set2.hits <- s2$id[s2$hit_type %in% c("neg", "pos")]
-
-      robjects$common.hits <- set1.hits[set1.hits %in% set2.hits]
     })
 
     # On click, the key field of the event data contains the gene symbol.
@@ -560,98 +513,98 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # TODO: lapply this, probably.
     observeEvent(event_data("plotly_click", source = paste0(h.id,"_volc1")), {
       gene <- event_data("plotly_click", source = paste0(h.id,"_volc1"))
-      gene_old_new <- rbind(clicked$volc1, gene)
+      gene_old_new <- rbind(robjects$clicked$volc1, gene)
       keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
 
       if (nrow(keep) == 0) {
-        clicked$volc1 <- NULL
+        robjects$clicked$volc1 <- NULL
       } else {
-        clicked$volc1 <- keep
+        robjects$clicked$volc1 <- keep
       }
     })
 
     observeEvent(event_data("plotly_click", source = paste0(h.id,"_rank1")), {
       gene <- event_data("plotly_click", source = paste0(h.id,"_rank1"))
-      gene_old_new <- rbind(clicked$rank1, gene)
+      gene_old_new <- rbind(robjects$clicked$rank1, gene)
       keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
 
       if (nrow(keep) == 0) {
-        clicked$rank1 <- NULL
+        robjects$clicked$rank1 <- NULL
       } else {
-        clicked$rank1 <- keep
+        robjects$clicked$rank1 <- keep
       }
     })
 
     observeEvent(event_data("plotly_click", source = paste0(h.id,"_lawn1")), {
       gene <- event_data("plotly_click", source = paste0(h.id,"_lawn1"))
-      gene_old_new <- rbind(clicked$lawn1, gene)
+      gene_old_new <- rbind(robjects$clicked$lawn1, gene)
       keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
 
       if (nrow(keep) == 0) {
-        clicked$lawn1 <- NULL
+        robjects$clicked$lawn1 <- NULL
       } else {
-        clicked$lawn1 <- keep
+        robjects$clicked$lawn1 <- keep
       }
     })
 
     observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_volc1")), {
-      clicked$volc1 <- NULL
+      robjects$clicked$volc1 <- NULL
     })
 
     observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_rank1")), {
-      clicked$rank1 <- NULL
+      robjects$clicked$rank1 <- NULL
     })
 
     observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_lawn1")), {
-      clicked$lawn1 <- NULL
+      robjects$clicked$lawn1 <- NULL
     })
 
     observeEvent(event_data("plotly_click", source = paste0(h.id,"_volc2")), {
       gene <- event_data("plotly_click", source = paste0(h.id,"_volc2"))
-      gene_old_new <- rbind(clicked$volc2, gene)
+      gene_old_new <- rbind(robjects$clicked$volc2, gene)
       keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
 
       if (nrow(keep) == 0) {
-        clicked$volc2 <- NULL
+        robjects$clicked$volc2 <- NULL
       } else {
-        clicked$volc2 <- keep
+        robjects$clicked$volc2 <- keep
       }
     })
 
     observeEvent(event_data("plotly_click", source = paste0(h.id,"_rank2")), {
       gene <- event_data("plotly_click", source = paste0(h.id,"_rank2"))
-      gene_old_new <- rbind(clicked$rank2, gene)
+      gene_old_new <- rbind(robjects$clicked$rank2, gene)
       keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
 
       if (nrow(keep) == 0) {
-        clicked$rank2 <- NULL
+        robjects$clicked$rank2 <- NULL
       } else {
-        clicked$rank2 <- keep
+        robjects$clicked$rank2 <- keep
       }
     })
 
     observeEvent(event_data("plotly_click", source = paste0(h.id,"_lawn2")), {
       gene <- event_data("plotly_click", source = paste0(h.id,"_lawn2"))
-      gene_old_new <- rbind(clicked$lawn2, gene)
+      gene_old_new <- rbind(robjects$clicked$lawn2, gene)
       keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata)==1)),]
 
       if (nrow(keep) == 0) {
-        clicked$lawn2 <- NULL
+        robjects$clicked$lawn2 <- NULL
       } else {
-        clicked$lawn2 <- keep
+        robjects$clicked$lawn2 <- keep
       }
     })
 
     observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_volc2")), {
-      clicked$volc2 <- NULL
+      robjects$clicked$volc2 <- NULL
     })
 
     observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_rank2")), {
-      clicked$rank2 <- NULL
+      robjects$clicked$rank2 <- NULL
     })
 
     observeEvent(event_data("plotly_doubleclick", source = paste0(h.id,"_lawn2")), {
-      clicked$lawn2 <- NULL
+      robjects$clicked$lawn2 <- NULL
     })
 
     # Summary table and plots.
