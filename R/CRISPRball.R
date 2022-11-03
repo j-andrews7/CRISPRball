@@ -108,7 +108,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # ---------------Data Upload-----------------
     tab_data_upload,
     # ----------------QC--------------------
-    .tab_qc(summ.choices),
+    .create_tab_qc(summ.choices),
     # -------------------QC Table----------------
     tabPanel(
       title = "QC Table",
@@ -117,15 +117,15 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       DTOutput("count.summary")
     ),
     # ------------------Gene (Overview)-------------
-    .tab_gene(gene.choices, genesets),
+    .create_tab_gene(gene.choices, genesets),
     # ----------------Gene Summary Tables--------------
     tab_gene_summary,
     # ----------------sgRNA---------------------
-    .tab_sgrna(sgrna.choices, sgrna.gene),
+    .create_tab_sgrna(sgrna.choices, sgrna.gene),
     # --------------------sgRNA Summary Tables----------------
     tab_sgrna_summary,
     # -----------------DepMap-------------------
-    .tab_depmap(sgrna.data, depmap.meta),
+    .create_tab_depmap(sgrna.data, depmap.meta),
     # -----------------About-------------------
     tab_about
   )

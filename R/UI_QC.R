@@ -1,4 +1,4 @@
-.tab_qc <- function(summ.choices) {
+.create_tab_qc <- function(summ.choices) {
     tabPanel(
         title = "QC",
         id = "qc",

@@ -1,4 +1,24 @@
-.tab_sgrna <- function(sgrna.choices, sgrna.gene) {
+#' Create a tabPanel for the sgrna tab
+#'
+#' Create a \code{\link{tabPanel}} with UI elements for the sgrna tab. 
+#'
+#' @param sgrna.choices A character vector containing dataset names.
+#' @param sgrna.gene A character vector containing gene identifiers.
+#'
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the sgrna tab.
+#'
+#' @author Jared Andrews
+#'
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom colourpicker colourInput
+#' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
+#' @importFrom shinycssloaders withSpinner
+#' @importFrom shinyjqui jqui_resizable
+#' @importFrom plotly plotlyOutput
+#'
+#' @rdname INTERNAL_create_tab_sgrna
+.create_tab_sgrna <- function(sgrna.choices, sgrna.gene) {
     tabPanel(
       title = "sgRNA",
       id = "sgrna",

@@ -1,4 +1,4 @@
-.tab_gene <- function(gene.choices, genesets) {
+.create_tab_gene <- function(gene.choices, genesets) {
     tabPanel(
       title = "Gene (Overview)",
       id = "gene-overview",

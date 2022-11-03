@@ -1,4 +1,4 @@
-.tab_depmap <- function(sgrna.data, depmap.meta) {
+.create_tab_depmap <- function(sgrna.data, depmap.meta) {
   tabPanel(
     title = "DepMap",
     id = "depmap",
