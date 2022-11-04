@@ -27,6 +27,7 @@ Imports:
     shiny,
     grid,
     ComplexHeatmap,
+    InteractiveComplexHeatmap,
     graphics,
     stats,
     ggplot2,
