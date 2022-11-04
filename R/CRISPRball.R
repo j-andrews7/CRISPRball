@@ -33,7 +33,7 @@
 #' @return A Shiny app containing interactive visualizations of MAGeCK RRA analysis results.
 #'
 #' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
-#' @importFrom ComplexHeatmap Heatmap pheatmap make_comb_mat extract_comb UpSet
+#' @importFrom ComplexHeatmap Heatmap pheatmap make_comb_mat extract_comb set_name comb_name UpSet draw
 #' @importFrom InteractiveComplexHeatmap InteractiveComplexHeatmapOutput makeInteractiveComplexHeatmap
 #' @import DT
 #' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations add_segments config toRGB event_data add_trace style
