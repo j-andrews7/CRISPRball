@@ -30,9 +30,11 @@
                         column(
                             12,
                             tipify(
-                                selectizeInput("comp.sets", "Datasets:",
-                                    choices = datasets,
-                                    selected = datasets, multiple = TRUE, 
+                                div(id = "comp_select",
+                                    selectizeInput("comp.sets", "Datasets:",
+                                        choices = datasets,
+                                        selected = datasets, multiple = TRUE, 
+                                    )
                                 ),
                                 "Datasets to compare.", "right",
                                 options = list(container = "body")
@@ -127,9 +129,9 @@
                                 heatmap_id = "overlap_pos",
                                 title1 = "Positively Selected Hits", layout = "1-2-3",
                                 title3 = "Shared Positively Selected Hits for Clicked Set",
-                                width1 = 900, width3 = 500,
+                                width1 = 950, width3 = 600, height1 = 300,
                                 response = "click", # Removes the sub-heatmap
-                                output_ui = div(DT::dataTableOutput("comp.pos.info"), style = "font-size:80%;")
+                                output_ui = div(DT::dataTableOutput("comp.pos.info"), style = "font-size:70%;")
                             ))
                         ),
                         hr(),
@@ -146,9 +148,9 @@
                                 heatmap_id = "overlap_neg",
                                 title1 = "Negatively Selected Hits", layout = "1-2-3",
                                 title3 = "Shared Negatively Selected Hits for Clicked Set",
-                                width1 = 900, width3 = 500,
+                                width1 = 950, width3 = 600, height1 = 300,
                                 response = "click", # Removes the sub-heatmap
-                                output_ui = div(DT::dataTableOutput("comp.neg.info"), style = "font-size:80%;")
+                                output_ui = div(DT::dataTableOutput("comp.neg.info"), style = "font-size:70%;")
                             ))
                         )
                     )

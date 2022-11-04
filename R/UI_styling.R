@@ -24,6 +24,10 @@ css <- tags$head(
         min-height: 24px;
         line-height: 1.1;
         }
+        #comp_select .items {
+        height: 75px;
+        min-height: 75px;
+        }
         .control-label {
         font-size: 10px;
         margin-bottom: 2px;

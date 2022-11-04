@@ -1673,7 +1673,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                   dom = "Blfrtip",
                   buttons = c("copy", "csv", "excel", "pdf", "print")
                 )
-              ) %>% DT::formatStyle(0, target = "row", lineHeight = "40%")
+              ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
             })
           }
 
@@ -1722,7 +1722,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
                   dom = "Blfrtip",
                   buttons = c("copy", "csv", "excel", "pdf", "print")
                 )
-              ) %>% DT::formatStyle(0, target = "row", lineHeight = "40%")
+              ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
             })
           }
 
