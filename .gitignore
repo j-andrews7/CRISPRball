@@ -2,3 +2,4 @@
 .Rhistory
 *.dcf
 *.sqlite
+INTERNAL_*
