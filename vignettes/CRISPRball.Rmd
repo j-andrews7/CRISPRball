@@ -134,7 +134,7 @@ gene.sets <- gene.sets %>% split(x = .$gene_symbol, f = .$gs_name)
 gene.sets[["my_fav_genes"]] <- c("TOP2A", "FECH", "SOX2", "DUT", "RELA")
 
 CRISPRball(gene.data = genes, sgrna.data = sgrnas, count.summary = count.summ, 
-           norm.counts = norm.counts, genesets = gene.sets, depmap.db = "depmap_db.sqlite")
+           norm.counts = norm.counts, genesets = gene.sets)
 ```
 
 Such genesets can then be highlighted very easily on the plots in the **Gene (Overview)** 
