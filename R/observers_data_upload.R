@@ -5,7 +5,7 @@
 #'
 #' @param input The Shiny input object from the server function.
 #' @param session The Shiny session object from the server function.
-#' @param robjects A reactive list of values generated in the \code{\link{iSEE}} app.
+#' @param robjects A reactive list of values generated in the server function.
 #'
 #' @return
 #' Observers are set up to monitor the data upload UI elements that can accept new data.

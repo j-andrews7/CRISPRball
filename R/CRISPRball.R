@@ -200,10 +200,12 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         volc1 = NULL, rank1 = NULL, lawn1 = NULL,
         volc2 = NULL, rank2 = NULL, lawn2 = NULL
       ),
-      comps = list(), comp.neg.genes = list(), comp.neg.genes = list()
+      comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
+      positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
+      genesets = genesets
     )
 
-    # -----------Loading Files In----------------
+    # ---------------Data Upload-----------------
     # Create data upload observers.
     .create_upload_observers(input, session, robjects)
 
@@ -1541,202 +1543,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     #--------------Comparisons Tab------------
-    if (length(gene.data) > 1) {
-      observeEvent(input$comp.update,
-        {
-          # Get hits for each dataset based on thresholds.
-          # Get overlap between genes. Split into up/down?
-          robjects$comps <- lapply(input$comp.sets, function(x) {
-            df <- robjects$gene.data[[x]]
-            .gene_ingress(df,
-              sig.thresh = input$comp.fdr.th, lfc.thresh = input$comp.lfc.th,
-              positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene
-            )
-          })
-
-          names(robjects$comps) <- input$comp.sets
-
-          robjects$comp.pos.genes <- lapply(robjects$comps, function(x) {
-            to.remove <- c()
-
-            if (input$comp.rem.ess) {
-              to.remove <- c(to.remove, essential.genes)
-            }
-
-            if (input$comp.rem.pos) {
-              to.remove <- c(to.remove, positive.ctrl.genes)
-            }
-
-            if (input$comp.dep.crispr.ess) {
-              to.remove <- c(to.remove, x$id[x$DepMap_CRISPR_Essential == TRUE])
-            }
-
-            if (input$comp.dep.rnai.ess) {
-              to.remove <- c(to.remove, x$id[x$DepMap_RNAi_Essential == TRUE])
-            }
-
-            if (input$comp.dep.crispr.sel) {
-              to.remove <- c(to.remove, x$id[x$DepMap_CRISPR_Selective == TRUE])
-            }
-
-            if (input$comp.dep.crispr.sel) {
-              to.remove <- c(to.remove, x$id[x$DepMap_RNAi_Selective == TRUE])
-            }
-
-            x$id[!x$id %in% unique(to.remove) & x$FDR < input$comp.fdr.th & x$LFC > input$comp.lfc.th]
-          })
-
-          names(robjects$comp.pos.genes) <- input$comp.sets
-
-          robjects$comp.neg.genes <- lapply(robjects$comps, function(x) {
-            to.remove <- c()
-
-            if (input$comp.rem.ess) {
-              to.remove <- c(to.remove, essential.genes)
-            }
-
-            if (input$comp.rem.pos) {
-              to.remove <- c(to.remove, positive.ctrl.genes)
-            }
-
-            if (input$comp.dep.crispr.ess) {
-              to.remove <- c(to.remove, x$id[x$DepMap_CRISPR_Essential == TRUE])
-            }
-
-            if (input$comp.dep.rnai.ess) {
-              to.remove <- c(to.remove, x$id[x$DepMap_RNAi_Essential == TRUE])
-            }
-
-            if (input$comp.dep.crispr.sel) {
-              to.remove <- c(to.remove, x$id[x$DepMap_CRISPR_Selective == TRUE])
-            }
-
-            if (input$comp.dep.crispr.sel) {
-              to.remove <- c(to.remove, x$id[x$DepMap_RNAi_Selective == TRUE])
-            }
-
-            x$id[!x$id %in% unique(to.remove) & x$FDR < input$comp.fdr.th & x$LFC < -input$comp.lfc.th]
-          })
-
-          names(robjects$comp.neg.genes) <- input$comp.sets
-
-          # Get the combination matrices.
-          robjects$pos.m <- make_comb_mat(robjects$comp.pos.genes)
-          robjects$neg.m <- make_comb_mat(robjects$comp.neg.genes)
-
-          # Make upset plots.
-          ht.pos <- draw(UpSet(robjects$pos.m))
-          ht.neg <- draw(UpSet(robjects$neg.m))
-
-          .pos_click_action <- function(df, output) {
-            if (!is.null(df)) {
-              # Get combination members and shared hits.
-              comb.name <- comb_name(robjects$pos.m[,df$column_index])
-              comb.genes <- extract_comb(robjects$pos.m, comb.name)
-              comb.members <- set_name(robjects$pos.m)[unlist(strsplit(comb.name, "")) == "1"]
-
-              # Make output df from genes using info from all combination members.
-              member.dfs <- lapply(comb.members, function(x) {
-                og.df <- robjects$comps[[x]]
-                og.df <- og.df[og.df$id %in% comb.genes, ]
-                rownames(og.df) <- og.df$id
-                og.df <- og.df[, c("FDR", "LFC")]
-                colnames(og.df) <- paste0(colnames(og.df), "_", x)
-                og.df
-              })
-
-              comp_pos_df <- Reduce(function(dtf1, dtf2) 
-                {
-                  out.d <- merge(dtf1, dtf2, by = "row.names", all.x = TRUE)
-                  rownames(out.d) <- out.d$Row.names
-                  out.d$Row.names <- NULL
-                  out.d
-                },
-                member.dfs)
-
-            } else {
-              comp_pos_df <- data.frame(
-                Gene = character()
-              )
-              comb.members <- NULL
-            }
-
-            output$comp.pos.info <- renderDT(server = FALSE, {
-              DT::datatable(comp_pos_df,
-                rownames = TRUE,
-                filter = "top",
-                extensions = c("Buttons"),
-                caption = paste("Positively Selected Hits in:", paste0(comb.members, collapse = ", ")),
-                options = list(
-                  search = list(regex = TRUE),
-                  pageLength = 10,
-                  dom = "Blfrtip",
-                  buttons = c("copy", "csv", "excel", "pdf", "print")
-                )
-              ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
-            })
-          }
-
-          .neg_click_action <- function(df, output) {
-            if (!is.null(df)) {
-              # Get combination members and shared hits.
-              comb.name <- comb_name(robjects$neg.m[,df$column_index])
-              comb.genes <- extract_comb(robjects$neg.m, comb.name)
-              comb.members <- set_name(robjects$neg.m)[unlist(strsplit(comb.name, "")) == "1"]
-
-              # Make output df from genes using info from all combination members.
-              member.dfs <- lapply(comb.members, function(x) {
-                og.df <- robjects$comps[[x]]
-                og.df <- og.df[og.df$id %in% comb.genes, ]
-                rownames(og.df) <- og.df$id
-                og.df <- og.df[, c("FDR", "LFC")]
-                colnames(og.df) <- paste0(colnames(og.df), "_", x)
-                og.df
-              })
-
-              comp_neg_df <- Reduce(function(dtf1, dtf2) 
-                {
-                  out.d <- merge(dtf1, dtf2, by = "row.names", all.x = TRUE)
-                  rownames(out.d) <- out.d$Row.names
-                  out.d$Row.names <- NULL
-                  out.d
-                },
-                member.dfs)
-
-            } else {
-              comp_neg_df <- data.frame(
-                Gene = character()
-              )
-              comb.members <- NULL
-            }
-
-            output$comp.neg.info <- renderDT(server = FALSE, {
-              DT::datatable(comp_neg_df,
-                rownames = TRUE,
-                filter = "top",
-                extensions = c("Buttons"),
-                caption = paste("Negatively Selected Hits in:", paste0(comb.members, collapse = ", ")),
-                options = list(
-                  search = list(regex = TRUE),
-                  pageLength = 10,
-                  dom = "Blfrtip",
-                  buttons = c("copy", "csv", "excel", "pdf", "print")
-                )
-              ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
-            })
-          }
-
-          makeInteractiveComplexHeatmap(input, output, session, ht.pos,
-            heatmap_id = "overlap_pos", click_action = .pos_click_action
-          )
-
-          makeInteractiveComplexHeatmap(input, output, session, ht.neg,
-            heatmap_id = "overlap_neg", click_action = .neg_click_action
-          )
-        },
-        ignoreInit = TRUE
-      )
-    }
+    observe({
+      .create_comparisons_observers(input, session, output, robjects)
+    })
 
     #--------------DepMap Tab-----------------
     if (!is.null(depmap.gene)) {
