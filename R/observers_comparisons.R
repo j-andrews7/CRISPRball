@@ -27,7 +27,8 @@
                     df <- robjects$gene.data[[x]]
                     .gene_ingress(df,
                         sig.thresh = input$comp.fdr.th, lfc.thresh = input$comp.lfc.th,
-                        positive.ctrl.genes = robjects$positive.ctrl.genes, essential.genes = robjects$essential.genes, depmap.genes = depmap.gene
+                        positive.ctrl.genes = robjects$positive.ctrl.genes, 
+                        essential.genes = robjects$essential.genes, depmap.genes = robjects$depmap.gene
                     )
                 })
 
@@ -215,4 +216,6 @@
     } else {
         out <- df$id[!df$id %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC < -input$comp.lfc.th]
     }
+
+    return(out)
 }
