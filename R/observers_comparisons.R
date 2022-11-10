@@ -19,9 +19,9 @@
 #' @importFrom shinyjs js
 .create_comparisons_observers <- function(input, session, output, robjects) {
     # nocov start
-    if (length(robjects$gene.data) > 1) {
-        observeEvent(input$comp.update,
-            {
+    observeEvent(input$comp.update,
+        {
+            if (length(robjects$gene.data) > 1) {
                 # Get hits for each dataset based on thresholds.
                 robjects$comps <- lapply(input$comp.sets, function(x) {
                     df <- robjects$gene.data[[x]]
@@ -161,10 +161,9 @@
                 makeInteractiveComplexHeatmap(input, output, session, ht.neg,
                     heatmap_id = "overlap_neg", click_action = .neg_click_action
                 )
-            },
-            ignoreInit = TRUE
-        )
-    }
+            }
+        }
+    )
     # nocov end
 
     invisible(NULL)
@@ -179,8 +178,7 @@
 #' @param pos A boolean indicating whether to get genes to remove for positive selection.
 #'   FALSE indicates negative selection.
 #'
-#' @return
-#' Character vector of gene identifiers to remove.
+#' @return Character vector of gene identifiers to remove.
 #'
 #' @author Jared Andrews
 #' @rdname INTERNAL_remove_unwanted_hits

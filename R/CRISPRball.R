@@ -846,12 +846,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       }
     })
 
-    # If the Gene tab update button is pressed, click all the update buttons.
-    observeEvent(input$gene.update, {
-      shinyjs::click("lawn.update")
-      shinyjs::click("vol.update")
-      shinyjs::click("rank.update")
-    })
 
     #---------------sgRNA Tab-----------------
 
@@ -1082,10 +1076,14 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     })
 
     #--------------Comparisons Tab------------
-    observe({
-      .create_comparisons_observers(input, session, output, robjects)
-    })
+    .create_comparisons_observers(input, session, output, robjects)
 
+    # Initialize plots by simulating button click once.
+    o <- observe({
+      req(robjects$gene.data)
+      shinyjs::click("comp.update")
+      o$destroy
+    })
     #--------------DepMap Tab-----------------
     if (!is.null(depmap.gene)) {
       output$depmap.deplines <- renderUI({
