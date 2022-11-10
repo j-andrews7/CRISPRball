@@ -33,7 +33,7 @@ shinyjs.enableTab = function(name) {
 # Generate easier columns for plotting for various data summaries.
 .gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL, 
                           essential.genes = NULL, depmap.genes = NULL) {
-                       
+
   if (!is.null(essential.genes)) {
     df$essential <- df$id %in% essential.genes
   }

@@ -202,7 +202,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       ),
       comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
       positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
-      genesets = genesets
+      genesets = genesets, pc = NULL
     )
 
     # ---------------Data Upload-----------------
@@ -218,48 +218,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # -----------QC & QC Summary Tabs------------
     # PCA.
-
-    observeEvent(req(colnames(robjects$norm.counts[, c(-1, -2)]) == gsub("-", ".", robjects$count.summary$Label)), {
-      slmed <- robjects$norm.counts
-      slmat <- as.matrix(slmed[, c(-1, -2)])
-      mat <- log2(slmat + 1)
-      rownames(mat) <- slmed$sgRNA
-
-      meta <- robjects$count.summary
-
-      # Filter samples from QC table.
-      if (!is.null(input$count.summary_rows_all) & input$meta.filt) {
-        meta <- meta[input$count.summary_rows_all, ]
-        mat <- mat[, input$count.summary_rows_all]
-      }
-
-      rownames(meta) <- gsub("-", ".", meta$Label)
-
-      # Remove guides with no variance in counts, as they break the PCA.
-      mat <- mat[(rowMaxs(mat) - rowMins(mat) > 0), ]
-
-      # If input to use top N features instead rather than percent-based feature removal, account for that
-      if (input$keep.top.n) {
-        mat <- mat[order(rowVars(mat), decreasing = TRUE), ]
-        mat <- mat[1:input$var.n.keep, ]
-        var.remove <- 0
-      } else {
-        var.remove <- input$var.remove
-      }
-
-      meta <- meta[colnames(mat), ]
-
-      robjects$pc <- NULL
-
-      if (ncol(mat) > 1) {
-        robjects$pc <- pca(mat,
-          metadata = meta,
-          removeVar = var.remove,
-          scale = input$scale,
-          center = input$center
-        )
-      }
-    })
+    .create_pca_observers(input, output, robjects)
 
     # Populate UI with all PCs.
     # TODO: Write check for only 2 PCs.
@@ -386,157 +345,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       })
     })
 
-    observeEvent(robjects$pc, {
-      output$qc.pca <- renderPlotly({
-        req(robjects$pc, input$dim1, input$dim2, input$dim3)
-        input$pca.update
-
-        pc.res <- isolate(robjects$pc)
-
-        pl.cols <- NULL
-        pl.shapes <- NULL
-        pl.col <- "black"
-        hov.text <- NULL
-
-        # Get marker aesthetics mappings.
-        # Drop unused factor levels if possible.
-        if (isolate(input$bip.color) != "") {
-          pl.cols <- pc.res$metadata[, isolate(input$bip.color), drop = TRUE]
-          if (is.factor(pl.cols)) {
-            pl.cols <- droplevels(pl.cols)
-          }
-          pl.col <- dittoColors()[seq_along(unique(pc.res$metadata[, isolate(input$bip.color), drop = TRUE]))]
-        }
-
-        if (isolate(input$bip.shape) != "") {
-          pl.shapes <- pc.res$metadata[, isolate(input$bip.shape), drop = TRUE]
-          if (is.factor(pl.shapes)) {
-            pl.shapes <- droplevels(pl.shapes)
-          }
-        }
-
-        # Just throw label on hover for now.
-        hov.text <- paste0("</br><b>Label:</b> ", pc.res$metadata$Label)
-
-        # Check if 2D is wanted.
-        if (isolate(input$bip.twod)) {
-          fig <- plot_ly(pc.res$rotated,
-            x = as.formula(paste0("~", isolate(input$dim1))),
-            y = as.formula(paste0("~", isolate(input$dim2))),
-            type = "scatter",
-            mode = "markers",
-            marker = list(size = 15),
-            color = pl.cols,
-            colors = pl.col,
-            symbol = pl.shapes,
-            symbols = c(
-              "circle", "square", "diamond", "cross",
-              "diamond-open", "circle-open", "square-open", "x"
-            ),
-            text = hov.text,
-            hoverinfo = "text"
-          ) %>%
-            layout(
-              xaxis = list(
-                showgrid = FALSE, showline = TRUE, mirror = TRUE, zeroline = FALSE,
-                title = paste0(
-                  isolate(input$dim1),
-                  " (", format(round(pc.res$variance[isolate(input$dim1)], 2), nsmall = 2), "%)"
-                )
-              ),
-              yaxis = list(
-                showgrid = FALSE, showline = TRUE, mirror = TRUE, zeroline = FALSE,
-                title = paste0(
-                  isolate(input$dim2),
-                  " (", format(round(pc.res$variance[isolate(input$dim2)], 2), nsmall = 2), "%)"
-                )
-              )
-            )
-
-          fig <- fig %>% toWebGL()
-
-          # Plot loadings.
-          if (isolate(input$bip.loadings)) {
-            lengthLoadingsArrowsFactor <- 1.5
-
-            # Get number of loadings to display.
-            xidx <- order(abs(pc.res$loadings[, isolate(input$dim1)]), decreasing = TRUE)
-            yidx <- order(abs(pc.res$loadings[, isolate(input$dim2)]), decreasing = TRUE)
-            vars <- unique(c(
-              rownames(pc.res$loadings)[xidx][seq_len(isolate(input$bip.n.loadings))],
-              rownames(pc.res$loadings)[yidx][seq_len(isolate(input$bip.n.loadings))]
-            ))
-
-            # get scaling parameter to match between variable loadings and rotated loadings
-            # This is cribbed almost verbatim from PCAtools code.
-            r <- min(
-              (max(pc.res$rotated[, isolate(input$dim1)]) - min(pc.res$rotated[, isolate(input$dim1)]) /
-                (max(pc.res$loadings[, isolate(input$dim1)]) - min(pc.res$loadings[, isolate(input$dim1)]))),
-              (max(pc.res$rotated[, isolate(input$dim2)]) - min(pc.res$rotated[, isolate(input$dim2)]) /
-                (max(pc.res$loadings[, isolate(input$dim2)]) - min(pc.res$loadings[, isolate(input$dim2)])))
-            )
-
-            fig <- fig %>%
-              add_segments(
-                x = 0, xend = pc.res$loadings[vars, isolate(input$dim1)] * r * lengthLoadingsArrowsFactor,
-                y = 0, yend = pc.res$loadings[vars, isolate(input$dim2)] * r * lengthLoadingsArrowsFactor,
-                line = list(color = "black"), inherit = FALSE, showlegend = FALSE, hoverinfo = "text"
-              ) %>%
-              add_annotations(
-                x = pc.res$loadings[vars, isolate(input$dim1)] * r * lengthLoadingsArrowsFactor,
-                y = pc.res$loadings[vars, isolate(input$dim2)] * r * lengthLoadingsArrowsFactor,
-                ax = 0, ay = 0, text = vars, xanchor = "center", yanchor = "bottom"
-              )
-          }
-        } else {
-          # Generate plot.
-          fig <- plot_ly(pc.res$rotated,
-            x = as.formula(paste0("~", isolate(input$dim1))),
-            y = as.formula(paste0("~", isolate(input$dim2))),
-            z = as.formula(paste0("~", isolate(input$dim3))),
-            type = "scatter3d",
-            mode = "markers",
-            color = pl.cols,
-            colors = pl.col,
-            symbol = pl.shapes,
-            symbols = c(
-              "circle", "square", "diamond", "cross", "diamond-open",
-              "circle-open", "square-open", "x"
-            ),
-            text = hov.text,
-            hoverinfo = "text"
-          ) %>%
-            layout(scene = list(
-              xaxis = list(title = paste0(
-                isolate(input$dim1), " (",
-                format(round(pc.res$variance[isolate(input$dim1)], 2), nsmall = 2), "%)"
-              )),
-              yaxis = list(title = paste0(
-                isolate(input$dim2), " (",
-                format(round(pc.res$variance[isolate(input$dim2)], 2), nsmall = 2), "%)"
-              )),
-              zaxis = list(title = paste0(
-                isolate(input$dim3), " (",
-                format(round(pc.res$variance[isolate(input$dim3)], 2), nsmall = 2), "%)"
-              )),
-              camera = list(eye = list(x = 1.5, y = 1.8, z = 0.4))
-            ))
-        }
-        fig <- fig %>%
-          config(
-            edits = list(
-              annotationPosition = TRUE,
-              annotationTail = FALSE
-            ),
-            toImageButtonOptions = list(format = "svg"),
-            displaylogo = FALSE,
-            plotGlPixelRatio = 7
-          )
-
-        fig
-      })
-    })
-
     observeEvent(robjects$count.summary, {
       output$count.summary <- renderDT(server = FALSE, {
         DT::datatable(robjects$count.summary,
@@ -559,7 +367,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # Initialize plots by simulating button click once.
     o <- observe({
-      req(robjects$pc, input$dim1, input$dim2, input$dim3)
+      req(robjects$pca.mat, robjects$pca.meta)
       shinyjs::click("pca.update")
       o$destroy
     })
@@ -567,6 +375,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     #---------Gene (Overview) & Summary Tables Tabs-------------
 
     # Load the gene summaries for easy plotting.
+    # TODO: This needs to be broken up into two different observers, as the ingress for the second set
+    # gets messed up due to the event trigerring when the first dataset is loaded and the second dataset
+    # input hasn't been updated yet.
     observeEvent(c(input$gene.sel1, input$gene.sel2), {
       df <- robjects$gene.data[[input$gene.sel1]]
       robjects$set1.genes <- .gene_ingress(df,

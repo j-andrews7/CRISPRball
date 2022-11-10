@@ -20,8 +20,7 @@
 .create_upload_observers <- function(input, session, robjects) {
     # nocov start
     observeEvent(input$geneSummaryFiles, {
-        new.data <- .gene_summ_ingress(input$geneSummaryFiles)
-        robjects$gene.data <- new.data
+        robjects$gene.data <- .gene_summ_ingress(input$geneSummaryFiles)
         if (!is.null(robjects$gene.data)) {
             js$enableTab("Gene (Overview)")
             js$enableTab("Gene Summary Tables")
@@ -31,8 +30,7 @@
     })
 
     observeEvent(input$sgrnaSummaryFiles, {
-        new.data <- .sgrna_summ_ingress(input$sgrnaSummaryFiles)
-        robjects$sgrna.data <- new.data
+        robjects$sgrna.data <- .sgrna_summ_ingress(input$sgrnaSummaryFiles)
         if (!is.null(robjects$sgrna.data)) {
             js$enableTab("sgRNA")
             js$enableTab("sgRNA Summary Tables")
@@ -43,8 +41,7 @@
     })
 
     observeEvent(input$countSummary, {
-        new.data <- read.delim(input$countSummary$datapath)
-        robjects$count.summary <- new.data
+        robjects$count.summary <- read.delim(input$countSummary$datapath)
         if (!is.null(robjects$count.summary)) {
             js$enableTab("QC")
             js$enableTab("QC Table")
@@ -54,8 +51,7 @@
     })
 
     observeEvent(input$countNormFile, {
-        new.data <- read.delim(input$countNormFile$datapath)
-        robjects$norm.counts <- new.data
+        robjects$norm.counts <- read.delim(input$countNormFile$datapath)
         if (!is.null(robjects$norm.counts)) {
             js$enableTab("QC")
         }
