@@ -44,12 +44,8 @@
 #' @importFrom shinyjs show useShinyjs hidden disable click extendShinyjs js
 #' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
 #' @importFrom colourpicker colourInput
-#' @importFrom MAGeCKFlute BarView MapRatesView
-#' @importFrom PCAtools pca
 #' @importFrom dittoSeq dittoColors
 #' @importFrom grid grid.newpage grid.text
-#' @importFrom matrixStats rowVars rowMaxs rowMins
-#' @importFrom graphics hist legend lines
 #' @importFrom stats cor as.formula
 #' @importFrom utils read.csv read.delim
 #'
@@ -220,150 +216,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # PCA.
     .create_pca_observers(input, output, robjects)
 
-    # Populate UI with all PCs.
-    # TODO: Write check for only 2 PCs.
-    output$pca.comps <- renderUI({
-      req(robjects$pc)
-      pcs <- robjects$pc
-
-      tagList(
-        fluidRow(
-          column(4, selectInput("dim1", "Dim1:", choices = pcs$components, selected = "PC1")),
-          column(4, selectInput("dim2", "Dim2:", choices = pcs$components, selected = "PC2")),
-          column(4, selectInput("dim3", "Dim3:", choices = pcs$components, selected = "PC3"))
-        )
-      )
-    })
-
-    output$qc.gini <- renderPlotly({
-      gg <- BarView(robjects$count.summary,
-        x = "Label",
-        y = "GiniIndex",
-        ylab = "Gini index",
-        main = "sgRNA Read Distribution"
-      )
-
-      gg + theme(
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 12),
-        axis.text.y = element_text(size = 12)
-      )
-
-      ggplotly(gg, tooltip = c("y")) %>%
-        layout(
-          yaxis = list(range = list(0, max(robjects$count.summary$GiniIndex) + .05)),
-          xaxis = list(tickangle = 315)
-        ) %>%
-        config(
-          toImageButtonOptions = list(format = "svg"),
-          displaylogo = FALSE,
-          plotGlPixelRatio = 7
-        )
-    })
-
-    output$qc.missed <- renderPlotly({
-      gg <- BarView(robjects$count.summary,
-        x = "Label", y = "Zerocounts", fill = "#394E80",
-        ylab = "Zero Count sgRNAs", main = "Fully Depleted sgRNAs"
-      )
-
-      gg + theme_classic() + theme(
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 12),
-        axis.text.y = element_text(size = 12)
-      ) +
-        ylim(0, max(robjects$count.summary$Zerocounts) + 5)
-
-      ggplotly(gg, tooltip = c("y")) %>%
-        layout(
-          yaxis = list(range = list(0, max(robjects$count.summary$Zerocounts) + 5)),
-          xaxis = list(tickangle = 315)
-        ) %>%
-        config(
-          toImageButtonOptions = list(format = "svg"),
-          displaylogo = FALSE,
-          plotGlPixelRatio = 7
-        )
-    })
-
-    output$qc.map <- renderPlot({
-      MapRatesView(robjects$count.summary) + scale_x_discrete(guide = guide_axis(angle = 45))
-    })
-
-    # TODO: rewrite this.
-    observeEvent(robjects$norm.counts, {
-      output$qc.histplot <- renderPlot({
-        colors <- dittoColors()
-
-        slmed <- robjects$norm.counts
-        tabsmat <- as.matrix(log2(slmed[, c(-1, -2)] + 1))
-        colnames(tabsmat) <- colnames(slmed)[c(-1, -2)]
-        samplecol <- colors[((1:ncol(tabsmat)) %% length(colors))]
-        tgz <- hist(tabsmat, breaks = 40)
-
-        if (ncol(tabsmat) >= 1) {
-          histlist <- lapply(1:ncol(tabsmat), function(X) {
-            return(hist(tabsmat[, X], plot = FALSE, breaks = tgz$breaks))
-          })
-          xrange <- range(unlist(lapply(histlist, function(X) {
-            X$mids
-          })))
-          yrange <- range(unlist(lapply(histlist, function(X) {
-            X$counts
-          })))
-          hst1 <- histlist[[1]]
-          plot(hst1$mids, hst1$counts,
-            type = "b", pch = 20, xlim = c(0, xrange[2] * 1.2),
-            ylim = c(0, yrange[2] * 1.2), xlab = "log2(counts)", ylab = "Frequency",
-            main = "Distribution of read counts", col = samplecol[1]
-          )
-        }
-
-        if (ncol(tabsmat) >= 2) {
-          for (i in 2:ncol(tabsmat)) {
-            hstn <- histlist[[i]]
-            lines(hstn$mids, hstn$counts, type = "b", pch = 20, col = samplecol[i])
-          }
-        }
-
-        legend("topright", colnames(tabsmat), pch = 20, lwd = 1, col = samplecol)
-      })
-
-      # TODO: rewrite this, add color min/max/mid selectors.
-      output$qc.corr <- renderPlot({
-        slmed <- robjects$norm.counts
-        slmat <- as.matrix(slmed[, c(-1, -2)])
-        slmat.log <- log2(slmat + 1)
-
-        if (ncol(slmat.log) > 1) {
-          ComplexHeatmap::pheatmap(cor(slmat.log),
-            heatmap_legend_param = list(title = "Pearson\nCorr."),
-            main = "Correlation Matrix"
-          )
-        } else {
-          grid.newpage()
-          grid.text("Only one sample, no correlation possible.")
-        }
-      })
-    })
-
-    observeEvent(robjects$count.summary, {
-      output$count.summary <- renderDT(server = FALSE, {
-        DT::datatable(robjects$count.summary,
-          rownames = FALSE,
-          filter = "top",
-          extensions = c("Buttons", "Scroller"),
-          options = list(
-            search = list(regex = TRUE),
-            lengthMenu = list(c(10, 25, 50, -1), c("10", "25", "50", "all")),
-            dom = "Blfrtip",
-            buttons = c("copy", "csv", "excel", "pdf", "print"),
-            scrollX = TRUE,
-            deferRender = TRUE,
-            scrollY = 600,
-            scroller = TRUE
-          )
-        ) %>% DT::formatStyle(0, target = "row", lineHeight = "80%")
-      })
-    })
+    .create_qc_output(input, output, robjects)
 
     # Initialize plots by simulating button click once.
     o <- observe({

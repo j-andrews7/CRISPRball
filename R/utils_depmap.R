@@ -147,8 +147,11 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
 #' @param crispr.color Character scalar for color to use for CRISPR title.
 #' @param rnai.color Character scalar for color to use for RNAi title.
 #' 
-#' @author Jared Andrews
 #' @return TagList containing dependency summary information.
+#' 
+#' @importFrom shiny span strong tagList div icon
+#' @importFrom shinyBS popify
+#' @author Jared Andrews
 #' @rdname INTERNAL_make_dependency_tag
 .make_dependency_tag <- function(dep.info, dep.release, crispr.color, rnai.color) {  
   cinfo <- "N/A"

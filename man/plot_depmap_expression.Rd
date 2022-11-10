@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plot_depmap_expression}
 \alias{plot_depmap_expression}
-\title{Plot gene expression information from DepMap, mostly from CCLE.}
+\title{Plot gene expression information from DepMap, mostly from CCLE}
 \usage{
 plot_depmap_expression(gene, depmap.meta, depmap.pool, color, plot.grid)
 }
@@ -22,7 +22,7 @@ of the SQLite database built by \code{\link{build_depmap_db}}.}
 plotly object
 }
 \description{
-Plot gene expression information from DepMap, mostly from CCLE.
+Plot gene expression information from DepMap, mostly from CCLE
 }
 \author{
 Jared Andrews

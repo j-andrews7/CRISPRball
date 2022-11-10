@@ -756,7 +756,7 @@
 }
 
 
-#' Plot gene dependency information from DepMap CRISPR and RNAi tables.
+#' Plot gene dependency information from DepMap CRISPR and RNAi tables
 #' 
 #' @param gene Character scalar for gene symbol.
 #' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
@@ -847,7 +847,7 @@ plot_depmap_dependency <- function(gene, depmap.meta, crispr.color,
 }
 
 
-#' Plot gene expression information from DepMap, mostly from CCLE.
+#' Plot gene expression information from DepMap, mostly from CCLE
 #' 
 #' @inheritParams plot_depmap_dependency
 #' @param color Character scalar for trace color.
@@ -899,7 +899,7 @@ plot_depmap_expression <- function(gene, depmap.meta, depmap.pool, color, plot.g
 }
 
 
-#' Plot gene CN information from DepMap, mostly from CCLE.
+#' Plot gene copy number information from DepMap, mostly from CCLE
 #' 
 #' @inheritParams plot_depmap_dependency
 #' @param color Character scalar for trace color.
@@ -1083,6 +1083,11 @@ plot_depmap_lineages <- function(gene, data.type, group.by, depmap.meta, depmap.
   }
 }
 
+#' Plot text indicating that gene was not found
+#' 
+#' @param gene Character scalar of gene identifier.
+#' @author Jared Andrews
+#' @rdname INTERNAL_plot_gene_not_found
 .plot_gene_not_found <- function(gene) {
   # Just plots text for when a gene isn't found in depmap.
   fig <- plot_ly()
