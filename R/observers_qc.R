@@ -1,4 +1,4 @@
-#' Define observers for PCA
+#' Define observers for QC tabs
 #'
 #' Define a series of observers to run PCA based on new data upload or button click.
 #'
@@ -11,11 +11,11 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rdname INTERNAL_create_pca_observers
+#' @rdname INTERNAL_create_qc_observers
 #' @importFrom shiny observeEvent
 #' @importFrom matrixStats rowVars rowMaxs rowMins
 #' @importFrom PCAtools pca
-.create_pca_observers <- function(input, robjects) {
+.create_qc_observers <- function(input, robjects) {
     # nocov start
     # This is used so that the matrix and metadata input for PCA are updated when new data is uploaded.
     observeEvent(req(colnames(robjects$norm.counts[, c(-1, -2)]) == gsub("-", ".", robjects$count.summary$Label)), {

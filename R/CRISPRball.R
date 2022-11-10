@@ -198,7 +198,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
       ),
       comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
       positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
-      genesets = genesets, pc = NULL
+      genesets = genesets, pc = NULL, h.id = h.id
     )
 
     # ---------------Data Upload-----------------
@@ -214,7 +214,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # -----------QC & QC Summary Tabs------------
     # PCA.
-    .create_pca_observers(input, output, robjects)
+    .create_qc_observers(input, robjects)
 
     .create_qc_output(input, output, robjects)
 
@@ -228,132 +228,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     #---------Gene (Overview) & Summary Tables Tabs-------------
 
     # Load the gene summaries for easy plotting.
-    # TODO: This needs to be broken up into two different observers, as the ingress for the second set
-    # gets messed up due to the event trigerring when the first dataset is loaded and the second dataset
-    # input hasn't been updated yet.
-    observeEvent(c(input$gene.sel1, input$gene.sel2), {
-      df <- robjects$gene.data[[input$gene.sel1]]
-      robjects$set1.genes <- .gene_ingress(df,
-        sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
-        positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene
-      )
-
-      if (length(robjects$gene.data) > 1) {
-        df <- robjects$gene.data[[input$gene.sel2]]
-        robjects$set2.genes <- .gene_ingress(df,
-          sig.thresh = isolate(input$gene.fdr.th), lfc.thresh = isolate(input$gene.lfc.th),
-          positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes, depmap.genes = depmap.gene
-        )
-
-        # Get overlapping hits between sets if needed.
-        s1 <- robjects$set1.genes
-        s2 <- robjects$set2.genes
-
-        set1.hits <- s1$id[s1$hit_type %in% c("neg", "pos")]
-        set2.hits <- s2$id[s2$hit_type %in% c("neg", "pos")]
-
-        robjects$common.hits <- set1.hits[set1.hits %in% set2.hits]
-      }
-    })
-
-    # On click, the key field of the event data contains the gene symbol.
-    # Add that gene to the set of all "selected" genes. Double click will clear all labels.
-    # TODO: lapply this, probably.
-    observeEvent(event_data("plotly_click", source = paste0(h.id, "_volc1")), {
-      gene <- event_data("plotly_click", source = paste0(h.id, "_volc1"))
-      gene_old_new <- rbind(robjects$clicked$volc1, gene)
-      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata) == 1)), ]
-
-      if (nrow(keep) == 0) {
-        robjects$clicked$volc1 <- NULL
-      } else {
-        robjects$clicked$volc1 <- keep
-      }
-    })
-
-    observeEvent(event_data("plotly_click", source = paste0(h.id, "_rank1")), {
-      gene <- event_data("plotly_click", source = paste0(h.id, "_rank1"))
-      gene_old_new <- rbind(robjects$clicked$rank1, gene)
-      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata) == 1)), ]
-
-      if (nrow(keep) == 0) {
-        robjects$clicked$rank1 <- NULL
-      } else {
-        robjects$clicked$rank1 <- keep
-      }
-    })
-
-    observeEvent(event_data("plotly_click", source = paste0(h.id, "_lawn1")), {
-      gene <- event_data("plotly_click", source = paste0(h.id, "_lawn1"))
-      gene_old_new <- rbind(robjects$clicked$lawn1, gene)
-      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata) == 1)), ]
-
-      if (nrow(keep) == 0) {
-        robjects$clicked$lawn1 <- NULL
-      } else {
-        robjects$clicked$lawn1 <- keep
-      }
-    })
-
-    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id, "_volc1")), {
-      robjects$clicked$volc1 <- NULL
-    })
-
-    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id, "_rank1")), {
-      robjects$clicked$rank1 <- NULL
-    })
-
-    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id, "_lawn1")), {
-      robjects$clicked$lawn1 <- NULL
-    })
-
-    observeEvent(event_data("plotly_click", source = paste0(h.id, "_volc2")), {
-      gene <- event_data("plotly_click", source = paste0(h.id, "_volc2"))
-      gene_old_new <- rbind(robjects$clicked$volc2, gene)
-      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata) == 1)), ]
-
-      if (nrow(keep) == 0) {
-        robjects$clicked$volc2 <- NULL
-      } else {
-        robjects$clicked$volc2 <- keep
-      }
-    })
-
-    observeEvent(event_data("plotly_click", source = paste0(h.id, "_rank2")), {
-      gene <- event_data("plotly_click", source = paste0(h.id, "_rank2"))
-      gene_old_new <- rbind(robjects$clicked$rank2, gene)
-      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata) == 1)), ]
-
-      if (nrow(keep) == 0) {
-        robjects$clicked$rank2 <- NULL
-      } else {
-        robjects$clicked$rank2 <- keep
-      }
-    })
-
-    observeEvent(event_data("plotly_click", source = paste0(h.id, "_lawn2")), {
-      gene <- event_data("plotly_click", source = paste0(h.id, "_lawn2"))
-      gene_old_new <- rbind(robjects$clicked$lawn2, gene)
-      keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata) == 1)), ]
-
-      if (nrow(keep) == 0) {
-        robjects$clicked$lawn2 <- NULL
-      } else {
-        robjects$clicked$lawn2 <- keep
-      }
-    })
-
-    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id, "_volc2")), {
-      robjects$clicked$volc2 <- NULL
-    })
-
-    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id, "_rank2")), {
-      robjects$clicked$rank2 <- NULL
-    })
-
-    observeEvent(event_data("plotly_doubleclick", source = paste0(h.id, "_lawn2")), {
-      robjects$clicked$lawn2 <- NULL
-    })
+    .create_gene_observers(input, robjects)
 
     # Summary table and plots.
     output$gene1.summary <- renderDT(server = FALSE, {
@@ -425,7 +300,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
       highlight <- NULL
       if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-        highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+        highlight.feats <- strsplit(isolate(input$hl.genes), ",|\\s|,\\s")[[1]]
         highlight <- highlight.feats[highlight.feats != ""]
       }
 
@@ -518,7 +393,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
       highlight <- NULL
       if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-        highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+        highlight.feats <- strsplit(isolate(input$hl.genes), ",|\\s|,\\s")[[1]]
         highlight <- highlight.feats[highlight.feats != ""]
       }
 
@@ -608,13 +483,13 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
       highlight <- NULL
       if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-        highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+        highlight.feats <- strsplit(isolate(input$hl.genes), ",|\\s|,\\s")[[1]]
         highlight <- highlight.feats[highlight.feats != ""]
       }
 
       # Add common hits to highlight.
       if (isolate(input$highlight.common)) {
-        highlight <- unique(c(common.hits(), highlight))
+        highlight <- unique(c(robjects$common.hits, highlight))
       }
 
       .make_lawn(
@@ -733,7 +608,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
           highlight <- NULL
           if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-            highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+            highlight.feats <- strsplit(isolate(input$hl.genes), ",|\\s|,\\s")[[1]]
             highlight <- highlight.feats[highlight.feats != ""]
           }
 
@@ -826,7 +701,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
           highlight <- NULL
           if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-            highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+            highlight.feats <- strsplit(isolate(input$hl.genes), ",|\\s|,\\s")[[1]]
             highlight <- highlight.feats[highlight.feats != ""]
           }
 
@@ -917,7 +792,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
           highlight <- NULL
           if (!is.null(isolate(input$hl.genes)) & isolate(input$hl.genes) != "") {
-            highlight.feats <- strsplit(input$hl.genes, ",|\\s|,\\s")[[1]]
+            highlight.feats <- strsplit(isolate(input$hl.genes), ",|\\s|,\\s")[[1]]
             highlight <- highlight.feats[highlight.feats != ""]
           }
 
