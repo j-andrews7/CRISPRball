@@ -16,8 +16,8 @@
 #' @importFrom matrixStats rowVars rowMaxs rowMins
 #' @importFrom PCAtools pca
 .create_qc_observers <- function(input, robjects) {
-    # nocov start
     # This is used so that the matrix and metadata input for PCA are updated when new data is uploaded.
+    # nocov start
     observeEvent(req(colnames(robjects$norm.counts[, c(-1, -2)]) == gsub("-", ".", robjects$count.summary$Label)), {
         slmed <- robjects$norm.counts
         slmat <- as.matrix(slmed[, c(-1, -2)])
@@ -29,7 +29,9 @@
         robjects$pca.mat <- mat
         robjects$pca.meta <- meta
     })
+    # nocov end
 
+    # nocov start
     observeEvent(input$pca.update, {
         pca.meta <- robjects$pca.meta
         pca.mat <- robjects$pca.mat

@@ -51,20 +51,21 @@
     # nocov start
     plot.suf <- list("volc1", "volc2", "rank1", "rank2", "lawn1", "lawn2")
     lapply(plot.suf, function(x) {
+      obj <- paste0("clicked.", x)
       observeEvent(event_data("plotly_click", source = paste0(robjects$h.id, "_", x)), {
         gene <- event_data("plotly_click", source = paste0(robjects$h.id, "_", x))
-        gene_old_new <- rbind(robjects$clicked[[x]], gene)
+        gene_old_new <- rbind(robjects[[obj]], gene)
         keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata) == 1)), ]
 
         if (nrow(keep) == 0) {
-            robjects$clicked[[x]] <- NULL
+            robjects[[obj]] <- NULL
         } else {
-            robjects$clicked[[x]] <- keep
+            robjects[[obj]] <- keep
         }
       })
 
       observeEvent(event_data("plotly_doubleclick", source = paste0(robjects$h.id, "_", x)), {
-        robjects$clicked[[x]] <- NULL
+        robjects[[obj]] <- NULL
       })
     })
     # nocov end
