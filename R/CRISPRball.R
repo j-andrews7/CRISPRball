@@ -125,7 +125,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # --------------------Dataset Comparisons----------------
     .create_tab_comparison(gene.choices),
     # -----------------DepMap-------------------
-    .create_tab_depmap(sgrna.data, depmap.meta),
+    .create_tab_depmap(depmap.gene, depmap.meta),
     # -----------------About-------------------
     tab_about
   )

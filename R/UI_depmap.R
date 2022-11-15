@@ -1,4 +1,25 @@
-.create_tab_depmap <- function(sgrna.data, depmap.meta) {
+#' Create a tabPanel for the DepMap tab
+#'
+#' Create a \code{\link{tabPanel}} with UI elements for the DepMap tab. 
+#'
+#' @param depmap.genes A data.frame containing DepMap gene summary information.
+#' @param depmap.meta A data.frame containing DepMap cell line metadata.
+#'
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the DepMap tab.
+#'
+#' @author Jared Andrews
+#'
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom colourpicker colourInput
+#' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
+#' @importFrom shinycssloaders withSpinner
+#' @importFrom shinyWidgets prettyCheckbox
+#' @importFrom shinyjqui jqui_resizable
+#' @importFrom plotly plotlyOutput
+#'
+#' @rdname INTERNAL_create_tab_depmap
+.create_tab_depmap <- function(depmap.genes, depmap.meta) {
   tabPanel(
     title = "DepMap",
     id = "depmap",
@@ -10,7 +31,7 @@
         div(
           fluidRow(
             column(12,
-                  pickerInput("depmap.gene", "Choose gene:", choices = unique(c(sgrna.data[[1]]$Gene)),
+                  pickerInput("depmap.gene", "Choose gene:", choices = unique(depmap.genes$gene_name),
                               multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE))
             )
           ),
