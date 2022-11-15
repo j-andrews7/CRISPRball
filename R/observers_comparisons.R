@@ -21,7 +21,7 @@
     # nocov start
     observeEvent(input$comp.update,
         {
-            if (length(robjects$gene.data) > 1) {
+            if (length(robjects$gene.data) > 1 & !is.null(input$comp.sets)) {
                 # Get hits for each dataset based on thresholds.
                 robjects$comps <- lapply(input$comp.sets, function(x) {
                     df <- robjects$gene.data[[x]]

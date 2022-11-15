@@ -139,7 +139,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     }
 
     if (length(gene.data) < 2) {
-      defaultDisabledTabs <- c(defaultDisabledTabs, "Dataset Comparisons")
+      defaultDisabledTabs <- c(defaultDisabledTabs, "Comparisons")
     }
 
     if (is.null(sgrna.data)) {

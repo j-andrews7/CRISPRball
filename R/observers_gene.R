@@ -28,20 +28,22 @@
     observeEvent(c(input$gene.sel2, input$gene.update), {
       if (length(robjects$gene.data) > 1) {
         df <- robjects$gene.data[[input$gene.sel2]]
-        robjects$set2.genes <- .gene_ingress(df,
-          sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
-          positive.ctrl.genes = robjects$positive.ctrl.genes, essential.genes = robjects$essential.genes, 
-          depmap.genes = robjects$depmap.gene
-        )
+        if (!is.null(df)) {
+          robjects$set2.genes <- .gene_ingress(df,
+            sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
+            positive.ctrl.genes = robjects$positive.ctrl.genes, essential.genes = robjects$essential.genes, 
+            depmap.genes = robjects$depmap.gene
+          )
 
-        # Get overlapping hits between sets if needed.
-        s1 <- robjects$set1.genes
-        s2 <- robjects$set2.genes
+          # Get overlapping hits between sets if needed.
+          s1 <- robjects$set1.genes
+          s2 <- robjects$set2.genes
 
-        set1.hits <- s1$id[s1$hit_type %in% c("neg", "pos")]
-        set2.hits <- s2$id[s2$hit_type %in% c("neg", "pos")]
+          set1.hits <- s1$id[s1$hit_type %in% c("neg", "pos")]
+          set2.hits <- s2$id[s2$hit_type %in% c("neg", "pos")]
 
-        robjects$common.hits <- set1.hits[set1.hits %in% set2.hits]
+          robjects$common.hits <- set1.hits[set1.hits %in% set2.hits]
+        }
       }
     })
     # nocov end
