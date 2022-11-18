@@ -1,4 +1,27 @@
-.create_tab_gene <- function(gene.choices, genesets) {
+#' Create a tabPanel for the Gene tab
+#' 
+#' Create a \code{\link{tabPanel}} with UI elements for the Gene tab.
+#' 
+#' @param dataset.choices A character vector containing the dataset names used for selecting a dataset for plotting.
+#' @param genesets A named list containing character vectors of genes, used in selecting pre-chosen sets of genes to be highlighted.
+#' 
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the Gene tab.
+#' 
+#' @author Jared Andrews
+#' 
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shinyBS tipify
+#' @importFrom shinycssloaders withSpinner
+#' @importFrom shinyjqui jqui_resizable
+#' @importFrom InteractiveComplexHeatmap InteractiveComplexHeatmapOutput
+#' @importFrom plotly plotlyOutput
+#' @importFrom colourpicker colourInput
+#' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
+#' 
+#' @rdname INTERNAL_create_tab_gene
+
+.create_tab_gene <- function(dataset.choices, genesets) {
     tabPanel(
       title = "Gene (Overview)",
       id = "gene-overview",
@@ -10,13 +33,13 @@
          div(
            fluidRow(
              column(6,
-                    tipify(selectizeInput("gene.sel1", "Dataset 1:", choices = gene.choices),
+                    tipify(selectizeInput("gene.sel1", "Dataset 1:", choices = dataset.choices),
                            "Dataset shown in top row.", "right", options = list(container = "body")),
                     numericInput("gene.fdr.th", "FDR threshold:",
                                  min = 0, max = 1, step = 0.01, value = 0.05)
              ),
              column(6,
-                    tipify(selectizeInput("gene.sel2", "Dataset 2:", choices = gene.choices),
+                    tipify(selectizeInput("gene.sel2", "Dataset 2:", choices = dataset.choices),
                            "Dataset shown in bottom row.", "right", options = list(container = "body")),
                     numericInput("gene.lfc.th", "log2FC threshold:",
                                  min = 0, max = Inf, step = 0.05, value = 0.5)
