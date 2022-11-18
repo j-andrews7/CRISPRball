@@ -1,4 +1,23 @@
-.create_tab_qc <- function(summ.choices) {
+#' Create a tabPanel for the QC tab
+#' 
+#' Create a \code{\link{tabPanel}} with UI elements for the QC tab.
+#' 
+#' @param meta.choices A character vector containing the metadata columns that can be used to color and/or shape points in the PCA biplot.
+#' 
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the QC tab.
+#' 
+#' @author Jared Andrews
+#' 
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
+#' @importFrom shinycssloaders withSpinner
+#' @importFrom shinyjqui jqui_resizable
+#' @importFrom plotly plotlyOutput
+#' 
+#' @rdname INTERNAL_create_tab_qc
+
+.create_tab_qc <- function(meta.choices) {
     tabPanel(
         title = "QC",
         id = "qc",
@@ -45,10 +64,10 @@
                                     "Filter PCA samples to those in metadata table.", "right", options = list(container = "body")),
                             fluidRow(
                             column(6, tipify(selectizeInput("bip.color", "Color by:",
-                                                            choices = c("", summ.choices), selected = ifelse("Label" %in% summ.choices, "Label", NULL)),
+                                                            choices = c("", meta.choices), selected = ifelse("Label" %in% meta.choices, "Label", NULL)),
                                                 "Metadata variable by which samples are colored.", "right", options = list(container = "body"))),
                             column(6, tipify(selectizeInput("bip.shape", "Shape by:",
-                                                            choices = c("", summ.choices)),
+                                                            choices = c("", meta.choices)),
                                                 "Metadata variable by which samples are shaped.", "right", options = list(container = "body")))
                             ),
                             fluidRow(
