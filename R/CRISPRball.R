@@ -155,39 +155,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
 
     # --------------Disable Inputs-----------------
     # Disable certain inputs if no data is provided.
-    if (is.null(depmap.gene)) {
-      shinyjs::hide("dep.crispr.ess")
-      shinyjs::hide("dep.crispr.sel")
-      shinyjs::hide("dep.rnai.ess")
-      shinyjs::hide("dep.rnai.sel")
-
-      shinyjs::hide("comp.dep.crispr.ess")
-      shinyjs::hide("comp.dep.crispr.sel")
-      shinyjs::hide("comp.dep.rnai.ess")
-      shinyjs::hide("comp.dep.rnai.sel")
-    }
-
-    if (is.null(essential.genes)) {
-      shinyjs::hide("rem.ess")
-      shinyjs::hide("comp.rem.ess")
-    }
-
-    if (is.null(positive.ctrl.genes)) {
-      shinyjs::hide("rem.pos")
-      shinyjs::hide("comp.rem.pos")
-    }
-
-    # Disable certain inputs if only one dataset provided.
-    observe({
-      if (length(robjects$gene.data) == 1) {
-        shinyjs::disable("gene.sel2")
-        shinyjs::hide("highlight.common")
-      }
-
-      if (length(robjects$sgrna.data) == 1) {
-        shinyjs::disable("sgrna.sel2")
-      }
-    })
+    .create_ui_observers(robjects)
 
     # -------------Reactive Values---------------
 
