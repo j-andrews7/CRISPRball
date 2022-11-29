@@ -1,4 +1,4 @@
-#' Render general output for the QC tab
+#' Render general outputs for the QC tab
 #'
 #' Create rendering expressions for the QC tab outputs.
 #'
@@ -11,7 +11,7 @@
 #'
 #' @author Jared Andrews
 #'
-#' @importFrom shiny renderUI renderPlot tagList column selectInput
+#' @importFrom shiny renderUI renderPlot tagList column selectInput isolate
 #' @importFrom plotly renderPlotly ggplotly layout config plot_ly toWebGL add_segments add_annotations
 #' @importFrom MAGeCKFlute BarView MapRatesView
 #' @importFrom shinyWidgets updatePickerInput
@@ -23,7 +23,7 @@
 #' @importFrom stats cor as.formula
 #' @import ggplot2
 #' @rdname INTERNAL_create_qc_output
-.create_qc_output <- function(input, output, robjects) {
+.create_qc_outputs <- function(input, output, robjects) {
     # nocov start
     output$pca.comps <- renderUI({
       req(robjects$pc)

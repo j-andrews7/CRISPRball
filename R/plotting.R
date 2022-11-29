@@ -842,7 +842,7 @@ plot_depmap_dependency <- function(gene, depmap.meta, crispr.color,
              displaylogo = FALSE,
              plotGlPixelRatio = 7)
   } else {
-    .plot_gene_not_found(gene)
+    .empty_plot(paste0(gene, " not found in DepMap."))
   }
 }
 
@@ -894,7 +894,7 @@ plot_depmap_expression <- function(gene, depmap.meta, depmap.pool, color, plot.g
              displaylogo = FALSE,
              plotGlPixelRatio = 7)
   } else {
-    .plot_gene_not_found(gene)
+    .empty_plot(paste0(gene, " not found in DepMap."))
   }
 }
 
@@ -945,7 +945,7 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool, color, plot.grid) {
              displaylogo = FALSE,
              plotGlPixelRatio = 7)
   } else {
-    .plot_gene_not_found(gene)
+    .empty_plot(paste0(gene, " not found in DepMap."))
   }
 }
 
@@ -1079,47 +1079,28 @@ plot_depmap_lineages <- function(gene, data.type, group.by, depmap.meta, depmap.
              displaylogo = FALSE,
              plotGlPixelRatio = 7)
   } else {
-    .plot_gene_not_found(gene)
+    .empty_plot(paste0(gene, " not found in DepMap."))
   }
 }
 
-#' Plot text indicating that gene was not found
+
+#' Plot text on empty plotly plot
 #' 
-#' @param gene Character scalar of gene identifier.
+#' @param title Character scalar to show.
 #' @author Jared Andrews
 #' @rdname INTERNAL_plot_gene_not_found
-.plot_gene_not_found <- function(gene) {
-  # Just plots text for when a gene isn't found in depmap.
-  fig <- plot_ly()
-  fig <- fig %>%
-    add_trace(
-      mode = "text",
-      text = paste0(gene, " not found in DepMap."),
-      type = "scattergl",
-      textfont = list(
-        size = 20
-      ),
-      x = 2,
-      y = 2
-    )
-  
-  fig <- fig %>%
+#' @importFrom plotly plotly_empty config layout
+.empty_plot <- function(title = NULL) {
+  p <- plotly_empty(type = "scatter", mode = "markers") %>%
+    config(
+      displayModeBar = FALSE
+    ) %>%
     layout(
-      xaxis = list(
-        range = c(0, 4),
-        showline = FALSE,
-        zeroline = FALSE,
-        showgrid = FALSE,
-        showticklabels = FALSE
-      ),
-      yaxis = list(
-        range = c(0, 4),
-        showline = FALSE,
-        zeroline = FALSE,
-        showgrid = FALSE,
-        showticklabels = FALSE
+      title = list(
+        text = title,
+        yref = "paper",
+        y = 0.5
       )
     )
-  
-  fig %>% style(hoverinfo = 'none')
-}
+  return(p)
+} 

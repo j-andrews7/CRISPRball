@@ -14,9 +14,9 @@
 #' @author Jared Andrews
 #'
 #' @rdname INTERNAL_create_comparison_observers
-#' @importFrom shiny observeEvent updateSelectizeInput
-#' @importFrom shinyWidgets updatePickerInput
-#' @importFrom shinyjs js
+#' @importFrom shiny observeEvent
+#' @importFrom ComplexHeatmap Heatmap pheatmap make_comb_mat extract_comb set_name comb_name UpSet draw
+#' @importFrom InteractiveComplexHeatmap makeInteractiveComplexHeatmap
 .create_comparisons_observers <- function(input, session, output, robjects) {
     # nocov start
     observeEvent(input$comp.update,
