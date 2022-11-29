@@ -130,6 +130,18 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
   )
 
   server <- function(input, output, session) {
+    # -------------Reactive Values---------------
+    robjects <- reactiveValues(
+      gene.data = gene.data, sgrna.data = sgrna.data,
+      count.summary = count.summary, norm.counts = norm.counts,
+      depmap.meta = depmap.meta, depmap.gene = depmap.gene, pool = pool,
+      clicked.volc1 = NULL, clicked.rank1 = NULL, clicked.lawn1 = NULL,
+      clicked.volc2 = NULL, clicked.rank2 = NULL, clicked.lawn2 = NULL,
+      comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
+      positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
+      genesets = genesets, pc = NULL, h.id = h.id
+    )
+
     # --------------Disable Tabs-----------------
     defaultDisabledTabs <- c()
 
@@ -157,29 +169,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     # Disable certain inputs if no data is provided.
     .create_ui_observers(robjects)
 
-    # -------------Reactive Values---------------
-
-    robjects <- reactiveValues(
-      gene.data = gene.data, sgrna.data = sgrna.data,
-      count.summary = count.summary, norm.counts = norm.counts,
-      depmap.meta = depmap.meta, depmap.gene = depmap.gene, pool = pool,
-      clicked.volc1 = NULL, clicked.rank1 = NULL, clicked.lawn1 = NULL,
-      clicked.volc2 = NULL, clicked.rank2 = NULL, clicked.lawn2 = NULL,
-      comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
-      positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
-      genesets = genesets, pc = NULL, h.id = h.id
-    )
-
     # ------------Data Upload Tab----------------
     # Create data upload observers.
     .create_upload_observers(input, session, robjects)
-
-    # Hide depmap tab if database not provided.
-    # Tried disable, still looks/feels selectable which may be confusing.
-    if (is.null(depmap.db)) {
-      shinyjs::hide(selector = '.navbar-nav a[data-value="DepMap"')
-    }
-
 
     # -----------QC & QC Summary Tabs------------
     # PCA.

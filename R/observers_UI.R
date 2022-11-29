@@ -17,7 +17,7 @@
 #' @rdname INTERNAL_create_ui_observers
 .create_ui_observers <- function(robjects) {
     # nocov start
-    observeEvent(robjects$depmap.gene, {
+    observe({
         if (is.null(robjects$depmap.gene)) {
             shinyjs::hide("dep.crispr.ess")
             shinyjs::hide("dep.crispr.sel")
@@ -28,12 +28,16 @@
             shinyjs::hide("comp.dep.crispr.sel")
             shinyjs::hide("comp.dep.rnai.ess")
             shinyjs::hide("comp.dep.rnai.sel")
-        } 
+            
+            # Hide depmap tab if database not provided.
+            # Tried disable, still looks/feels selectable which may be confusing.
+            shinyjs::hide(selector = '.navbar-nav a[data-value="DepMap"')
+        }
     })
     # nocov end
 
     # nocov start
-    observeEvent(robjects$essential.genes, {
+    observe({
         if (is.null(robjects$essential.genes)) {
             shinyjs::hide("rem.ess")
             shinyjs::hide("comp.rem.ess")
@@ -42,7 +46,7 @@
     # nocov end
 
     # nocov start
-    observeEvent(robjects$positive.ctrl.genes, {
+    observe({
         if (is.null(robjects$positive.ctrl.genes)) {
             shinyjs::hide("rem.pos")
             shinyjs::hide("comp.rem.pos")
