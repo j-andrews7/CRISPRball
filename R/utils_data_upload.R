@@ -1,3 +1,4 @@
+# js code to enable/disable tabs.
 .utils.js <- "
 shinyjs.disableTab = function(name) {
   var tab = $('.nav.navbar-nav li a[data-value=\"' + name + '\"]');
@@ -15,21 +16,51 @@ shinyjs.enableTab = function(name) {
 }
 "
 
-# File upload ingress to appropriate named list structure.
+#' Read user-uploaded gene summary files and assign sample names
+#' @param fileList A list of gene summary files uploaded by the user.
+#' 
+#' @importFrom utils read.delim
+#' 
+#' @return A named list of data.frames read from gene summary files uploaded by the user.
+#' @author Jared Andrews
+#' @rdname INTERNAL_gene_summ_ingress
 .gene_summ_ingress <- function(fileList) {
   out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-  names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', replacement='', fixed=TRUE)
+  names(out) <- sapply(fileList$name, gsub, pattern='.gene_summary.txt', 
+                       replacement='', fixed=TRUE)
   return(out)
 }
 
+
+#' Read user-uploaded sgrna summary files and assign sample names
+#' @param fileList A list of sgrna summary files uploaded by the user.
+#' 
+#' @return A named list of data.frames read from sgrna summary files uploaded by the user.
+#' 
+#' @importFrom utils read.delim
+#' 
+#' @author Jared Andrews
+#' @rdname INTERNAL_sgrna_summ_ingress
 .sgrna_summ_ingress <- function(fileList) {
   out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-  names(out) <- sapply(fileList$name, gsub, pattern='.sgrna_summary.txt', replacement='', fixed=TRUE)
+  names(out) <- sapply(fileList$name, gsub, pattern='.sgrna_summary.txt', 
+                       replacement='', fixed=TRUE)
   return(out)
 }
 
-# Generate easier columns for plotting for various data summaries.
-.gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL, essential.genes = NULL, depmap.genes = NULL) {
+#' Parse gene summary data for easier plotting and display
+#' @param df data.frame of gene summary data
+#' @param sig.thresh Numeric scalar for significance threshold to consider a gene a hit.
+#' @param lfc.thresh Numeric scalar for absolute log fold change threshold to consider a gene a hit.
+#' @param positive.ctrl.genes Character vector of gene identifiers to label as positive controls.
+#' @param essential.genes Character vector of gene identifiers to label as essential genes.
+#' @param depmap.genes data.frame of DepMap gene summary data.
+#' 
+#' @return A data.frame with additional columns added.
+#' @author Jared Andrews
+#' @rdname INTERNAL_gene_ingress
+.gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL, 
+                          essential.genes = NULL, depmap.genes = NULL) {
 
   if (!is.null(essential.genes)) {
     df$essential <- df$id %in% essential.genes
@@ -76,17 +107,19 @@ shinyjs.enableTab = function(name) {
 
   df$pval <- apply(df, 1, function(x) {
     x <- split(unname(x),names(x))
-    as.numeric(ifelse(as.numeric(x$`neg|p-value`) < as.numeric(x$`pos|p-value`), x$`neg|p-value`, x$`pos|p-value`))
+    as.numeric(ifelse(as.numeric(x$`neg|p-value`) < as.numeric(x$`pos|p-value`), 
+                      x$`neg|p-value`, x$`pos|p-value`))
   })
 
   df$goodsgrna <- apply(df, 1, function(x) {
     x <- split(unname(x),names(x))
-    as.integer(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`), x$`neg|goodsgrna`, x$`pos|goodsgrna`))
+    as.integer(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`), 
+                      x$`neg|goodsgrna`, x$`pos|goodsgrna`))
   })
 
   df$Rank <- rank(df$LFC)
 
   df$RandomIndex <- sample(1:nrow(df), nrow(df))
 
-  df
+  return(df)
 }

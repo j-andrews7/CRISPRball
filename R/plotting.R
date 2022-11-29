@@ -756,7 +756,7 @@
 }
 
 
-#' Plot gene dependency information from DepMap CRISPR and RNAi tables.
+#' Plot gene dependency information from DepMap CRISPR and RNAi tables
 #' 
 #' @param gene Character scalar for gene symbol.
 #' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table 
@@ -807,9 +807,9 @@ plot_depmap_dependency <- function(gene, depmap.meta, crispr.color,
                               "</br><b>Disease:</b> ", df$primary_disease)
 
     gg <- ggplot() +
-      geom_density(data = df, aes(x=dependency, color=dataset, fill=dataset), alpha = 0.6) +
-      geom_rug(data = df[df$dataset == "CRISPR",], aes(x=dependency, color=dataset, text=hover.string), outside = FALSE) +
-      geom_rug(data = df[df$dataset == "RNAi",], aes(x=dependency, color=dataset, text=hover.string), sides = "t") +
+      geom_density(data = df, aes_string(x="dependency", color="dataset", fill="dataset"), alpha = 0.6) +
+      geom_rug(data = df[df$dataset == "CRISPR",], aes_string(x="dependency", color="dataset", text="hover.string"), outside = FALSE) +
+      geom_rug(data = df[df$dataset == "RNAi",], aes_string(x="dependency", color="dataset", text="hover.string"), sides = "t") +
       ylab("") +
       xlab("") +
       theme_bw() +
@@ -842,12 +842,12 @@ plot_depmap_dependency <- function(gene, depmap.meta, crispr.color,
              displaylogo = FALSE,
              plotGlPixelRatio = 7)
   } else {
-    .plot_gene_not_found(gene)
+    .empty_plot(paste0(gene, " not found in DepMap."))
   }
 }
 
 
-#' Plot gene expression information from DepMap, mostly from CCLE.
+#' Plot gene expression information from DepMap, mostly from CCLE
 #' 
 #' @inheritParams plot_depmap_dependency
 #' @param color Character scalar for trace color.
@@ -873,13 +873,13 @@ plot_depmap_expression <- function(gene, depmap.meta, depmap.pool, color, plot.g
     df$color <- color
     
     gg <- ggplot(show.legend = FALSE) +
-      geom_density(data = df, aes(x=rna_expression, color=color, fill=color)) +
-      geom_rug(data = df, aes(x=rna_expression, color=color, text=hover.string, fill=color), outside = FALSE) +
+      geom_density(data = df, aes_string(x="rna_expression", color="color", fill="color")) +
+      geom_rug(data = df, aes_string(x="rna_expression", color="color", text="hover.string", fill="color"), outside = FALSE) +
       ylab("Density") +
       xlab("log2(TPM+1)") +
       theme_bw() +
-      scale_color_manual(values=c(color), breaks = c(color)) +
-      scale_fill_manual(values=c(color), breaks = c(color)) + theme(legend.position="none")
+      scale_color_manual(values=c(df$color), breaks = c(df$color)) +
+      scale_fill_manual(values=c(df$color), breaks = c(df$color)) + theme(legend.position="none")
     
     if (!plot.grid) {
       gg <- gg + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -894,12 +894,12 @@ plot_depmap_expression <- function(gene, depmap.meta, depmap.pool, color, plot.g
              displaylogo = FALSE,
              plotGlPixelRatio = 7)
   } else {
-    .plot_gene_not_found(gene)
+    .empty_plot(paste0(gene, " not found in DepMap."))
   }
 }
 
 
-#' Plot gene CN information from DepMap, mostly from CCLE.
+#' Plot gene copy number information from DepMap, mostly from CCLE
 #' 
 #' @inheritParams plot_depmap_dependency
 #' @param color Character scalar for trace color.
@@ -924,13 +924,13 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool, color, plot.grid) {
     df$color <- color
     
     gg <- ggplot(show.legend = FALSE) +
-      geom_density(data = df, aes(x=log_copy_number, color=color, fill=color)) +
-      geom_rug(data = df, aes(x=log_copy_number, color=color, text=hover.string, fill=color), outside = FALSE) +
+      geom_density(data = df, aes_string(x="log_copy_number", color="color", fill="color")) +
+      geom_rug(data = df, aes_string(x="log_copy_number", color="color", text="hover.string", fill="color"), outside = FALSE) +
       ylab("Density") +
       xlab("log2(Copy Number)") +
       theme_bw() +
-      scale_color_manual(values=c(color), breaks = c(color)) +
-      scale_fill_manual(values=c(color), breaks = c(color)) + theme(legend.position="none")
+      scale_color_manual(values=c(df$color), breaks = c(df$color)) +
+      scale_fill_manual(values=c(df$color), breaks = c(df$color)) + theme(legend.position="none")
     
     if (!plot.grid) {
       gg <- gg + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -945,7 +945,7 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool, color, plot.grid) {
              displaylogo = FALSE,
              plotGlPixelRatio = 7)
   } else {
-    .plot_gene_not_found(gene)
+    .empty_plot(paste0(gene, " not found in DepMap."))
   }
 }
 
@@ -954,7 +954,8 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool, color, plot.grid) {
 #' @inheritParams plot_depmap_dependency
 #' @param data.type One of "crispr", "rnai", "cn", or "ccle_tpm".
 #' @param group.by Character scalar of column name to group by.
-#' @param jitter Numeric scalar for point jitter.
+#' @param lineage Character scalar of lineage for which to plot sub-lineage data.
+#' @param label.size Numeric scaler for axis label size.
 #' @param pt.size Numeric scalar for point size.
 #' @param pt.color Character scalar for point color.
 #' @param boxplot.fill Character scalar for boxplot fill color.
@@ -1078,42 +1079,28 @@ plot_depmap_lineages <- function(gene, data.type, group.by, depmap.meta, depmap.
              displaylogo = FALSE,
              plotGlPixelRatio = 7)
   } else {
-    .plot_gene_not_found(gene)
+    .empty_plot(paste0(gene, " not found in DepMap."))
   }
 }
 
-.plot_gene_not_found <- function(gene) {
-  # Just plots text for when a gene isn't found in depmap.
-  fig <- plot_ly()
-  fig <- fig %>%
-    add_trace(
-      mode = "text",
-      text = paste0(gene, " not found in DepMap."),
-      type = "scattergl",
-      textfont = list(
-        size = 20
-      ),
-      x = 2,
-      y = 2
-    )
-  
-  fig <- fig %>%
+
+#' Plot text on empty plotly plot
+#' 
+#' @param title Character scalar to show.
+#' @author Jared Andrews
+#' @rdname INTERNAL_plot_gene_not_found
+#' @importFrom plotly plotly_empty config layout
+.empty_plot <- function(title = NULL) {
+  p <- plotly_empty(type = "scatter", mode = "markers") %>%
+    config(
+      displayModeBar = FALSE
+    ) %>%
     layout(
-      xaxis = list(
-        range = c(0, 4),
-        showline = FALSE,
-        zeroline = FALSE,
-        showgrid = FALSE,
-        showticklabels = FALSE
-      ),
-      yaxis = list(
-        range = c(0, 4),
-        showline = FALSE,
-        zeroline = FALSE,
-        showgrid = FALSE,
-        showticklabels = FALSE
+      title = list(
+        text = title,
+        yref = "paper",
+        y = 0.5
       )
     )
-  
-  fig %>% style(hoverinfo = 'none')
-}
+  return(p)
+} 
