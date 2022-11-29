@@ -68,7 +68,7 @@
       }
 
       # Remove DepMap stuff if requested.
-      if (!is.null(depmap.gene)) {
+      if (!is.null(robjects$depmap.gene)) {
         if (isolate(input$dep.crispr.ess)) {
           df <- df[!df$DepMap_CRISPR_Essential, ]
         }
@@ -106,7 +106,7 @@
         fc.lines = isolate(input$vol.fcline),
         sig.thresh = isolate(input$gene.fdr.th),
         sig.line = isolate(input$vol.sigline),
-        h.id = h.id,
+        h.id = robjects$h.id,
         h.id.suffix = "_volc1",
         sig.term = "FDR",
         lfc.term = "LFC",
@@ -128,7 +128,7 @@
         counts.size = isolate(input$counts.size),
         highlight.featsets = isolate(input$hl.genesets),
         highlight.feats = highlight,
-        featsets = genesets,
+        featsets = robjects$genesets,
         highlight.feats.color = isolate(input$hl.genes.col),
         highlight.feats.size = isolate(input$hl.genes.size),
         highlight.feats.opac = isolate(input$hl.genes.opa),
@@ -163,7 +163,7 @@
       }
 
       # Remove DepMap stuff if requested.
-      if (!is.null(depmap.gene)) {
+      if (!is.null(robjects$depmap.gene)) {
         if (isolate(input$dep.crispr.ess)) {
           df <- df[!df$DepMap_CRISPR_Essential, ]
         }
@@ -198,7 +198,7 @@
         y.thresh = isolate(input$gene.lfc.th),
         y.lines = isolate(input$rank.fcline),
         sig.thresh = isolate(input$gene.fdr.th),
-        h.id = h.id,
+        h.id = robjects$h.id,
         h.id.suffix = "_rank1",
         sig.term = "FDR",
         y.term = "LFC",
@@ -221,7 +221,7 @@
         counts.size = isolate(input$counts.size),
         highlight.featsets = isolate(input$hl.genesets),
         highlight.feats = highlight,
-        featsets = genesets,
+        featsets = robjects$genesets,
         highlight.feats.color = isolate(input$hl.genes.col),
         highlight.feats.size = isolate(input$hl.genes.size),
         highlight.feats.opac = isolate(input$hl.genes.opa),
@@ -255,7 +255,7 @@
       }
 
       # Remove DepMap stuff if requested.
-      if (!is.null(depmap.gene)) {
+      if (!is.null(robjects$depmap.gene)) {
         if (isolate(input$dep.crispr.ess)) {
           df <- df[!df$DepMap_CRISPR_Essential, ]
         }
@@ -290,7 +290,7 @@
         fc.thresh = isolate(input$gene.lfc.th),
         sig.thresh = isolate(input$gene.fdr.th),
         sig.line = isolate(input$lawn.sigline),
-        h.id = h.id,
+        h.id = robjects$h.id,
         h.id.suffix = "_lawn1",
         sig.term = "FDR",
         lfc.term = "LFC",
@@ -313,7 +313,7 @@
         counts.size = isolate(input$counts.size),
         highlight.featsets = isolate(input$hl.genesets),
         highlight.feats = highlight,
-        featsets = genesets,
+        featsets = robjects$genesets,
         highlight.feats.color = isolate(input$hl.genes.col),
         highlight.feats.size = isolate(input$hl.genes.size),
         highlight.feats.opac = isolate(input$hl.genes.opa),
@@ -381,7 +381,7 @@
       }
 
       # Remove DepMap stuff if requested.
-      if (!is.null(depmap.gene)) {
+      if (!is.null(robjects$depmap.gene)) {
         if (isolate(input$dep.crispr.ess)) {
           df <- df[!df$DepMap_CRISPR_Essential, ]
         }
@@ -419,7 +419,7 @@
         fc.lines = isolate(input$vol.fcline),
         sig.thresh = isolate(input$gene.fdr.th),
         sig.line = isolate(input$vol.sigline),
-        h.id = h.id,
+        h.id = robjects$h.id,
         h.id.suffix = "_volc2",
         sig.term = "FDR",
         lfc.term = "LFC",
@@ -441,7 +441,7 @@
         counts.size = isolate(input$counts.size),
         highlight.featsets = isolate(input$hl.genesets),
         highlight.feats = highlight,
-        featsets = genesets,
+        featsets = robjects$genesets,
         highlight.feats.color = isolate(input$hl.genes.col),
         highlight.feats.size = isolate(input$hl.genes.size),
         highlight.feats.opac = isolate(input$hl.genes.opa),
@@ -476,7 +476,7 @@
       }
 
       # Remove DepMap stuff if requested.
-      if (!is.null(depmap.gene)) {
+      if (!is.null(robjects$depmap.gene)) {
         if (isolate(input$dep.crispr.ess)) {
           df <- df[!df$DepMap_CRISPR_Essential, ]
         }
@@ -511,7 +511,7 @@
         y.thresh = isolate(input$gene.lfc.th),
         y.lines = isolate(input$rank.fcline),
         sig.thresh = isolate(input$gene.fdr.th),
-        h.id = h.id,
+        h.id = robjects$h.id,
         h.id.suffix = "_rank2",
         sig.term = "FDR",
         y.term = "LFC",
@@ -534,7 +534,7 @@
         counts.size = isolate(input$counts.size),
         highlight.featsets = isolate(input$hl.genesets),
         highlight.feats = highlight,
-        featsets = genesets,
+        featsets = robjects$genesets,
         highlight.feats.color = isolate(input$hl.genes.col),
         highlight.feats.size = isolate(input$hl.genes.size),
         highlight.feats.opac = isolate(input$hl.genes.opa),
@@ -569,7 +569,7 @@
       }
 
       # Remove DepMap stuff if requested.
-      if (!is.null(depmap.gene)) {
+      if (!is.null(robjects$depmap.gene)) {
         if (isolate(input$dep.crispr.ess)) {
           df <- df[!df$DepMap_CRISPR_Essential, ]
         }
@@ -604,7 +604,7 @@
         fc.thresh = isolate(input$gene.lfc.th),
         sig.thresh = isolate(input$gene.fdr.th),
         sig.line = isolate(input$lawn.sigline),
-        h.id = h.id,
+        h.id = robjects$h.id,
         h.id.suffix = "_lawn2",
         sig.term = "FDR",
         lfc.term = "LFC",
@@ -627,7 +627,7 @@
         counts.size = isolate(input$counts.size),
         highlight.featsets = isolate(input$hl.genesets),
         highlight.feats = highlight,
-        featsets = genesets,
+        featsets = robjects$genesets,
         highlight.feats.color = isolate(input$hl.genes.col),
         highlight.feats.size = isolate(input$hl.genes.size),
         highlight.feats.opac = isolate(input$hl.genes.opa),
