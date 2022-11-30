@@ -30,10 +30,11 @@
                         column(
                             12,
                             tipify(
-                                div(id = "comp_select",
+                                div(
+                                    id = "comp_select",
                                     selectizeInput("comp.sets", "Datasets:",
                                         choices = datasets,
-                                        selected = datasets, multiple = TRUE, 
+                                        selected = datasets, multiple = TRUE,
                                     )
                                 ),
                                 "Datasets to compare.", "right",
@@ -159,4 +160,3 @@
         )
     )
 }
-

@@ -19,151 +19,149 @@
 #' @importFrom InteractiveComplexHeatmap makeInteractiveComplexHeatmap
 .create_comparisons_observers <- function(input, session, output, robjects) {
     # nocov start
-    observeEvent(input$comp.update,
-        {
-            if (length(robjects$gene.data) > 1 & !is.null(input$comp.sets)) {
-                # Get hits for each dataset based on thresholds.
-                robjects$comps <- lapply(input$comp.sets, function(x) {
-                    df <- robjects$gene.data[[x]]
-                    .gene_ingress(df,
-                        sig.thresh = input$comp.fdr.th, lfc.thresh = input$comp.lfc.th,
-                        positive.ctrl.genes = robjects$positive.ctrl.genes, 
-                        essential.genes = robjects$essential.genes, depmap.genes = robjects$depmap.gene
+    observeEvent(input$comp.update, {
+        if (length(robjects$gene.data) > 1 & !is.null(input$comp.sets)) {
+            # Get hits for each dataset based on thresholds.
+            robjects$comps <- lapply(input$comp.sets, function(x) {
+                df <- robjects$gene.data[[x]]
+                .gene_ingress(df,
+                    sig.thresh = input$comp.fdr.th, lfc.thresh = input$comp.lfc.th,
+                    positive.ctrl.genes = robjects$positive.ctrl.genes,
+                    essential.genes = robjects$essential.genes, depmap.genes = robjects$depmap.gene
+                )
+            })
+
+            names(robjects$comps) <- input$comp.sets
+
+            robjects$comp.pos.genes <- lapply(robjects$comps, .remove_unwanted_hits,
+                robjects = robjects, input = input
+            )
+
+            names(robjects$comp.pos.genes) <- input$comp.sets
+
+            robjects$comp.neg.genes <- lapply(robjects$comps, .remove_unwanted_hits,
+                robjects = robjects, input = input, pos = FALSE
+            )
+
+            names(robjects$comp.neg.genes) <- input$comp.sets
+
+            # Get the combination matrices.
+            robjects$pos.m <- make_comb_mat(robjects$comp.pos.genes)
+            robjects$neg.m <- make_comb_mat(robjects$comp.neg.genes)
+
+            # Make upset plots.
+            ht.pos <- draw(UpSet(robjects$pos.m))
+            ht.neg <- draw(UpSet(robjects$neg.m))
+
+            # TODO: See if there's a way to move these out of this function.
+            .pos_click_action <- function(df, output) {
+                if (!is.null(df)) {
+                    # Get combination members and shared hits.
+                    comb.name <- comb_name(robjects$pos.m[, df$column_index])
+                    comb.genes <- extract_comb(robjects$pos.m, comb.name)
+                    comb.members <- set_name(robjects$pos.m)[unlist(strsplit(comb.name, "")) == "1"]
+
+                    # Make output df from genes using info from all combination members.
+                    member.dfs <- lapply(comb.members, function(x) {
+                        og.df <- robjects$comps[[x]]
+                        og.df <- og.df[og.df$id %in% comb.genes, ]
+                        rownames(og.df) <- og.df$id
+                        og.df <- og.df[, c("FDR", "LFC")]
+                        colnames(og.df) <- paste0(colnames(og.df), "_", x)
+                        og.df
+                    })
+
+                    comp_pos_df <- Reduce(
+                        function(dtf1, dtf2) {
+                            out.d <- merge(dtf1, dtf2, by = "row.names", all.x = TRUE)
+                            rownames(out.d) <- out.d$Row.names
+                            out.d$Row.names <- NULL
+                            out.d
+                        },
+                        member.dfs
                     )
+                } else {
+                    comp_pos_df <- data.frame(
+                        Gene = character()
+                    )
+                    comb.members <- NULL
+                }
+
+                output$comp.pos.info <- renderDT(server = FALSE, {
+                    DT::datatable(comp_pos_df,
+                        rownames = TRUE,
+                        filter = "top",
+                        extensions = c("Buttons"),
+                        caption = paste("Positively Selected Hits in:", paste0(comb.members, collapse = ", ")),
+                        options = list(
+                            search = list(regex = TRUE),
+                            pageLength = 10,
+                            dom = "Blfrtip",
+                            buttons = c("copy", "csv", "excel", "pdf", "print")
+                        )
+                    ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
                 })
-
-                names(robjects$comps) <- input$comp.sets
-
-                robjects$comp.pos.genes <- lapply(robjects$comps, .remove_unwanted_hits,
-                    robjects = robjects, input = input
-                )
-
-                names(robjects$comp.pos.genes) <- input$comp.sets
-
-                robjects$comp.neg.genes <- lapply(robjects$comps, .remove_unwanted_hits,
-                    robjects = robjects, input = input, pos = FALSE
-                )
-
-                names(robjects$comp.neg.genes) <- input$comp.sets
-
-                # Get the combination matrices.
-                robjects$pos.m <- make_comb_mat(robjects$comp.pos.genes)
-                robjects$neg.m <- make_comb_mat(robjects$comp.neg.genes)
-
-                # Make upset plots.
-                ht.pos <- draw(UpSet(robjects$pos.m))
-                ht.neg <- draw(UpSet(robjects$neg.m))
-
-                #TODO: See if there's a way to move these out of this function.
-                .pos_click_action <- function(df, output) {
-                    if (!is.null(df)) {
-                        # Get combination members and shared hits.
-                        comb.name <- comb_name(robjects$pos.m[, df$column_index])
-                        comb.genes <- extract_comb(robjects$pos.m, comb.name)
-                        comb.members <- set_name(robjects$pos.m)[unlist(strsplit(comb.name, "")) == "1"]
-
-                        # Make output df from genes using info from all combination members.
-                        member.dfs <- lapply(comb.members, function(x) {
-                            og.df <- robjects$comps[[x]]
-                            og.df <- og.df[og.df$id %in% comb.genes, ]
-                            rownames(og.df) <- og.df$id
-                            og.df <- og.df[, c("FDR", "LFC")]
-                            colnames(og.df) <- paste0(colnames(og.df), "_", x)
-                            og.df
-                        })
-
-                        comp_pos_df <- Reduce(
-                            function(dtf1, dtf2) {
-                                out.d <- merge(dtf1, dtf2, by = "row.names", all.x = TRUE)
-                                rownames(out.d) <- out.d$Row.names
-                                out.d$Row.names <- NULL
-                                out.d
-                            },
-                            member.dfs
-                        )
-                    } else {
-                        comp_pos_df <- data.frame(
-                            Gene = character()
-                        )
-                        comb.members <- NULL
-                    }
-
-                    output$comp.pos.info <- renderDT(server = FALSE, {
-                        DT::datatable(comp_pos_df,
-                            rownames = TRUE,
-                            filter = "top",
-                            extensions = c("Buttons"),
-                            caption = paste("Positively Selected Hits in:", paste0(comb.members, collapse = ", ")),
-                            options = list(
-                                search = list(regex = TRUE),
-                                pageLength = 10,
-                                dom = "Blfrtip",
-                                buttons = c("copy", "csv", "excel", "pdf", "print")
-                            )
-                        ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
-                    })
-                }
-
-                .neg_click_action <- function(df, output) {
-                    if (!is.null(df)) {
-                        # Get combination members and shared hits.
-                        comb.name <- comb_name(robjects$neg.m[, df$column_index])
-                        comb.genes <- extract_comb(robjects$neg.m, comb.name)
-                        comb.members <- set_name(robjects$neg.m)[unlist(strsplit(comb.name, "")) == "1"]
-
-                        # Make output df from genes using info from all combination members.
-                        member.dfs <- lapply(comb.members, function(x) {
-                            og.df <- robjects$comps[[x]]
-                            og.df <- og.df[og.df$id %in% comb.genes, ]
-                            rownames(og.df) <- og.df$id
-                            og.df <- og.df[, c("FDR", "LFC")]
-                            colnames(og.df) <- paste0(colnames(og.df), "_", x)
-                            og.df
-                        })
-
-                        comp_neg_df <- Reduce(
-                            function(dtf1, dtf2) {
-                                out.d <- merge(dtf1, dtf2, by = "row.names", all.x = TRUE)
-                                rownames(out.d) <- out.d$Row.names
-                                out.d$Row.names <- NULL
-                                out.d
-                            },
-                            member.dfs
-                        )
-                    } else {
-                        comp_neg_df <- data.frame(
-                            Gene = character()
-                        )
-                        comb.members <- NULL
-                    }
-
-                    output$comp.neg.info <- renderDT(server = FALSE, {
-                        DT::datatable(comp_neg_df,
-                            rownames = TRUE,
-                            filter = "top",
-                            extensions = c("Buttons"),
-                            caption = paste("Negatively Selected Hits in:", paste0(comb.members, collapse = ", ")),
-                            options = list(
-                                search = list(regex = TRUE),
-                                pageLength = 10,
-                                dom = "Blfrtip",
-                                buttons = c("copy", "csv", "excel", "pdf", "print")
-                            )
-                        ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
-                    })
-                }
-
-                # Make the output.
-                makeInteractiveComplexHeatmap(input, output, session, ht.pos,
-                    heatmap_id = "overlap_pos", click_action = .pos_click_action
-                )
-
-                makeInteractiveComplexHeatmap(input, output, session, ht.neg,
-                    heatmap_id = "overlap_neg", click_action = .neg_click_action
-                )
             }
+
+            .neg_click_action <- function(df, output) {
+                if (!is.null(df)) {
+                    # Get combination members and shared hits.
+                    comb.name <- comb_name(robjects$neg.m[, df$column_index])
+                    comb.genes <- extract_comb(robjects$neg.m, comb.name)
+                    comb.members <- set_name(robjects$neg.m)[unlist(strsplit(comb.name, "")) == "1"]
+
+                    # Make output df from genes using info from all combination members.
+                    member.dfs <- lapply(comb.members, function(x) {
+                        og.df <- robjects$comps[[x]]
+                        og.df <- og.df[og.df$id %in% comb.genes, ]
+                        rownames(og.df) <- og.df$id
+                        og.df <- og.df[, c("FDR", "LFC")]
+                        colnames(og.df) <- paste0(colnames(og.df), "_", x)
+                        og.df
+                    })
+
+                    comp_neg_df <- Reduce(
+                        function(dtf1, dtf2) {
+                            out.d <- merge(dtf1, dtf2, by = "row.names", all.x = TRUE)
+                            rownames(out.d) <- out.d$Row.names
+                            out.d$Row.names <- NULL
+                            out.d
+                        },
+                        member.dfs
+                    )
+                } else {
+                    comp_neg_df <- data.frame(
+                        Gene = character()
+                    )
+                    comb.members <- NULL
+                }
+
+                output$comp.neg.info <- renderDT(server = FALSE, {
+                    DT::datatable(comp_neg_df,
+                        rownames = TRUE,
+                        filter = "top",
+                        extensions = c("Buttons"),
+                        caption = paste("Negatively Selected Hits in:", paste0(comb.members, collapse = ", ")),
+                        options = list(
+                            search = list(regex = TRUE),
+                            pageLength = 10,
+                            dom = "Blfrtip",
+                            buttons = c("copy", "csv", "excel", "pdf", "print")
+                        )
+                    ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
+                })
+            }
+
+            # Make the output.
+            makeInteractiveComplexHeatmap(input, output, session, ht.pos,
+                heatmap_id = "overlap_pos", click_action = .pos_click_action
+            )
+
+            makeInteractiveComplexHeatmap(input, output, session, ht.neg,
+                heatmap_id = "overlap_neg", click_action = .neg_click_action
+            )
         }
-    )
+    })
     # nocov end
 
     invisible(NULL)
