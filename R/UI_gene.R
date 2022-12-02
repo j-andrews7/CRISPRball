@@ -341,6 +341,7 @@
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.gene1.vol", "Download Volcano Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                             withSpinner(jqui_resizable(plotlyOutput("gene1.vol")))
                         )
                     ),
@@ -357,6 +358,7 @@
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.gene1.rank", "Download Rank Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                             withSpinner(jqui_resizable(plotlyOutput("gene1.rank")))
                         )
                     ),
@@ -373,6 +375,7 @@
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.gene1.lawn", "Download Lawn Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                             withSpinner(jqui_resizable(plotlyOutput("gene1.lawn")))
                         )
                     )
@@ -381,15 +384,18 @@
                 fluidRow(
                     column(
                         width = 4,
-                        withSpinner(jqui_resizable(plotlyOutput("gene2.vol")))
+                        withSpinner(jqui_resizable(plotlyOutput("gene2.vol"))),
+                        div(downloadButton("dl_plot.gene2.vol", "Download Volcano Plot", class = "btn-dl"), style = "display:inline-block; float:right")
                     ),
                     column(
                         width = 4,
-                        withSpinner(jqui_resizable(plotlyOutput("gene2.rank")))
+                        withSpinner(jqui_resizable(plotlyOutput("gene2.rank"))),
+                        div(downloadButton("dl_plot.gene2.rank", "Download Rank Plot", class = "btn-dl"), style = "display:inline-block; float:right")
                     ),
                     column(
                         width = 4,
-                        withSpinner(jqui_resizable(plotlyOutput("gene2.lawn")))
+                        withSpinner(jqui_resizable(plotlyOutput("gene2.lawn"))),
+                        div(downloadButton("dl_plot.gene2.lawn", "Download Lawn Plot", class = "btn-dl"), style = "display:inline-block; float:right")
                     )
                 )
             )
@@ -401,7 +407,7 @@ tab_gene_summary <- tabPanel(
     title = "Gene Summary Tables",
     id = "gene-summ",
     br(),
-    div(DT::dataTableOutput("gene1.summary"), style = "font-size:80%;"),
+    div(withSpinner(DT::dataTableOutput("gene1.summary")), style = "font-size:80%;"),
     br(),
-    div(DT::dataTableOutput("gene2.summary"), style = "font-size:80%;")
+    div(withSpinner(DT::dataTableOutput("gene2.summary")), style = "font-size:80%;")
 )

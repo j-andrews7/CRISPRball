@@ -246,7 +246,7 @@
                                     "to the median of all common essential genes."
                                 ),
                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")
-                            ), .noWS = "outside"),
+                            ), div(downloadButton("dl_plot.depmap.essplot", "Download Essential Plot", class = "btn-dl"), style = "display:inline-block; float:right"), .noWS = "outside"),
                             uiOutput("depmap.deplines"),
                             withSpinner(jqui_resizable(plotlyOutput("depmap.essplot", height = 250)))
                         ),
@@ -257,7 +257,7 @@
                                     "Reported values are log2(TPM+1)."
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
-                            ), .noWS = "outside"),
+                            ), div(downloadButton("dl_plot.depmap.expplot", "Download Expression Plot", class = "btn-dl"), style = "display:inline-block; float:right"), .noWS = "outside"),
                             withSpinner(jqui_resizable(plotlyOutput("depmap.expplot", height = 200)))
                         ),
                         span(
@@ -272,7 +272,7 @@
                                     "WES data were processed through GATK using PONs from TCGA without matched normals and transformed by log2(x+1)."
                                 ),
                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")
-                            ), .noWS = "outside"),
+                            ), div(downloadButton("dl_plot.depmap.cnplot", "Download CN Plot", class = "btn-dl"), style = "display:inline-block; float:right"), .noWS = "outside"),
                             withSpinner(jqui_resizable(plotlyOutput("depmap.cnplot", height = 200)))
                         )
                     ),
@@ -289,7 +289,7 @@
                                     "The grouping can be changed between lineage, disease, and lineage subtypes."
                                 ),
                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")
-                            ), .noWS = "outside"),
+                            ), div(downloadButton("dl_plot.depmap.lineages", "Download Lineage Plot", class = "btn-dl"), style = "display:inline-block; float:right"), .noWS = "outside"),
                             withSpinner(jqui_resizable(plotlyOutput("depmap.lineages", height = 800)))
                         )
                     ),
@@ -306,7 +306,7 @@
                                     "The grouping can be changed between lineage subtypes."
                                 ),
                                 placement = "bottom", trigger = c("hover", "click"), options = list(container = "body")
-                            ), .noWS = "outside"),
+                            ), div(downloadButton("dl_plot.depmap.sublineage", "Download Sublineage Plot", class = "btn-dl"), style = "display:inline-block; float:right"), .noWS = "outside"),
                             withSpinner(jqui_resizable(plotlyOutput("depmap.sublineage", height = 300)))
                         ),
                         br(),

@@ -44,7 +44,10 @@
         df <- robjects$set1.sgrnas
         df <- df[df$Gene == input$sgrna.gene, ]
 
-        .make_sgrna_pairplot(df)
+        fig <- .make_sgrna_pairplot(df)
+
+        robjects$plot.sgrna1.counts <- fig
+        fig
     })
     # nocov end
 
@@ -60,7 +63,7 @@
         highlight <- NULL
         highlight <- df$sgrna[df$Gene == input$sgrna.gene]
 
-        .make_rank(
+        fig <- .make_rank(
             df = df,
             ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
             y.thresh = 0,
@@ -101,6 +104,9 @@
             highlight.featsets.linecolor = "black",
             highlight.featsets.linewidth = 0.5
         )
+
+        robjects$plot.sgrna1.rank <- fig
+        fig
     })
     # nocov end
 
@@ -156,7 +162,10 @@
         df <- robjects$set2.sgrnas
         df <- df[df$Gene == input$sgrna.gene, ]
 
-        .make_sgrna_pairplot(df)
+        fig <- .make_sgrna_pairplot(df)
+
+        robjects$plot.sgrna2.counts <- fig
+        fig
     })
     # nocov end
 
@@ -172,7 +181,7 @@
         highlight <- NULL
         highlight <- df$sgrna[df$Gene == input$sgrna.gene]
 
-        .make_rank(
+        fig <- .make_rank(
             df = df,
             ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
             y.thresh = 0,
@@ -213,6 +222,9 @@
             highlight.featsets.linecolor = "black",
             highlight.featsets.linewidth = 0.5
         )
+
+        robjects$plot.sgrna2.rank <- fig
+        fig
     })
     # nocov end
 

@@ -71,6 +71,7 @@
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.sgrna1.counts", "Download Counts Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                             withSpinner(jqui_resizable(plotlyOutput("sgrna1.counts")))
                         )
                     ),
@@ -86,6 +87,7 @@
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.sgrna1.rank", "Download Rank Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                             withSpinner(jqui_resizable(plotlyOutput("sgrna1.rank")))
                         )
                     ),
@@ -98,11 +100,13 @@
                 fluidRow(
                     column(
                         width = 2,
-                        withSpinner(jqui_resizable(plotlyOutput("sgrna2.counts")))
+                        withSpinner(jqui_resizable(plotlyOutput("sgrna2.counts"))),
+                        div(downloadButton("dl_plot.sgrna2.counts", "Download Counts Plot", class = "btn-dl"), style = "display:inline-block; float:right; height:18px"),
                     ),
                     column(
                         width = 4,
-                        withSpinner(jqui_resizable(plotlyOutput("sgrna2.rank")))
+                        withSpinner(jqui_resizable(plotlyOutput("sgrna2.rank"))),
+                        div(downloadButton("dl_plot.sgrna2.rank", "Download Rank Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                     ),
                     column(
                         width = 6,
@@ -118,7 +122,7 @@ tab_sgrna_summary <- tabPanel(
     title = "sgRNA Summary Tables",
     id = "sgrna-tables",
     br(),
-    div(DT::dataTableOutput("sgrna1.summary"), style = "font-size:80%;"),
+    div(withSpinner(DT::dataTableOutput("sgrna1.summary")), style = "font-size:80%;"),
     br(),
-    div(DT::dataTableOutput("sgrna2.summary"), style = "font-size:80%;")
+    div(withSpinner(DT::dataTableOutput("sgrna2.summary")), style = "font-size:80%;")
 )

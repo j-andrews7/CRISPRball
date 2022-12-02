@@ -60,5 +60,10 @@ css <- tags$head(
         cursor: not-allowed !important;
         border-color: #aaa !important;
         }
+        .btn-dl {
+        padding: 3px 6px;
+        font-size: 11px;
+        line-height: 0.428571;
+        }
     "))
 )

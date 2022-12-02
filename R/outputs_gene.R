@@ -98,7 +98,7 @@
         }
 
 
-        .make_volcano(
+        fig <- .make_volcano(
             res = df,
             xlim = isolate(input$vol.x),
             ylim = isolate(input$vol.y),
@@ -140,6 +140,9 @@
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
             highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
         )
+
+        robjects$plot.gene1.vol <- fig
+        fig
     })
     # nocov end
 
@@ -192,7 +195,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        .make_rank(
+        fig <- .make_rank(
             df = df,
             ylim = list(isolate(input$rank.y.min), isolate(input$rank.y.max)),
             y.thresh = isolate(input$gene.lfc.th),
@@ -233,6 +236,9 @@
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
             highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
         )
+
+        robjects$plot.gene1.rank <- fig
+        fig
     })
     # nocov end
 
@@ -284,7 +290,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        .make_lawn(
+        fig <- .make_lawn(
             res = df,
             ylim = isolate(input$lawn.y),
             fc.thresh = isolate(input$gene.lfc.th),
@@ -325,6 +331,9 @@
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
             highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
         )
+
+        robjects$plot.gene1.lawn <- fig
+        fig
     })
     # nocov end
 
@@ -411,7 +420,7 @@
         }
 
 
-        .make_volcano(
+        fig <- .make_volcano(
             res = df,
             xlim = isolate(input$vol.x),
             ylim = isolate(input$vol.y),
@@ -453,6 +462,9 @@
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
             highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
         )
+
+        robjects$plot.gene2.vol <- fig
+        fig
     })
     # nocov end
 
@@ -505,7 +517,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        .make_rank(
+        fig <- .make_rank(
             df = df,
             ylim = list(isolate(input$rank.y.min), isolate(input$rank.y.max)),
             y.thresh = isolate(input$gene.lfc.th),
@@ -546,6 +558,9 @@
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
             highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
         )
+
+        robjects$plot.gene2.rank <- fig
+        fig
     })
     # nocov end
 
@@ -598,7 +613,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        .make_lawn(
+        fig <- .make_lawn(
             res = df,
             ylim = isolate(input$lawn.y),
             fc.thresh = isolate(input$gene.lfc.th),
@@ -639,6 +654,9 @@
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
             highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
         )
+
+        robjects$plot.gene2.lawn <- fig
+        fig
     })
     # nocov end
     invisible(NULL)

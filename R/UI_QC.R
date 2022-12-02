@@ -157,6 +157,7 @@
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.qc.gini", "Download Gini Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                             jqui_resizable(plotlyOutput("qc.gini"))
                         ),
                         span(
@@ -175,7 +176,7 @@
                     column(
                         width = 4,
                         span(
-                            popify(icon("circle-info", style = "font-size: 20px"), "Zero Count gRNAs",
+                            popify(icon("circle-info", style = "font-size: 20px"), "Zero Count sgRNAs",
                                 c(
                                     "This plot shows the number of guides with zero reads for each sample. ",
                                     "For early passages and initial timepoints, this count should ideally be zero ",
@@ -183,6 +184,7 @@
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.qc.missed", "Download sgRNA Count Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                             jqui_resizable(plotlyOutput("qc.missed"))
                         ),
                         span(
@@ -215,6 +217,7 @@
                                 ),
                                 placement = "top", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.qc.pca", "Download PCA Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                             withSpinner(jqui_resizable(plotlyOutput("qc.pca")))
                         ),
                     )

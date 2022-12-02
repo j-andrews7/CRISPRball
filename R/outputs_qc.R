@@ -187,6 +187,8 @@
                 plotGlPixelRatio = 7
             )
 
+        robjects$plot.qc.pca <- fig
+
         fig
     })
     # nocov end
@@ -205,7 +207,7 @@
             axis.text.y = element_text(size = 12)
         )
 
-        ggplotly(gg, tooltip = c("y")) %>%
+        fig <- ggplotly(gg, tooltip = c("y")) %>%
             layout(
                 yaxis = list(range = list(0, max(robjects$count.summary$GiniIndex) + .05)),
                 xaxis = list(tickangle = 315)
@@ -215,6 +217,10 @@
                 displaylogo = FALSE,
                 plotGlPixelRatio = 7
             )
+
+        robjects$plot.qc.gini <- fig
+
+        fig
     })
     # nocov end
 
@@ -231,7 +237,7 @@
         ) +
             ylim(0, max(robjects$count.summary$Zerocounts) + 5)
 
-        ggplotly(gg, tooltip = c("y")) %>%
+        fig <- ggplotly(gg, tooltip = c("y")) %>%
             layout(
                 yaxis = list(range = list(0, max(robjects$count.summary$Zerocounts) + 5)),
                 xaxis = list(tickangle = 315)
@@ -241,6 +247,10 @@
                 displaylogo = FALSE,
                 plotGlPixelRatio = 7
             )
+
+        robjects$plot.qc.missed <- fig
+
+        fig
     })
     # nocov end
 

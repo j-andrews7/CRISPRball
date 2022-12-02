@@ -139,8 +139,17 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
             clicked.volc2 = NULL, clicked.rank2 = NULL, clicked.lawn2 = NULL,
             comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
             positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
-            genesets = genesets, pc = NULL, h.id = h.id
+            genesets = genesets, pc = NULL, h.id = h.id,
+            plot.qc.pca = NULL, plot.qc.missed = NULL, plot.qc.gini = NULL,
+            plot.gene1.vol = NULL, plot.gene1.rank = NULL, plot.gene1.lawn = NULL,
+            plot.gene2.vol = NULL, plot.gene2.rank = NULL, plot.gene2.lawn = NULL, 
+            plot.sgrna1.counts = NULL, plot.sgrna1.rank = NULL,
+            plot.depmap.essplot = NULL, plot.depmap.expplot = NULL, plot.depmap.cnplot = NULL,
+            plot.depmap.lineages = NULL, plot.depmap.sublineage = NULL
         )
+
+        # Create downloadHander outputs.
+        .create_dl_outputs(output, robjects)
 
         # --------------Disable Tabs-----------------
         defaultDisabledTabs <- c()
