@@ -37,7 +37,7 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.dep.update
 
-        dep.info <- plot_depmap_dependency(
+        fig <- plot_depmap_dependency(
             gene = input$depmap.gene,
             crispr.color = isolate(input$dep.crispr.color),
             rnai.color = isolate(input$dep.rnai.color),
@@ -46,6 +46,9 @@
             depmap.meta = robjects$depmap.meta,
             depmap.pool = robjects$pool
         )
+
+        robjects$plot.depmap.essplot <- fig
+        fig
     })
     # nocov end
 
@@ -54,13 +57,16 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.exp.update
 
-        dep.info <- plot_depmap_expression(
+        fig <- plot_depmap_expression(
             gene = input$depmap.gene,
             depmap.meta = robjects$depmap.meta,
             depmap.pool = robjects$pool,
             color = isolate(input$exp.color),
             plot.grid = isolate(input$exp.plot.grid)
         )
+
+        robjects$plot.depmap.expplot <- fig
+        fig
     })
     # nocov end
 
@@ -69,13 +75,16 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.cn.update
 
-        dep.info <- plot_depmap_cn(
+        fig <- plot_depmap_cn(
             gene = input$depmap.gene,
             depmap.meta = robjects$depmap.meta,
             depmap.pool = robjects$pool,
             color = isolate(input$cn.color),
             plot.grid = isolate(input$cn.plot.grid)
         )
+
+        robjects$plot.depmap.cnplot <- fig
+        fig
     })
     # nocov end
 
@@ -84,7 +93,7 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.lineage.update
 
-        dep.info <- plot_depmap_lineages(
+        fig <- plot_depmap_lineages(
             gene = input$depmap.gene,
             data.type = isolate(input$lin.data),
             group.by = isolate(input$lin.group),
@@ -97,6 +106,9 @@
             depmap.meta = robjects$depmap.meta,
             depmap.pool = robjects$pool
         )
+
+        robjects$plot.depmap.lineages <- fig
+        fig
     })
     # nocov end
 
@@ -105,7 +117,7 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.sublineage.update
 
-        dep.info <- plot_depmap_lineages(
+        fig <- plot_depmap_lineages(
             gene = input$depmap.gene,
             data.type = isolate(input$lin.data),
             group.by = "lineage_subtype",
@@ -119,6 +131,9 @@
             depmap.meta = robjects$depmap.meta,
             depmap.pool = robjects$pool
         )
+
+        robjects$plot.depmap.sublineage <- fig
+        fig
     })
     # nocov end
 

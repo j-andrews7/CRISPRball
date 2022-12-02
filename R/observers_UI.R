@@ -8,7 +8,7 @@
 #' @return
 #' Observers are set up to monitor the reactives necessary for the dynamic UI elements.
 #' A \code{NULL} is invisibly returned.
-#' 
+#'
 #' @importFrom shinyjs show hide disable enable
 #' @importFrom shiny observeEvent
 #'
@@ -28,7 +28,7 @@
             shinyjs::hide("comp.dep.crispr.sel")
             shinyjs::hide("comp.dep.rnai.ess")
             shinyjs::hide("comp.dep.rnai.sel")
-            
+
             # Hide depmap tab if database not provided.
             # Tried disable, still looks/feels selectable which may be confusing.
             shinyjs::hide(selector = '.navbar-nav a[data-value="DepMap"')
@@ -57,23 +57,23 @@
     # Disable certain inputs if only one dataset provided.
     # nocov start
     observeEvent(robjects$gene.data, {
-      if (length(robjects$gene.data) == 1) {
-        shinyjs::disable("gene.sel2")
-        shinyjs::hide("highlight.common")
-      } else {
-        shinyjs::enable("gene.sel2")
-        shinyjs::show("highlight.common")
-      }
+        if (length(robjects$gene.data) == 1) {
+            shinyjs::disable("gene.sel2")
+            shinyjs::hide("highlight.common")
+        } else {
+            shinyjs::enable("gene.sel2")
+            shinyjs::show("highlight.common")
+        }
     })
     # nocov end
 
     # nocov start
     observeEvent(robjects$sgrna.data, {
-      if (length(robjects$sgrna.data) == 1) {
-        shinyjs::disable("sgrna.sel2")
-      } else {
-        shinyjs::enable("sgrna.sel2")
-      }
+        if (length(robjects$sgrna.data) == 1) {
+            shinyjs::disable("sgrna.sel2")
+        } else {
+            shinyjs::enable("sgrna.sel2")
+        }
     })
     # nocov end
 

@@ -15,15 +15,15 @@
 .create_sgrna_observers <- function(input, robjects) {
     # nocov start
     observe({
-      df <- robjects$sgrna.data[[input$sgrna.sel1]]
-      df$Rank <- rank(df$LFC)
-      robjects$set1.sgrnas <- df
-
-      if (length(robjects$sgrna.data) > 1) {
-        df <- robjects$sgrna.data[[input$sgrna.sel2]]
+        df <- robjects$sgrna.data[[input$sgrna.sel1]]
         df$Rank <- rank(df$LFC)
-        robjects$set2.sgrnas <- df
-      }
+        robjects$set1.sgrnas <- df
+
+        if (length(robjects$sgrna.data) > 1) {
+            df <- robjects$sgrna.data[[input$sgrna.sel2]]
+            df$Rank <- rank(df$LFC)
+            robjects$set2.sgrnas <- df
+        }
     })
     # nocov end
 

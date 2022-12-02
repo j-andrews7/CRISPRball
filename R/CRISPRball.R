@@ -52,175 +52,184 @@
 CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL, norm.counts = NULL, h.id = "mag1",
                        positive.ctrl.genes = NULL, essential.genes = NULL,
                        depmap.db = NULL, genesets = NULL, return.app = TRUE) {
-  # Increase file upload size limit to 50MB, which should cover pretty much any use case.
-  options(shiny.maxRequestSize = 50 * 1024^2)
+    # Increase file upload size limit to 50MB, which should cover pretty much any use case.
+    options(shiny.maxRequestSize = 50 * 1024^2)
 
-  # Set initial metadata and dataset choices if input data isn't NULL.
-  gene.choices <- NULL
-  sgrna.choices <- NULL
-  meta.choices <- NULL
-  sgrna.gene <- NULL
+    # Set initial metadata and dataset choices if input data isn't NULL.
+    gene.choices <- NULL
+    sgrna.choices <- NULL
+    meta.choices <- NULL
+    sgrna.gene <- NULL
 
-  default.tab <- NULL
+    default.tab <- NULL
 
-  if (!is.null(gene.data)) {
-    gene.choices <- names(gene.data)
-  }
+    if (!is.null(gene.data)) {
+        gene.choices <- names(gene.data)
+    }
 
-  if (!is.null(sgrna.data)) {
-    sgrna.choices <- names(sgrna.data)
-    sgrna.gene <- unique(c(sgrna.data[[1]]$Gene))
-  }
+    if (!is.null(sgrna.data)) {
+        sgrna.choices <- names(sgrna.data)
+        sgrna.gene <- unique(c(sgrna.data[[1]]$Gene))
+    }
 
-  if (!is.null(count.summary)) {
-    meta.choices <- colnames(count.summary)
-    default.tab <- "QC"
-  }
+    if (!is.null(count.summary)) {
+        meta.choices <- colnames(count.summary)
+        default.tab <- "QC"
+    }
 
-  # Load cell line metadata and gene summaries if depmap db provided.
-  if (!is.null(depmap.db)) {
-    .error_if_no_pool()
-    .error_if_no_rsqlite()
+    # Load cell line metadata and gene summaries if depmap db provided.
+    if (!is.null(depmap.db)) {
+        .error_if_no_pool()
+        .error_if_no_rsqlite()
 
-    pool <- pool::dbPool(RSQLite::SQLite(), dbname = depmap.db)
-    depmap.meta <- pool::dbGetQuery(pool, "SELECT * FROM 'meta'")
-    depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
+        pool <- pool::dbPool(RSQLite::SQLite(), dbname = depmap.db)
+        depmap.meta <- pool::dbGetQuery(pool, "SELECT * FROM 'meta'")
+        depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
 
-    # Close db on app close.
-    onStop(function() {
-      pool::poolClose(pool)
-    })
-  } else {
-    depmap.meta <- NULL
-    depmap.gene <- NULL
-    pool <- NULL
-  }
+        # Close db on app close.
+        onStop(function() {
+            pool::poolClose(pool)
+        })
+    } else {
+        depmap.meta <- NULL
+        depmap.gene <- NULL
+        pool <- NULL
+    }
 
-  ui <- navbarPage(
-    "CRISPRball",
-    selected = default.tab,
-    useShinyjs(),
-    extendShinyjs(text = .utils.js, functions = c("disableTab", "enableTab")),
-    css,
-    # ---------------Data Upload-----------------
-    tab_data_upload,
-    # ----------------QC--------------------
-    .create_tab_qc(meta.choices),
-    # -------------------QC Table----------------
-    tabPanel(
-      title = "QC Table",
-      id = "qc-table",
-      br(),
-      DTOutput("count.summary")
-    ),
-    # ------------------Gene (Overview)-------------
-    .create_tab_gene(gene.choices, genesets),
-    # ----------------Gene Summary Tables--------------
-    tab_gene_summary,
-    # ----------------sgRNA---------------------
-    .create_tab_sgrna(sgrna.choices, sgrna.gene),
-    # --------------------sgRNA Summary Tables----------------
-    tab_sgrna_summary,
-    # --------------------Dataset Comparisons----------------
-    .create_tab_comparison(gene.choices),
-    # -----------------DepMap-------------------
-    .create_tab_depmap(depmap.gene, depmap.meta),
-    # -----------------About-------------------
-    tab_about
-  )
-
-  server <- function(input, output, session) {
-    # -------------Reactive Values---------------
-    robjects <- reactiveValues(
-      gene.data = gene.data, sgrna.data = sgrna.data,
-      count.summary = count.summary, norm.counts = norm.counts,
-      depmap.meta = depmap.meta, depmap.gene = depmap.gene, pool = pool,
-      clicked.volc1 = NULL, clicked.rank1 = NULL, clicked.lawn1 = NULL,
-      clicked.volc2 = NULL, clicked.rank2 = NULL, clicked.lawn2 = NULL,
-      comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
-      positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
-      genesets = genesets, pc = NULL, h.id = h.id
+    ui <- navbarPage(
+        "CRISPRball",
+        selected = default.tab,
+        useShinyjs(),
+        extendShinyjs(text = .utils.js, functions = c("disableTab", "enableTab")),
+        css,
+        # ---------------Data Upload-----------------
+        tab_data_upload,
+        # ----------------QC--------------------
+        .create_tab_qc(meta.choices),
+        # -------------------QC Table----------------
+        tabPanel(
+            title = "QC Table",
+            id = "qc-table",
+            br(),
+            DTOutput("count.summary")
+        ),
+        # ------------------Gene (Overview)-------------
+        .create_tab_gene(gene.choices, genesets),
+        # ----------------Gene Summary Tables--------------
+        tab_gene_summary,
+        # ----------------sgRNA---------------------
+        .create_tab_sgrna(sgrna.choices, sgrna.gene),
+        # --------------------sgRNA Summary Tables----------------
+        tab_sgrna_summary,
+        # --------------------Dataset Comparisons----------------
+        .create_tab_comparison(gene.choices),
+        # -----------------DepMap-------------------
+        .create_tab_depmap(depmap.gene, depmap.meta),
+        # -----------------About-------------------
+        tab_about
     )
 
-    # --------------Disable Tabs-----------------
-    defaultDisabledTabs <- c()
+    server <- function(input, output, session) {
+        # -------------Reactive Values---------------
+        robjects <- reactiveValues(
+            gene.data = gene.data, sgrna.data = sgrna.data,
+            count.summary = count.summary, norm.counts = norm.counts,
+            depmap.meta = depmap.meta, depmap.gene = depmap.gene, pool = pool,
+            clicked.volc1 = NULL, clicked.rank1 = NULL, clicked.lawn1 = NULL,
+            clicked.volc2 = NULL, clicked.rank2 = NULL, clicked.lawn2 = NULL,
+            comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
+            positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
+            genesets = genesets, pc = NULL, h.id = h.id,
+            plot.qc.pca = NULL, plot.qc.missed = NULL, plot.qc.gini = NULL,
+            plot.gene1.vol = NULL, plot.gene1.rank = NULL, plot.gene1.lawn = NULL,
+            plot.gene2.vol = NULL, plot.gene2.rank = NULL, plot.gene2.lawn = NULL, 
+            plot.sgrna1.counts = NULL, plot.sgrna1.rank = NULL,
+            plot.depmap.essplot = NULL, plot.depmap.expplot = NULL, plot.depmap.cnplot = NULL,
+            plot.depmap.lineages = NULL, plot.depmap.sublineage = NULL
+        )
 
-    if (is.null(gene.data)) {
-      defaultDisabledTabs <- c(defaultDisabledTabs, "Gene (Overview)", "Gene Summary Tables")
+        # Create downloadHander outputs.
+        .create_dl_outputs(output, robjects)
+
+        # --------------Disable Tabs-----------------
+        defaultDisabledTabs <- c()
+
+        if (is.null(gene.data)) {
+            defaultDisabledTabs <- c(defaultDisabledTabs, "Gene (Overview)", "Gene Summary Tables")
+        }
+
+        if (length(gene.data) < 2) {
+            defaultDisabledTabs <- c(defaultDisabledTabs, "Comparisons")
+        }
+
+        if (is.null(sgrna.data)) {
+            defaultDisabledTabs <- c(defaultDisabledTabs, "sgRNA", "sgRNA Summary Tables")
+        }
+
+        if (is.null(count.summary) | is.null(norm.counts)) {
+            defaultDisabledTabs <- c(defaultDisabledTabs, "QC", "QC Table")
+        }
+
+        for (tabname in defaultDisabledTabs) {
+            js$disableTab(tabname)
+        }
+
+        # --------------Disable Inputs-----------------
+        # Disable certain inputs if no data is provided.
+        .create_ui_observers(robjects)
+
+        # ------------Data Upload Tab----------------
+        # Create data upload observers.
+        .create_upload_observers(input, session, robjects)
+
+        # -----------QC & QC Summary Tabs------------
+        # PCA.
+        .create_qc_observers(input, robjects)
+
+        .create_qc_outputs(input, output, robjects)
+
+        # Initialize plots by simulating button click once.
+        o <- observe({
+            req(robjects$pca.mat, robjects$pca.meta)
+            shinyjs::click("pca.update")
+            o$destroy
+        })
+
+        #---------Gene (Overview) & Summary Tables Tabs-------------
+
+        # Load the gene summaries for easy plotting.
+        .create_gene_observers(input, robjects)
+
+        # Summary tables and plots.
+        .create_gene_outputs(input, output, robjects)
+
+        #---------------sgRNA & Summary Tables Tabs-----------------
+
+        # Load the gene summaries for easy plotting.
+        .create_sgrna_observers(input, robjects)
+
+        # Summary tables and plots.
+        .create_sgrna_outputs(input, output, robjects)
+
+        #--------------Comparisons Tab------------
+        .create_comparisons_observers(input, session, output, robjects)
+
+        # Initialize plots by simulating button click once.
+        o <- observe({
+            req(robjects$gene.data)
+            shinyjs::click("comp.update")
+            o$destroy
+        })
+
+        #--------------DepMap Tab-----------------
+        if (!is.null(depmap.gene)) {
+            .create_depmap_outputs(input, output, robjects)
+        }
     }
 
-    if (length(gene.data) < 2) {
-      defaultDisabledTabs <- c(defaultDisabledTabs, "Comparisons")
+    if (return.app) {
+        shinyApp(ui, server)
+    } else {
+        return(list(ui = ui, server = server))
     }
-
-    if (is.null(sgrna.data)) {
-      defaultDisabledTabs <- c(defaultDisabledTabs, "sgRNA", "sgRNA Summary Tables")
-    }
-
-    if (is.null(count.summary) | is.null(norm.counts)) {
-      defaultDisabledTabs <- c(defaultDisabledTabs, "QC", "QC Table")
-    }
-
-    for (tabname in defaultDisabledTabs) {
-      js$disableTab(tabname)
-    }
-
-    # --------------Disable Inputs-----------------
-    # Disable certain inputs if no data is provided.
-    .create_ui_observers(robjects)
-
-    # ------------Data Upload Tab----------------
-    # Create data upload observers.
-    .create_upload_observers(input, session, robjects)
-
-    # -----------QC & QC Summary Tabs------------
-    # PCA.
-    .create_qc_observers(input, robjects)
-
-    .create_qc_outputs(input, output, robjects)
-
-    # Initialize plots by simulating button click once.
-    o <- observe({
-      req(robjects$pca.mat, robjects$pca.meta)
-      shinyjs::click("pca.update")
-      o$destroy
-    })
-
-    #---------Gene (Overview) & Summary Tables Tabs-------------
-
-    # Load the gene summaries for easy plotting.
-    .create_gene_observers(input, robjects)
-
-    # Summary tables and plots.
-    .create_gene_outputs(input, output, robjects)
-
-    #---------------sgRNA & Summary Tables Tabs-----------------
-
-    # Load the gene summaries for easy plotting.
-    .create_sgrna_observers(input, robjects)
-
-    # Summary tables and plots.
-    .create_sgrna_outputs(input, output, robjects)
-
-    #--------------Comparisons Tab------------
-    .create_comparisons_observers(input, session, output, robjects)
-
-    # Initialize plots by simulating button click once.
-    o <- observe({
-      req(robjects$gene.data)
-      shinyjs::click("comp.update")
-      o$destroy
-    })
-
-    #--------------DepMap Tab-----------------
-    if (!is.null(depmap.gene)) {
-      .create_depmap_outputs(input, output, robjects)
-    }
-  }
-
-  if (return.app) {
-    shinyApp(ui, server)
-  } else {
-    return(list(ui = ui, server = server))
-  }
 }
