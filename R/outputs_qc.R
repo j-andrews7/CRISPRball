@@ -215,7 +215,11 @@
             config(
                 toImageButtonOptions = list(format = "svg"),
                 displaylogo = FALSE,
-                plotGlPixelRatio = 7
+                plotGlPixelRatio = 7,
+                edits = list(
+                    axisTitleText = TRUE,
+                    titleText = TRUE
+                )
             )
 
         robjects$plot.qc.gini <- fig
@@ -245,7 +249,11 @@
             config(
                 toImageButtonOptions = list(format = "svg"),
                 displaylogo = FALSE,
-                plotGlPixelRatio = 7
+                plotGlPixelRatio = 7,
+                edits = list(
+                    axisTitleText = TRUE,
+                    titleText = TRUE
+                )
             )
 
         robjects$plot.qc.missed <- fig
