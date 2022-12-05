@@ -195,69 +195,19 @@
 
     # nocov start
     output$qc.gini <- renderPlotly({
-        gg <- BarView(robjects$count.summary,
-            x = "Label",
-            y = "GiniIndex",
-            ylab = "Gini index",
-            main = "sgRNA Read Distribution"
-        )
-
-        gg + theme(
-            axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 12),
-            axis.text.y = element_text(size = 12)
-        )
-
-        fig <- ggplotly(gg, tooltip = c("y")) %>%
-            layout(
-                yaxis = list(range = list(0, max(robjects$count.summary$GiniIndex) + .05)),
-                xaxis = list(tickangle = 315)
-            ) %>%
-            config(
-                toImageButtonOptions = list(format = "svg"),
-                displaylogo = FALSE,
-                plotGlPixelRatio = 7,
-                edits = list(
-                    axisTitleText = TRUE,
-                    titleText = TRUE
-                )
-            )
-
+        fig <- plot_bar(robjects$count.summary)
         robjects$plot.qc.gini <- fig
-
         fig
     })
     # nocov end
 
     # nocov start
     output$qc.missed <- renderPlotly({
-        gg <- BarView(robjects$count.summary,
+        fig <- plot_bar(robjects$count.summary,
             x = "Label", y = "Zerocounts", fill = "#394E80",
-            ylab = "Zero Count sgRNAs", main = "Fully Depleted sgRNAs"
+            ylab = "Zero Count sgRNAs", title = "Fully Depleted sgRNAs", yaxis_addition = 10
         )
-
-        gg + theme_classic() + theme(
-            axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 12),
-            axis.text.y = element_text(size = 12)
-        ) +
-            ylim(0, max(robjects$count.summary$Zerocounts) + 5)
-
-        fig <- ggplotly(gg, tooltip = c("y")) %>%
-            layout(
-                yaxis = list(range = list(0, max(robjects$count.summary$Zerocounts) + 5)),
-                xaxis = list(tickangle = 315)
-            ) %>%
-            config(
-                toImageButtonOptions = list(format = "svg"),
-                displaylogo = FALSE,
-                plotGlPixelRatio = 7,
-                edits = list(
-                    axisTitleText = TRUE,
-                    titleText = TRUE
-                )
-            )
-
         robjects$plot.qc.missed <- fig
-
         fig
     })
     # nocov end
