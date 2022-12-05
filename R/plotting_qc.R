@@ -88,10 +88,19 @@ plot_bar <- function(count.summary, x = "Label",
 #' @author Jared Andrews
 #' @examples
 #' library(CRISPRball)
-#' plot_hist(mat, colors)
+#' counts <- read.delim(system.file("extdata", "escneg.count_normalized.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#' slmed <- robjects$norm.counts
+#' tabsmat <- as.matrix(log2(slmed[, c(-1, -2)] + 1))
+#' colnames(tabsmat) <- colnames(slmed)[c(-1, -2)]
+#'
+#' plot_hist(tabsmat,
+#'     title = "Distribution of read counts",
+#'     xlab = "log2(counts + 1)", ylab = "Frequency"
+#' )
 plot_hist <- function(mat, title = NULL, xlab = "Values",
                       ylab = "Frequency", show.grid = FALSE) {
-
     histo <- hist(mat, breaks = 40)
 
     if (ncol(mat) >= 1) {
