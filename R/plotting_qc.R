@@ -67,3 +67,105 @@ plot_bar <- function(count.summary, x = "Label",
             )
         )
 }
+
+
+#' Create a plotly plot from a distribution of values
+#'
+#' This function creates a plotly plot with the distribution of values for each
+#' column in the `mat` matrix, using different colors for each column.
+#' The legend will show the column names from `mat`, and the plot will have
+#' the title "Distribution of read counts".
+#'
+#' @param mat A matrix with the data to plot.
+#' @param xlab Character scalar for label of the x-axis.
+#' @param ylab Character scalar for label of the y-axis.
+#' @param title A character scalar for the title of the plot.
+#' @param show.grid A boolean for whether to show the grid lines.
+#' @return A plotly plot with the distribution of read counts.
+#'
+#' @importFrom plotly plot_ly add_trace layout config
+#' @export
+#' @author Jared Andrews
+#' @examples
+#' library(CRISPRball)
+#' plot_hist(mat, colors)
+plot_hist <- function(mat, title = NULL, xlab = "Values",
+                      ylab = "Frequency", show.grid = FALSE) {
+
+    histo <- hist(mat, breaks = 40)
+
+    if (ncol(mat) >= 1) {
+        histlist <- lapply(1:ncol(mat), function(x) {
+            return(hist(mat[, x], plot = FALSE, breaks = histo$breaks))
+        })
+        xrange <- range(unlist(lapply(histlist, function(x) {
+            x$mids
+        })))
+        yrange <- range(unlist(lapply(histlist, function(x) {
+            x$counts
+        })))
+        hst1 <- histlist[[1]]
+        fig <- plot_ly(
+            x = hst1$mids, y = hst1$counts,
+            type = "scatter", mode = "lines+markers",
+            name = colnames(mat)[1]
+        )
+    }
+
+    if (ncol(mat) >= 2) {
+        for (i in 2:ncol(mat)) {
+            hstn <- histlist[[i]]
+            fig <- fig %>% add_trace(
+                x = hstn$mids, y = hstn$counts,
+                type = "scatter", mode = "lines+markers",
+                name = colnames(mat)[i]
+            )
+        }
+    }
+
+    ay <- list(
+        showline = TRUE,
+        mirror = TRUE,
+        linecolor = toRGB("black"),
+        linewidth = 0.5,
+        showgrid = show.grid,
+        layer = "below traces",
+        zeroline = FALSE,
+        ticks = "outside",
+        zerolinewidth = 0.5,
+        title = ylab,
+        range = c(0, yrange[2] * 1.1)
+    )
+
+    ax <- list(
+        showline = TRUE,
+        mirror = TRUE,
+        linecolor = toRGB("black"),
+        linewidth = 0.5,
+        zeroline = FALSE,
+        showgrid = show.grid,
+        layer = "below traces",
+        ticks = "outside",
+        zerolinewidth = 0.5,
+        title = xlab,
+        range = c(0, xrange[2] * 1.1)
+    )
+
+    fig <- fig %>%
+        layout(
+            title = title,
+            xaxis = ax,
+            yaxis = ay
+        ) %>%
+        config(
+            toImageButtonOptions = list(format = "svg"),
+            displaylogo = FALSE,
+            plotGlPixelRatio = 7,
+            edits = list(
+                axisTitleText = TRUE,
+                titleText = TRUE
+            )
+        )
+
+    fig
+}

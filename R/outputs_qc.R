@@ -205,7 +205,7 @@
     output$qc.missed <- renderPlotly({
         fig <- plot_bar(robjects$count.summary,
             x = "Label", y = "Zerocounts", fill = "#394E80",
-            ylab = "Zero Count sgRNAs", title = "Fully Depleted sgRNAs", yaxis_addition = 10
+            ylab = "Zero Count sgRNAs", title = "Fully Depleted sgRNAs", yaxis.addition = 10
         )
         robjects$plot.qc.missed <- fig
         fig
@@ -218,43 +218,18 @@
     })
     # nocov end
 
-    # TODO: rewrite this.
     # nocov start
-    output$qc.histplot <- renderPlot({
-        colors <- dittoColors()
-
+    output$qc.histplot <- renderPlotly({
         slmed <- robjects$norm.counts
         tabsmat <- as.matrix(log2(slmed[, c(-1, -2)] + 1))
         colnames(tabsmat) <- colnames(slmed)[c(-1, -2)]
-        samplecol <- colors[((1:ncol(tabsmat)) %% length(colors))]
-        tgz <- hist(tabsmat, breaks = 40)
 
-        if (ncol(tabsmat) >= 1) {
-            histlist <- lapply(1:ncol(tabsmat), function(X) {
-                return(hist(tabsmat[, X], plot = FALSE, breaks = tgz$breaks))
-            })
-            xrange <- range(unlist(lapply(histlist, function(X) {
-                X$mids
-            })))
-            yrange <- range(unlist(lapply(histlist, function(X) {
-                X$counts
-            })))
-            hst1 <- histlist[[1]]
-            plot(hst1$mids, hst1$counts,
-                type = "b", pch = 20, xlim = c(0, xrange[2] * 1.2),
-                ylim = c(0, yrange[2] * 1.2), xlab = "log2(counts)", ylab = "Frequency",
-                main = "Distribution of read counts", col = samplecol[1]
-            )
-        }
+        #TODO: Add input to control gridlines.
+        fig <- plot_hist(tabsmat, title = "Distribution of read counts", 
+            xlab = "log2(counts + 1)", ylab = "Frequency", show.grid = FALSE)
 
-        if (ncol(tabsmat) >= 2) {
-            for (i in 2:ncol(tabsmat)) {
-                hstn <- histlist[[i]]
-                lines(hstn$mids, hstn$counts, type = "b", pch = 20, col = samplecol[i])
-            }
-        }
-
-        legend("topright", colnames(tabsmat), pch = 20, lwd = 1, col = samplecol)
+        robjects$plot.qc.hist <- fig
+        fig
     })
     # nocov end
 

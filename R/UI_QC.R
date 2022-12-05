@@ -158,7 +158,7 @@
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
                             div(downloadButton("dl_plot.qc.gini", "Download Gini Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
-                            jqui_resizable(plotlyOutput("qc.gini"))
+                            withSpinner(jqui_resizable(plotlyOutput("qc.gini")))
                         ),
                         span(
                             popify(icon("circle-info", style = "font-size: 20px"), "Read Distributions",
@@ -170,7 +170,8 @@
                                 ),
                                 placement = "top", trigger = "hover", options = list(container = "body")
                             ),
-                            jqui_resizable(plotOutput("qc.histplot"))
+                            withSpinner(jqui_resizable(plotlyOutput("qc.histplot"))),
+                            div(downloadButton("dl_plot.qc.hist", "Download Read Distribution Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
                         )
                     ),
                     column(
@@ -185,7 +186,7 @@
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
                             div(downloadButton("dl_plot.qc.missed", "Download sgRNA Count Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
-                            jqui_resizable(plotlyOutput("qc.missed"))
+                            withSpinner(jqui_resizable(plotlyOutput("qc.missed")))
                         ),
                         span(
                             popify(icon("circle-info", style = "font-size: 20px"), "Sample Correlations",

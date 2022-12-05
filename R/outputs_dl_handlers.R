@@ -14,7 +14,7 @@
 #' @rdname INTERNAL_create_dl_outputs
 .create_dl_outputs <- function(output, robjects) {
     plotters <- list(
-        "plot.qc.pca", "plot.qc.missed", "plot.qc.gini",
+        "plot.qc.pca", "plot.qc.missed", "plot.qc.gini", "plot.qc.hist",
         "plot.gene1.vol", "plot.gene1.rank", "plot.gene1.lawn",
         "plot.gene2.vol", "plot.gene2.rank", "plot.gene2.lawn",
         "plot.sgrna1.counts", "plot.sgrna1.rank",
