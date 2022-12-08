@@ -244,3 +244,10 @@
         )
     )
 }
+
+tab_qc_summary <- tabPanel(
+    title = "QC Table",
+    id = "qc-table",
+    br(),
+    DTOutput("count.summary")
+)

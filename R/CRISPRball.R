@@ -107,12 +107,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         # ----------------QC--------------------
         .create_tab_qc(meta.choices),
         # -------------------QC Table----------------
-        tabPanel(
-            title = "QC Table",
-            id = "qc-table",
-            br(),
-            DTOutput("count.summary")
-        ),
+        tab_qc_summary,
         # ------------------Gene (Overview)-------------
         .create_tab_gene(gene.choices, genesets),
         # ----------------Gene Summary Tables--------------
