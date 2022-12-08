@@ -13,13 +13,12 @@
 #'
 #' @importFrom shiny renderUI renderPlot tagList column selectInput isolate fluidRow
 #' @importFrom plotly renderPlotly ggplotly layout config plot_ly toWebGL add_segments add_annotations
-#' @importFrom MAGeCKFlute BarView MapRatesView
+#' @importFrom MAGeCKFlute MapRatesView
 #' @importFrom shinyWidgets updatePickerInput
 #' @importFrom shinyjs js
 #' @importFrom dittoSeq dittoColors
 #' @importFrom grid grid.newpage grid.text
 #' @importFrom DT renderDT datatable formatStyle
-#' @importFrom graphics hist legend lines
 #' @importFrom stats cor as.formula
 #' @import ggplot2
 #' @rdname INTERNAL_create_qc_output
@@ -233,18 +232,21 @@
     })
     # nocov end
 
-    # TODO: rewrite this, add color min/max/mid selectors.
     # nocov start
     output$qc.corr <- renderPlot({
-        slmed <- robjects$norm.counts
-        slmat <- as.matrix(slmed[, c(-1, -2)])
-        slmat.log <- log2(slmat + 1)
+        input$corr.update
 
-        if (ncol(slmat.log) > 1) {
-            ComplexHeatmap::pheatmap(cor(slmat.log),
-                heatmap_legend_param = list(title = "Pearson\nCorr."),
-                main = "Correlation Matrix"
-            )
+        n.counts <- robjects$norm.counts
+        n.counts.log <- as.matrix(log2(slmed[, c(-1, -2)] + 1))
+
+        if (!is.null(isolate(input$count.summary_rows_all)) & isolate(input$meta.filt)) {
+            n.counts.log <- as.matrix(n.counts.log[, isolate(input$count.summary_rows_all)])
+        }
+
+        if (ncol(n.counts.log) > 1) {
+            cor.mat <- cor(n.counts.log)
+            plot_correlation_heatmap(cor.mat, min.color = isolate(input$corr.min.col), 
+                max.color = isolate(input$corr.max.col))
         } else {
             grid.newpage()
             grid.text("Only one sample, no correlation possible.")

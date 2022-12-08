@@ -139,6 +139,23 @@
                             ),
                             div(actionButton("pca.update", "Update PCA"), align = "center")
                         )
+                    ),
+                    bsCollapsePanel(
+                        title = span(icon("plus"), "Correlation Plot Settings"), value = "corr.settings", style = "info",
+                        fluidRow(
+                            column(
+                                12,
+                                tipify(colourInput("corr.max.col", "Maximum color:", value = "#FF0000"),
+                                    "Maximum correlation color.", "right",
+                                    options = list(container = "body")
+                                ),
+                                tipify(colourInput("corr.min.col", "Maximum color:", value = "#FFFFFF"),
+                                    "Minimum correlation color.", "right",
+                                    options = list(container = "body")
+                                )
+                            ),
+                            div(actionButton("corr.update", "Update Correlation Plot"), align = "center")
+                        )
                     )
                 )
             ),

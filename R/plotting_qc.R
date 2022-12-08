@@ -2,7 +2,6 @@
 #'
 #' Create an interactive bar plot for specific summary information for each sample in the dataset.
 #'
-#'
 #' @param count.summary data.frame containing the count summary information for each sample.
 #' @param x Character scalar for column of count.summary to plot along the x-axis.
 #' @param y Character scalar for column of count.summary to plot along the y-axis.
@@ -177,4 +176,48 @@ plot_hist <- function(mat, title = NULL, xlab = "Values",
         )
 
     fig
+}
+
+
+#' Plot a Correlation Heatmap
+#'
+#' This function creates a heatmap using ComplexHeatmap to display the correlation values
+#' in a matrix. The color of each cell in the heatmap is determined by the
+#' corresponding correlation value, using a color ramp that ranges from the
+#' minimum value color to a maximum value color.
+#'
+#' @param mat A matrix containing the correlation values.
+#' @param min.color Character scalar for the hexadecimal color code for
+#'   the minimum values in the heatmap.
+#' @param max.color Character scalar for the hexadecimal color code for
+#'   the maximum values in the heatmap.
+#' @param plot.title Character scalar for title of the plot.
+#' @param legend.title Character scalar for title of the legend.
+#'
+#' @return A Heatmap object. If only one column is present in the `data` matrix,
+#'   returns a text grob indicating only one sample was provided.
+#'
+#' @importFrom ComplexHeatmap Heatmap
+#' @importFrom circlize colorRamp2
+#' @examples
+#' library(CRISPRball)
+#' norm.counts <- read.delim(system.file("extdata", "escneg.count_normalized.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#' norm.counts <- as.matrix(norm.counts[, c(-1, -2)])
+#' norm.counts.log <- log2(norm.counts + 1)
+#' cor.mat <- cor(norm.counts.log)
+#' plot_correlation_heatmap(cor.mat)
+#' @author Jared Andrews
+#' @export
+plot_correlation_heatmap <- function(mat, min.color = "#FF0000",
+                                     max.color = "#0000FF", legend.title = "Pearson Corr.",
+                                     plot.title = "Correlation Matrix") {
+    Heatmap(mat,
+        name = legend.title,
+        column_title = plot.title,
+        cluster_rows = TRUE,
+        cluster_columns = TRUE,
+        col = colorRamp2(c(min(mat), max(mat)), c(min.color, max.color))
+    )
 }

@@ -419,7 +419,6 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-
         fig <- .make_volcano(
             res = df,
             xlim = isolate(input$vol.x),
