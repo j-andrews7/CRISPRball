@@ -34,14 +34,13 @@ the title "Distribution of read counts".
 }
 \examples{
 library(CRISPRball)
-counts <- read.delim(system.file("extdata", "escneg.count_normalized.txt",
+cts <- read.delim(system.file("extdata", "escneg.count_normalized.txt",
     package = "CRISPRball"
 ), check.names = FALSE)
-slmed <- robjects$norm.counts
-tabsmat <- as.matrix(log2(slmed[, c(-1, -2)] + 1))
-colnames(tabsmat) <- colnames(slmed)[c(-1, -2)]
+cts.log <- as.matrix(log2(cts[, c(-1, -2)] + 1))
+colnames(cts.log) <- colnames(cts)[c(-1, -2)]
 
-plot_hist(tabsmat,
+plot_hist(cts,
     title = "Distribution of read counts",
     xlab = "log2(counts + 1)", ylab = "Frequency"
 )

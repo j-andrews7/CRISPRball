@@ -2,7 +2,6 @@
 #'
 #' Define a series of observers to adjust UI usability/visibility based on data availability.
 #'
-#' @param input The Shiny input object from the server function.
 #' @param robjects A reactive list of values generated in the server function.
 #'
 #' @return

@@ -41,7 +41,8 @@ Imports:
     shinyjs,
     MAGeCKFlute,
     circlize,
-    PCAtools
+    PCAtools,
+    htmlwidgets
 Suggests:
     BiocStyle,
     msigdbr,
