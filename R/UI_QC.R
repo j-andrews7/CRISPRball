@@ -74,6 +74,13 @@
                                     ),
                                     "Scale the data to have unit variance before performing PCA.", "right",
                                     options = list(container = "body")
+                                ),
+                                tipify(
+                                    numericInput("pca.pt.size", "Point size:",
+                                        min = 1, max = Inf, step = 0.1, value = 12
+                                    ),
+                                    "PCA biplot point size.", "right",
+                                    options = list(container = "body")
                                 )
                             )
                         ),
@@ -131,7 +138,7 @@
                                 12,
                                 tipify(
                                     numericInput("bip.n.loadings", "Loadings:",
-                                        min = 0, max = 100, step = 1, value = 5
+                                        min = 0, max = 100, step = 1, value = 3
                                     ),
                                     "Number of PCA loadings to plot (if checked).", "right",
                                     options = list(container = "body")
@@ -235,8 +242,8 @@
                                 ),
                                 placement = "top", trigger = "hover", options = list(container = "body")
                             ),
-                            div(downloadButton("dl_plot.qc.pca", "Download PCA Plot", class = "btn-dl"), style = "display:inline-block; float:right"),
-                            withSpinner(jqui_resizable(plotlyOutput("qc.pca")))
+                            withSpinner(jqui_resizable(plotlyOutput("qc.pca"))),
+                            div(downloadButton("dl_plot.qc.pca", "Download PCA Plot", class = "btn-dl"), style = "display:inline-block; float:right")
                         ),
                     )
                 )

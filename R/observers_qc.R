@@ -9,12 +9,13 @@
 #' Observers are set up to monitor the reactives necessary for the PCA.
 #' A \code{NULL} is invisibly returned.
 #'
-#' @author Jared Andrews
-#'
-#' @rdname INTERNAL_create_qc_observers
 #' @importFrom shiny observeEvent
 #' @importFrom matrixStats rowVars rowMaxs rowMins
 #' @importFrom PCAtools pca
+#'
+#' @author Jared Andrews
+#'
+#' @rdname INTERNAL_create_qc_observers
 .create_qc_observers <- function(input, robjects) {
     # This is used so that the matrix and metadata input for PCA are updated when new data is uploaded.
     # nocov start

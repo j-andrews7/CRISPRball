@@ -42,149 +42,30 @@
 
     # nocov start
     output$qc.pca <- renderPlotly({
-        req(input$dim1, input$dim2)
+        req(input$dim1, input$dim2, robjects$pc)
 
-        pc.res <- robjects$pc
+        input$pca.update
 
-        pl.cols <- NULL
-        pl.shapes <- NULL
-        pl.col <- "black"
-        hov.text <- NULL
+        pca.res <- robjects$pc
 
-        # Get marker aesthetics mappings.
-        # Drop unused factor levels if possible.
-        if (isolate(input$bip.color) != "") {
-            pl.cols <- pc.res$metadata[, isolate(input$bip.color), drop = TRUE]
-            if (is.factor(pl.cols)) {
-                pl.cols <- droplevels(pl.cols)
-            }
-            pl.col <- dittoColors()[seq_along(unique(pc.res$metadata[, isolate(input$bip.color), drop = TRUE]))]
-        }
-
-        if (isolate(input$bip.shape) != "") {
-            pl.shapes <- pc.res$metadata[, isolate(input$bip.shape), drop = TRUE]
-            if (is.factor(pl.shapes)) {
-                pl.shapes <- droplevels(pl.shapes)
-            }
-        }
-
-        # Just throw label on hover for now.
-        hov.text <- paste0("</br><b>Label:</b> ", pc.res$metadata$Label)
-
-        # Check if 2D is wanted.
-        if (isolate(input$bip.twod)) {
-            fig <- plot_ly(pc.res$rotated,
-                x = as.formula(paste0("~", isolate(input$dim1))),
-                y = as.formula(paste0("~", isolate(input$dim2))),
-                type = "scatter",
-                mode = "markers",
-                marker = list(size = 15),
-                color = pl.cols,
-                colors = pl.col,
-                symbol = pl.shapes,
-                symbols = c(
-                    "circle", "square", "diamond", "cross",
-                    "diamond-open", "circle-open", "square-open", "x"
-                ),
-                text = hov.text,
-                hoverinfo = "text"
-            ) %>%
-                layout(
-                    xaxis = list(
-                        showgrid = FALSE, showline = TRUE, mirror = TRUE, zeroline = FALSE,
-                        title = paste0(
-                            isolate(input$dim1),
-                            " (", format(round(pc.res$variance[isolate(input$dim1)], 2), nsmall = 2), "%)"
-                        )
-                    ),
-                    yaxis = list(
-                        showgrid = FALSE, showline = TRUE, mirror = TRUE, zeroline = FALSE,
-                        title = paste0(
-                            isolate(input$dim2),
-                            " (", format(round(pc.res$variance[isolate(input$dim2)], 2), nsmall = 2), "%)"
-                        )
-                    )
-                )
-
-            fig <- fig %>% toWebGL()
-
-            # Plot loadings.
-            if (isolate(input$bip.loadings)) {
-                lengthLoadingsArrowsFactor <- 1.5
-
-                # Get number of loadings to display.
-                xidx <- order(abs(pc.res$loadings[, isolate(input$dim1)]), decreasing = TRUE)
-                yidx <- order(abs(pc.res$loadings[, isolate(input$dim2)]), decreasing = TRUE)
-                vars <- unique(c(
-                    rownames(pc.res$loadings)[xidx][seq_len(isolate(input$bip.n.loadings))],
-                    rownames(pc.res$loadings)[yidx][seq_len(isolate(input$bip.n.loadings))]
-                ))
-
-                # get scaling parameter to match between variable loadings and rotated loadings
-                # This is cribbed almost verbatim from PCAtools code.
-                r <- min(
-                    (max(pc.res$rotated[, isolate(input$dim1)]) - min(pc.res$rotated[, isolate(input$dim1)]) /
-                        (max(pc.res$loadings[, isolate(input$dim1)]) - min(pc.res$loadings[, isolate(input$dim1)]))),
-                    (max(pc.res$rotated[, isolate(input$dim2)]) - min(pc.res$rotated[, isolate(input$dim2)]) /
-                        (max(pc.res$loadings[, isolate(input$dim2)]) - min(pc.res$loadings[, isolate(input$dim2)])))
-                )
-
-                fig <- fig %>%
-                    add_segments(
-                        x = 0, xend = pc.res$loadings[vars, isolate(input$dim1)] * r * lengthLoadingsArrowsFactor,
-                        y = 0, yend = pc.res$loadings[vars, isolate(input$dim2)] * r * lengthLoadingsArrowsFactor,
-                        line = list(color = "black"), inherit = FALSE, showlegend = FALSE, hoverinfo = "text"
-                    ) %>%
-                    add_annotations(
-                        x = pc.res$loadings[vars, isolate(input$dim1)] * r * lengthLoadingsArrowsFactor,
-                        y = pc.res$loadings[vars, isolate(input$dim2)] * r * lengthLoadingsArrowsFactor,
-                        ax = 0, ay = 0, text = vars, xanchor = "center", yanchor = "bottom"
-                    )
-            }
+        if ((isolate(input$bip.twod) | length(pca.res$components) < 3)) {
+            dizzy <- NULL
         } else {
-            # Generate plot.
-            fig <- plot_ly(pc.res$rotated,
-                x = as.formula(paste0("~", isolate(input$dim1))),
-                y = as.formula(paste0("~", isolate(input$dim2))),
-                z = as.formula(paste0("~", isolate(input$dim3))),
-                type = "scatter3d",
-                mode = "markers",
-                color = pl.cols,
-                colors = pl.col,
-                symbol = pl.shapes,
-                symbols = c(
-                    "circle", "square", "diamond", "cross", "diamond-open",
-                    "circle-open", "square-open", "x"
-                ),
-                text = hov.text,
-                hoverinfo = "text"
-            ) %>%
-                layout(scene = list(
-                    xaxis = list(title = paste0(
-                        isolate(input$dim1), " (",
-                        format(round(pc.res$variance[isolate(input$dim1)], 2), nsmall = 2), "%)"
-                    )),
-                    yaxis = list(title = paste0(
-                        isolate(input$dim2), " (",
-                        format(round(pc.res$variance[isolate(input$dim2)], 2), nsmall = 2), "%)"
-                    )),
-                    zaxis = list(title = paste0(
-                        isolate(input$dim3), " (",
-                        format(round(pc.res$variance[isolate(input$dim3)], 2), nsmall = 2), "%)"
-                    )),
-                    camera = list(eye = list(x = 1.5, y = 1.8, z = 0.4))
-                ))
+            dizzy <- isolate(input$dim3)
         }
-        fig <- fig %>%
-            config(
-                edits = list(
-                    annotationPosition = TRUE,
-                    annotationTail = FALSE
-                ),
-                toImageButtonOptions = list(format = "svg"),
-                displaylogo = FALSE,
-                plotGlPixelRatio = 7
-            )
+
+        fig <- plot_pca_biplot(
+            pca.res = pca.res,
+            dim.x = isolate(input$dim1),
+            dim.y = isolate(input$dim2),
+            dim.z = dizzy,
+            color.by = isolate(input$bip.color),
+            shape.by = isolate(input$bip.shape),
+            hover.info = "Label",
+            show.loadings = isolate(input$bip.loadings),
+            n.loadings = isolate(input$bip.n.loadings),
+            pt.size = isolate(input$pca.pt.size)
+        )
 
         robjects$plot.qc.pca <- fig
 
@@ -219,13 +100,17 @@
 
     # nocov start
     output$qc.histplot <- renderPlotly({
-        slmed <- robjects$norm.counts
-        tabsmat <- as.matrix(log2(slmed[, c(-1, -2)] + 1))
-        colnames(tabsmat) <- colnames(slmed)[c(-1, -2)]
+        req(robjects$norm.counts)
 
-        #TODO: Add input to control gridlines.
-        fig <- plot_hist(tabsmat, title = "Distribution of read counts", 
-            xlab = "log2(counts + 1)", ylab = "Frequency", show.grid = FALSE)
+        n.counts <- robjects$norm.counts
+        n.counts.log <- as.matrix(log2(n.counts[, c(-1, -2)] + 1))
+        colnames(n.counts.log) <- colnames(n.counts)[c(-1, -2)]
+
+        # TODO: Add input to control gridlines.
+        fig <- plot_hist(n.counts.log,
+            title = "Distribution of read counts",
+            xlab = "log2(counts + 1)", ylab = "Frequency", show.grid = FALSE
+        )
 
         robjects$plot.qc.hist <- fig
         fig
@@ -237,7 +122,7 @@
         input$corr.update
 
         n.counts <- robjects$norm.counts
-        n.counts.log <- as.matrix(log2(slmed[, c(-1, -2)] + 1))
+        n.counts.log <- as.matrix(log2(n.counts[, c(-1, -2)] + 1))
 
         if (!is.null(isolate(input$count.summary_rows_all)) & isolate(input$meta.filt)) {
             n.counts.log <- as.matrix(n.counts.log[, isolate(input$count.summary_rows_all)])
@@ -245,8 +130,10 @@
 
         if (ncol(n.counts.log) > 1) {
             cor.mat <- cor(n.counts.log)
-            plot_correlation_heatmap(cor.mat, min.color = isolate(input$corr.min.col), 
-                max.color = isolate(input$corr.max.col))
+            plot_correlation_heatmap(cor.mat,
+                min.color = isolate(input$corr.min.col),
+                max.color = isolate(input$corr.max.col)
+            )
         } else {
             grid.newpage()
             grid.text("Only one sample, no correlation possible.")
