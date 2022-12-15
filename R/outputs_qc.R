@@ -48,19 +48,31 @@
 
         pca.res <- robjects$pc
 
+        colorb <- NULL
+        shapeb <- NULL
+
+        if (isolate(input$bip.color) != "") {
+            colorb <- isolate(input$bip.color)
+        }
+
+        if (isolate(input$bip.shape) != "") {
+            shapeb <- isolate(input$bip.shape)
+        }
+
         if ((isolate(input$bip.twod) | length(pca.res$components) < 3)) {
             dizzy <- NULL
         } else {
             dizzy <- isolate(input$dim3)
         }
 
+
         fig <- plot_pca_biplot(
             pca.res = pca.res,
             dim.x = isolate(input$dim1),
             dim.y = isolate(input$dim2),
             dim.z = dizzy,
-            color.by = isolate(input$bip.color),
-            shape.by = isolate(input$bip.shape),
+            color.by = colorb,
+            shape.by = shapeb,
             hover.info = "Label",
             show.loadings = isolate(input$bip.loadings),
             n.loadings = isolate(input$bip.n.loadings),

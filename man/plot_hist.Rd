@@ -40,7 +40,7 @@ cts <- read.delim(system.file("extdata", "escneg.count_normalized.txt",
 cts.log <- as.matrix(log2(cts[, c(-1, -2)] + 1))
 colnames(cts.log) <- colnames(cts)[c(-1, -2)]
 
-plot_hist(cts,
+plot_hist(cts.log,
     title = "Distribution of read counts",
     xlab = "log2(counts + 1)", ylab = "Frequency"
 )

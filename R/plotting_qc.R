@@ -94,7 +94,7 @@ plot_bar <- function(count.summary, x = "Label",
 #' cts.log <- as.matrix(log2(cts[, c(-1, -2)] + 1))
 #' colnames(cts.log) <- colnames(cts)[c(-1, -2)]
 #'
-#' plot_hist(cts,
+#' plot_hist(cts.log,
 #'     title = "Distribution of read counts",
 #'     xlab = "log2(counts + 1)", ylab = "Frequency"
 #' )
@@ -285,7 +285,7 @@ plot_pca_biplot <- function(pca.res,
     hov.text <- NULL
 
     # Warn if color.by, shape.by, and hover.info are provided with no metadata
-    if (is.null(pca$metadata)) {
+    if (is.null(pca.res$metadata)) {
         if (!is.null(color.by) || !is.null(shape.by) || !is.null(hover.info)) {
             warning("No metadata was provided to the pca function, so color.by, shape.by, and hover.info will be ignored.")
         }
@@ -325,7 +325,7 @@ plot_pca_biplot <- function(pca.res,
 
     # Get marker aesthetics mappings.
     # Drop unused factor levels if possible.
-    if (color.by != "" && !is.null(color.by) && !is.null(pca.res$metadata)) {
+    if (!is.null(color.by) && !is.null(pca.res$metadata)) {
         pl.cols <- pca.res$metadata[, color.by, drop = TRUE]
         if (is.factor(pl.cols)) {
             pl.cols <- droplevels(pl.cols)
@@ -333,7 +333,7 @@ plot_pca_biplot <- function(pca.res,
         pl.col <- dittoColors()[seq_along(unique(pca.res$metadata[, color.by, drop = TRUE]))]
     }
 
-    if (shape.by != "" & !is.null(shape.by) & !is.null(pca.res$metadata)) {
+    if (!is.null(shape.by) & !is.null(pca.res$metadata)) {
         pl.shapes <- pca.res$metadata[, shape.by, drop = TRUE]
         if (is.factor(pl.shapes)) {
             pl.shapes <- droplevels(pl.shapes)
@@ -347,8 +347,6 @@ plot_pca_biplot <- function(pca.res,
         }
     }
 
-    # Check if 2D is wanted.
-    # if (isolate(input$bip.twod)) {
     fig <- plot_ly(pca.res$rotated,
         x = as.formula(paste0("~", dim.x)),
         y = as.formula(paste0("~", dim.y)),
