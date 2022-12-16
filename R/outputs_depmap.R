@@ -37,14 +37,17 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.dep.update
 
+        df <- get_depmap_plot_data(
+            gene = input$depmap.gene, data.type = "dependency",
+            depmap.meta = robjects$depmap.meta, depmap.pool = robjects$pool
+        )
+
         fig <- plot_depmap_dependency(
-            gene = input$depmap.gene,
+            df = df,
             crispr.color = isolate(input$dep.crispr.color),
             rnai.color = isolate(input$dep.rnai.color),
             depline = isolate(input$dep.depline),
-            plot.grid = isolate(input$dep.plot.grid),
-            depmap.meta = robjects$depmap.meta,
-            depmap.pool = robjects$pool
+            plot.grid = isolate(input$dep.plot.grid)
         )
 
         robjects$plot.depmap.essplot <- fig
@@ -57,10 +60,13 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.exp.update
 
+        df <- get_depmap_plot_data(
+            gene = input$depmap.gene, data.type = "ccle_tpm",
+            depmap.meta = robjects$depmap.meta, depmap.pool = robjects$pool
+        )
+
         fig <- plot_depmap_expression(
-            gene = input$depmap.gene,
-            depmap.meta = robjects$depmap.meta,
-            depmap.pool = robjects$pool,
+            df = df,
             color = isolate(input$exp.color),
             plot.grid = isolate(input$exp.plot.grid)
         )
@@ -75,10 +81,13 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.cn.update
 
+        df <- get_depmap_plot_data(
+            gene = input$depmap.gene, data.type = "cn",
+            depmap.meta = robjects$depmap.meta, depmap.pool = robjects$pool
+        )
+
         fig <- plot_depmap_cn(
-            gene = input$depmap.gene,
-            depmap.meta = robjects$depmap.meta,
-            depmap.pool = robjects$pool,
+            df = df,
             color = isolate(input$cn.color),
             plot.grid = isolate(input$cn.plot.grid)
         )
@@ -93,18 +102,41 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.lineage.update
 
+        plot.val <- isolate(input$lin.data)
+
+        switch(plot.val,
+            dependency = {
+                plot.val <- "dependency"
+            },
+            crispr = {
+                plot.val <- "dependency"
+            },
+            rnai = {
+                plot.val <- "dependency"
+            },
+            cn = {
+                plot.val <- "log_copy_number"
+            },
+            ccle_tpm = {
+                plot.val <- "rna_expression"
+            }
+        )
+
+        df <- get_depmap_plot_data(
+            gene = input$depmap.gene, data.type = isolate(input$lin.data),
+            depmap.meta = robjects$depmap.meta, depmap.pool = robjects$pool
+        )
+
         fig <- plot_depmap_lineages(
-            gene = input$depmap.gene,
-            data.type = isolate(input$lin.data),
+            df = df,
+            plot.val = plot.val,
             group.by = isolate(input$lin.group),
             label.size = isolate(input$lin.label.size),
             pt.color = isolate(input$lin.pt.color),
             pt.size = isolate(input$lin.pt.size),
             boxplot.fill = isolate(input$lin.box.fill),
             boxplot.line.color = isolate(input$lin.box.color),
-            depline = isolate(input$lin.depline),
-            depmap.meta = robjects$depmap.meta,
-            depmap.pool = robjects$pool
+            depline = isolate(input$lin.depline)
         )
 
         robjects$plot.depmap.lineages <- fig
@@ -117,9 +149,34 @@
         req(input$depmap.gene, robjects$depmap.meta, robjects$pool)
         input$dm.sublineage.update
 
+        plot.val <- isolate(input$lin.data)
+
+        switch(plot.val,
+            dependency = {
+                plot.val <- "dependency"
+            },
+            crispr = {
+                plot.val <- "dependency"
+            },
+            rnai = {
+                plot.val <- "dependency"
+            },
+            cn = {
+                plot.val <- "log_copy_number"
+            },
+            ccle_tpm = {
+                plot.val <- "rna_expression"
+            }
+        )
+
+        df <- get_depmap_plot_data(
+            gene = input$depmap.gene, data.type = isolate(input$lin.data),
+            depmap.meta = robjects$depmap.meta, depmap.pool = robjects$pool
+        )
+
         fig <- plot_depmap_lineages(
-            gene = input$depmap.gene,
-            data.type = isolate(input$lin.data),
+            df = df,
+            plot.val = plot.val,
             group.by = "lineage_subtype",
             lineage = isolate(input$sub.lineage),
             label.size = isolate(input$sub.label.size),
@@ -127,9 +184,7 @@
             pt.size = isolate(input$sub.pt.size),
             boxplot.fill = isolate(input$sub.box.fill),
             boxplot.line.color = isolate(input$sub.box.color),
-            depline = isolate(input$sub.depline),
-            depmap.meta = robjects$depmap.meta,
-            depmap.pool = robjects$pool
+            depline = isolate(input$sub.depline)
         )
 
         robjects$plot.depmap.sublineage <- fig

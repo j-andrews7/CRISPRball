@@ -216,11 +216,20 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
 
 
 #' Generate gene tagList via mygene API
-#' @param gene Character scalar for gene symbol.
+#' 
+#' Given a query gene symbol, this function will query the mygene API and parse the results
+#' into a tagList of relevant information for display in the UI.
+#' 
+#' @details
+#' Occasionally, the top hit returned by mygene will not be the gene symbol of interest. 
+#' Typically, this occurs when the gene symbol is out of date or has an associated antisense gene.
+#'
+#' @param gene Character scalar for gene symbol to use as query.
 #'
 #' @return TagList containing dependency summary information.
 #'
 #' @author Jared Andrews
+#' @seealso \code{\link[mygene]{query}}
 #' @rdname INTERNAL_make_gene_tag
 .make_gene_tag <- function(gene) {
     .error_if_no_mygene()
