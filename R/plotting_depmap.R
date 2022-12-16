@@ -14,6 +14,19 @@
 #' @seealso \code{\link{plot_depmap_lineages}}
 #'
 #' @author Jared Andrews
+#' @examples
+#' \dontrun{
+#' library(CRISPRball)
+#' build_depmap_db()
+#' pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
+#' depmap.meta <- pool::dbGetQuery(pool, "SELECT * FROM 'meta'")
+#' depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
+#'
+#' df <- get_depmap_plot_data(
+#'     gene = "CDK2", data.type = "crispr",
+#'     depmap.meta = depmap.meta, depmap.pool = pool
+#' )
+#' }
 get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
     # Get appropriate plot stuff based on datatype.
     switch(data.type,
@@ -98,7 +111,7 @@ get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
 #' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank geom_vline
 #' @importFrom plotly ggplotly layout config
 #'
-#' @seealso \code{\link{get_depmap_plot_data}} 
+#' @seealso \code{\link{get_depmap_plot_data}}
 #'
 #' @export
 #' @author Jared Andrews
@@ -167,7 +180,7 @@ plot_depmap_dependency <- function(df, crispr.color = "#3584B5",
 #' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank
 #' @importFrom plotly ggplotly layout config
 #'
-#' @seealso \code{\link{get_depmap_plot_data}}  
+#' @seealso \code{\link{get_depmap_plot_data}}
 #'
 #' @export
 #' @author Jared Andrews
@@ -216,7 +229,7 @@ plot_depmap_expression <- function(df, color = "#7B8CB2", plot.grid = FALSE) {
 #' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank
 #' @importFrom plotly ggplotly layout config
 #'
-#' @seealso \code{\link{get_depmap_plot_data}}  
+#' @seealso \code{\link{get_depmap_plot_data}}
 #'
 #' @export
 #' @author Jared Andrews
@@ -272,7 +285,7 @@ plot_depmap_cn <- function(df, color = "#CEA3CB", plot.grid = FALSE) {
 #' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank
 #' @importFrom plotly ggplotly layout config
 #'
-#' @seealso \code{\link{get_depmap_plot_data}}  
+#' @seealso \code{\link{get_depmap_plot_data}}
 #'
 #' @export
 #' @author Jared Andrews
@@ -371,4 +384,3 @@ plot_depmap_lineages <- function(df, plot.val, group.by,
         .empty_plot("Gene not found in DepMap.")
     }
 }
-

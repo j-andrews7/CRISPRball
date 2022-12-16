@@ -4,11 +4,13 @@
     }
 }
 
+
 .error_if_no_rsqlite <- function() {
     if (!requireNamespace("RSQLite", quietly = TRUE)) {
         stop("'RSQLite' installation required for building and using depmap database.")
     }
 }
+
 
 .error_if_no_pool <- function() {
     if (!requireNamespace("pool", quietly = TRUE)) {
@@ -16,19 +18,25 @@
     }
 }
 
+
 .error_if_no_mygene <- function() {
     if (!requireNamespace("mygene", quietly = TRUE)) {
         stop("'mygene' installation required to display gene information.")
     }
 }
 
+
 #' Build SQLite database of DepMap data
-#'
 #'
 #' @return Name of SQLite database containing DepMap data.
 #'
 #' @export
 #' @author Jared Andrews
+#'
+#' @seealso \code{\link[depmap]{depmap_rnai}}, \code{\link[depmap]{depmap_crispr}},
+#' \code{\link[depmap]{depmap_copyNumber}}, \code{\link[depmap]{depmap_TPM}},
+#' \code{\link[depmap]{depmap_metadata}}, \code{\link[depmap]{depmap_gene_summary}},
+#' \code{\link[pool]{dbPool}}, \code{\link[pool]{dbWriteTable}}
 #'
 #' @examples
 #' \dontrun{
@@ -77,6 +85,9 @@ build_depmap_db <- function() {
 
     gene.summary <- depmap::depmap_gene_summary()
     pool::dbWriteTable(pool, "gene.summary", as.data.frame(gene.summary), overwrite = TRUE, append = FALSE)
+
+    release <- depmap::depmap_release()
+    pool::dbWriteTable(pool, "release", as.data.frame(list("depmap_release" = depmap::depmap_release())), overwrite = TRUE, append = FALSE)
 
     pool::poolClose(pool)
 
@@ -139,6 +150,7 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
     outs <- list(crispr = crispr, rnai = rnai)
     return(outs)
 }
+
 
 #' Generate dependency summary info tagList
 #' @param dep.info Named list containing summary CRISPR and RNAi info.
@@ -216,12 +228,12 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
 
 
 #' Generate gene tagList via mygene API
-#' 
+#'
 #' Given a query gene symbol, this function will query the mygene API and parse the results
 #' into a tagList of relevant information for display in the UI.
-#' 
+#'
 #' @details
-#' Occasionally, the top hit returned by mygene will not be the gene symbol of interest. 
+#' Occasionally, the top hit returned by mygene will not be the gene symbol of interest.
 #' Typically, this occurs when the gene symbol is out of date or has an associated antisense gene.
 #'
 #' @param gene Character scalar for gene symbol to use as query.
