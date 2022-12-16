@@ -221,7 +221,8 @@
                                 ),
                                 placement = "top", trigger = "hover", options = list(container = "body")
                             ),
-                            jqui_resizable(plotOutput("qc.corr"))
+                            jqui_resizable(plotOutput("qc.corr")),
+                            div(downloadButton("dl_plot.qc.corr", "Download Correlation Matrix", class = "btn-dl"), style = "display:inline-block; float:right")
                         )
                     ),
                     column(
@@ -231,6 +232,7 @@
                                 c("This plot shows read mapping rates for each sample. 50-75% mapped is typical."),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
+                            div(downloadButton("dl_plot.qc.map", "Download Mapping Rates", class = "btn-dl"), style = "display:inline-block; float:right"),
                             jqui_resizable(plotOutput("qc.map"))
                         ),
                         span(

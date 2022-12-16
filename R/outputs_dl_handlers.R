@@ -2,6 +2,7 @@
 #'
 #' @param output The Shiny output object from the server function.
 #' @param robjects A reactive list of values generated in the server function.
+#' @param session The Shiny session object from the server function.
 #'
 #' @return A \linkS4class{NULL} is invisibly returned
 #' and handlers for plotly plot downloads are added to \code{output}.
@@ -11,9 +12,11 @@
 #' @importFrom shiny downloadHandler
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom shinyjqui jqui_resizable
+#' @importFrom grDevices pdf dev.off
+#' @importFrom ComplexHeatmap draw
 #' @rdname INTERNAL_create_dl_outputs
-.create_dl_outputs <- function(output, robjects) {
-    plotters <- list(
+.create_dl_outputs <- function(output, robjects, session) {
+    plotters.int <- list(
         "plot.qc.pca", "plot.qc.missed", "plot.qc.gini", "plot.qc.hist",
         "plot.gene1.vol", "plot.gene1.rank", "plot.gene1.lawn",
         "plot.gene2.vol", "plot.gene2.rank", "plot.gene2.lawn",
@@ -24,7 +27,7 @@
     )
 
     # nocov start
-    lapply(plotters, function(x) {
+    lapply(plotters.int, function(x) {
         output[[paste0("dl_", x)]] <- downloadHandler(
             filename = function() {
                 paste(x, "-", Sys.Date(), ".html", sep = "")
@@ -35,6 +38,28 @@
                     file,
                     selfcontained = TRUE
                 )
+            }
+        )
+    })
+    # nocov end
+
+    # Static plots
+    plotters.stat <- list("plot.qc.corr", "plot.qc.map")
+
+    # nocov start
+    lapply(plotters.stat, function(x) {
+        output[[paste0("dl_", x)]] <- downloadHandler(
+            filename = function() {
+                paste(x, "-", Sys.Date(), ".pdf", sep = "")
+            },
+            content = function(file) {
+                pdf(file, width = 7, height = 7)
+                if ("Heatmap" %in% class(robjects[[x]])) {
+                    draw(robjects[[x]])
+                } else {
+                    print(robjects[[x]])
+                }
+                dev.off()
             }
         )
     })

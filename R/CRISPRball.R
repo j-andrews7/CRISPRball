@@ -136,7 +136,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
             positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
             genesets = genesets, pc = NULL, h.id = h.id,
             plot.qc.pca = NULL, plot.qc.missed = NULL, plot.qc.gini = NULL,
-            plot.qc.hist = NULL,
+            plot.qc.hist = NULL, plot.qc.corr = NULL, plot.qc.map = NULL,
             plot.gene1.vol = NULL, plot.gene1.rank = NULL, plot.gene1.lawn = NULL,
             plot.gene2.vol = NULL, plot.gene2.rank = NULL, plot.gene2.lawn = NULL, 
             plot.sgrna1.counts = NULL, plot.sgrna1.rank = NULL,

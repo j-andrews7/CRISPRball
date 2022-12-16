@@ -106,7 +106,9 @@
 
     # nocov start
     output$qc.map <- renderPlot({
-        MapRatesView(robjects$count.summary) + scale_x_discrete(guide = guide_axis(angle = 45))
+        fig <- MapRatesView(robjects$count.summary) + scale_x_discrete(guide = guide_axis(angle = 45))
+        robjects$plot.qc.map <- fig
+        fig
     })
     # nocov end
 
@@ -142,7 +144,7 @@
 
         if (ncol(n.counts.log) > 1) {
             cor.mat <- cor(n.counts.log)
-            plot_correlation_heatmap(cor.mat,
+            fig <- plot_correlation_heatmap(cor.mat,
                 min.color = isolate(input$corr.min.col),
                 max.color = isolate(input$corr.max.col)
             )
@@ -150,6 +152,10 @@
             grid.newpage()
             grid.text("Only one sample, no correlation possible.")
         }
+
+        robjects$plot.qc.corr <- fig
+
+        fig
     })
     # nocov end
 
