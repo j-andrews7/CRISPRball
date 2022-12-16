@@ -36,6 +36,7 @@
     )
 }
 
+
 # Generic volcano plot function.
 # TODO: Add defaults, document, and export.
 .make_volcano <- function(res, xlim, ylim, fc.thresh, fc.lines, hover.info = NULL,
@@ -537,6 +538,7 @@
 
     fig
 }
+
 
 # Generic lawn plot function.
 # TODO: Add defaults, document, and export.
@@ -1045,6 +1047,7 @@ plot_depmap_cn <- function(gene, depmap.meta, depmap.pool, color, plot.grid) {
     }
 }
 
+
 #' Plot selected information across lineages from DepMap.
 #'
 #' @inheritParams plot_depmap_dependency
@@ -1195,9 +1198,9 @@ plot_depmap_lineages <- function(gene, data.type, group.by, depmap.meta, depmap.
 
 #' Plot text on empty plotly plot
 #'
-#' @param title Character scalar to show.
+#' @param title Character scalar to show in plot area.
 #' @author Jared Andrews
-#' @rdname INTERNAL_plot_gene_not_found
+#' @rdname INTERNAL_empty_plot
 #' @importFrom plotly plotly_empty config layout
 .empty_plot <- function(title = NULL) {
     p <- plotly_empty(type = "scatter", mode = "markers") %>%

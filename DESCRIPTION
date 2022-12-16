@@ -40,7 +40,9 @@ Imports:
     colourpicker,
     shinyjs,
     MAGeCKFlute,
-    PCAtools
+    circlize,
+    PCAtools,
+    htmlwidgets
 Suggests:
     BiocStyle,
     msigdbr,

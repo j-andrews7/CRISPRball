@@ -2,7 +2,6 @@
 #'
 #' Define a series of observers to adjust UI usability/visibility based on data availability.
 #'
-#' @param input The Shiny input object from the server function.
 #' @param robjects A reactive list of values generated in the server function.
 #'
 #' @return
@@ -60,9 +59,15 @@
         if (length(robjects$gene.data) == 1) {
             shinyjs::disable("gene.sel2")
             shinyjs::hide("highlight.common")
+            shinyjs::hide("dl_plot.gene2.vol")
+            shinyjs::hide("dl_plot.gene2.rank")
+            shinyjs::hide("dl_plot.gene2.lawn")
         } else {
             shinyjs::enable("gene.sel2")
             shinyjs::show("highlight.common")
+            shinyjs::show("dl_plot.gene2.vol")
+            shinyjs::show("dl_plot.gene2.rank")
+            shinyjs::show("dl_plot.gene2.lawn")
         }
     })
     # nocov end
@@ -71,8 +76,12 @@
     observeEvent(robjects$sgrna.data, {
         if (length(robjects$sgrna.data) == 1) {
             shinyjs::disable("sgrna.sel2")
+            shinyjs::hide("dl_plot.sgrna2.counts")
+            shinyjs::hide("dl_plot.sgrna2.rank")
         } else {
             shinyjs::enable("sgrna.sel2")
+            shinyjs::show("dl_plot.sgrna2.counts")
+            shinyjs::show("dl_plot.sgrna2.rank")
         }
     })
     # nocov end
