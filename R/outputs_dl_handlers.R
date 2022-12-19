@@ -2,7 +2,6 @@
 #'
 #' @param output The Shiny output object from the server function.
 #' @param robjects A reactive list of values generated in the server function.
-#' @param session The Shiny session object from the server function.
 #'
 #' @return A \linkS4class{NULL} is invisibly returned
 #' and handlers for plotly plot downloads are added to \code{output}.
@@ -15,7 +14,7 @@
 #' @importFrom grDevices pdf dev.off
 #' @importFrom ComplexHeatmap draw
 #' @rdname INTERNAL_create_dl_outputs
-.create_dl_outputs <- function(output, robjects, session) {
+.create_dl_outputs <- function(output, robjects) {
     plotters.int <- list(
         "plot.qc.pca", "plot.qc.missed", "plot.qc.gini", "plot.qc.hist",
         "plot.gene1.vol", "plot.gene1.rank", "plot.gene1.lawn",

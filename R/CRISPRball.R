@@ -77,7 +77,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         default.tab <- "QC"
     }
 
-    # Load cell line metadata and gene summaries if depmap db provided.
+    # Load cell line metadata, gene summaries, and release if depmap db provided.
     if (!is.null(depmap.db)) {
         .error_if_no_pool()
         .error_if_no_rsqlite()
@@ -85,6 +85,8 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         pool <- pool::dbPool(RSQLite::SQLite(), dbname = depmap.db)
         depmap.meta <- pool::dbGetQuery(pool, "SELECT * FROM 'meta'")
         depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
+        depmap.release <- pool::dbGetQuery(pool, "SELECT * FROM 'release'")
+        depmap.release <- depmap.release$depmap_release
 
         # Close db on app close.
         onStop(function() {
@@ -93,6 +95,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     } else {
         depmap.meta <- NULL
         depmap.gene <- NULL
+        depmap.release <- NULL
         pool <- NULL
     }
 
@@ -129,7 +132,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         robjects <- reactiveValues(
             gene.data = gene.data, sgrna.data = sgrna.data,
             count.summary = count.summary, norm.counts = norm.counts,
-            depmap.meta = depmap.meta, depmap.gene = depmap.gene, pool = pool,
+            depmap.meta = depmap.meta, depmap.gene = depmap.gene, depmap.release = depmap.release, pool = pool,
             clicked.volc1 = NULL, clicked.rank1 = NULL, clicked.lawn1 = NULL,
             clicked.volc2 = NULL, clicked.rank2 = NULL, clicked.lawn2 = NULL,
             comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
@@ -138,7 +141,7 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
             plot.qc.pca = NULL, plot.qc.missed = NULL, plot.qc.gini = NULL,
             plot.qc.hist = NULL, plot.qc.corr = NULL, plot.qc.map = NULL,
             plot.gene1.vol = NULL, plot.gene1.rank = NULL, plot.gene1.lawn = NULL,
-            plot.gene2.vol = NULL, plot.gene2.rank = NULL, plot.gene2.lawn = NULL, 
+            plot.gene2.vol = NULL, plot.gene2.rank = NULL, plot.gene2.lawn = NULL,
             plot.sgrna1.counts = NULL, plot.sgrna1.rank = NULL,
             plot.depmap.essplot = NULL, plot.depmap.expplot = NULL, plot.depmap.cnplot = NULL,
             plot.depmap.lineages = NULL, plot.depmap.sublineage = NULL
