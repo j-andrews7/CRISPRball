@@ -28,7 +28,7 @@ A data frame with 1782 rows and 9 columns:
 \url{https://bioconductor.org/packages/release/data/experiment/html/depmap.html}
 }
 \usage{
-depmap_22q1_crispr_rnai
+data(depmap_22q1_crispr_rnai)
 }
 \description{
 The DepMap CRISPR & RNAi screen data for CDK2.

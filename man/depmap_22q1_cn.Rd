@@ -28,7 +28,7 @@ A data frame with 1754 rows and 9 columns:
 \url{https://bioconductor.org/packages/release/data/experiment/html/depmap.html}
 }
 \usage{
-depmap_22q1_cn
+data(depmap_22q1_cn)
 }
 \description{
 The DepMap copy number data for CDK2.

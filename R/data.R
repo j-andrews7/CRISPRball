@@ -17,6 +17,8 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @usage
+#' data(depmap_22q1_rnai)
 "depmap_22q1_rnai"
 
 
@@ -39,6 +41,8 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @usage 
+#' data(depmap_22q1_crispr)
 "depmap_22q1_crispr"
 
 
@@ -62,6 +66,8 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @usage 
+#' data(depmap_22q1_crispr_rnai)
 "depmap_22q1_crispr_rnai"
 
 
@@ -85,6 +91,8 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @usage
+#' data(depmap_22q1_TPM)
 "depmap_22q1_TPM"
 
 
@@ -108,4 +116,6 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @usage 
+#' data(depmap_22q1_cn)
 "depmap_22q1_cn"

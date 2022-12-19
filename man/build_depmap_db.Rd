@@ -21,7 +21,7 @@ build_depmap_db()
 \code{\link[depmap]{depmap_rnai}}, \code{\link[depmap]{depmap_crispr}},
 \code{\link[depmap]{depmap_copyNumber}}, \code{\link[depmap]{depmap_TPM}},
 \code{\link[depmap]{depmap_metadata}}, \code{\link[depmap]{depmap_gene_summary}},
-\code{\link[pool]{dbPool}}, \code{\link[pool]{dbWriteTable}}
+\code{\link[pool]{dbPool}}, \code{\link[DBI]{dbWriteTable}}
 }
 \author{
 Jared Andrews
