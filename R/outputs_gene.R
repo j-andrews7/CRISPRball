@@ -134,11 +134,13 @@
             highlight.feats.opac = isolate(input$hl.genes.opa),
             highlight.feats.linecolor = isolate(input$hl.genes.lcol),
             highlight.feats.linewidth = isolate(input$hl.genes.lw),
+            highlight.feats.label = isolate(input$hl.genes.label),
             highlight.featsets.color = isolate(input$hl.genesets.col),
             highlight.featsets.size = isolate(input$hl.genesets.size),
             highlight.featsets.opac = isolate(input$hl.genesets.opa),
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-            highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
+            highlight.featsets.linewidth = isolate(input$hl.genesets.lw),
+            highlight.featsets.label = isolate(input$hl.genesets.label)
         )
 
         robjects$plot.gene1.vol <- fig
@@ -196,7 +198,7 @@
         }
 
         fig <- .make_rank(
-            df = df,
+            res = df,
             ylim = list(isolate(input$rank.y.min), isolate(input$rank.y.max)),
             y.thresh = isolate(input$gene.lfc.th),
             y.lines = isolate(input$rank.fcline),
@@ -230,11 +232,13 @@
             highlight.feats.opac = isolate(input$hl.genes.opa),
             highlight.feats.linecolor = isolate(input$hl.genes.lcol),
             highlight.feats.linewidth = isolate(input$hl.genes.lw),
+            highlight.feats.label = isolate(input$hl.genes.label),
             highlight.featsets.color = isolate(input$hl.genesets.col),
             highlight.featsets.size = isolate(input$hl.genesets.size),
             highlight.featsets.opac = isolate(input$hl.genesets.opa),
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-            highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
+            highlight.featsets.linewidth = isolate(input$hl.genesets.lw),
+            highlight.featsets.label = isolate(input$hl.genesets.label)
         )
 
         robjects$plot.gene1.rank <- fig
@@ -325,11 +329,13 @@
             highlight.feats.opac = isolate(input$hl.genes.opa),
             highlight.feats.linecolor = isolate(input$hl.genes.lcol),
             highlight.feats.linewidth = isolate(input$hl.genes.lw),
+            highlight.feats.label = isolate(input$hl.genes.label),
             highlight.featsets.color = isolate(input$hl.genesets.col),
             highlight.featsets.size = isolate(input$hl.genesets.size),
             highlight.featsets.opac = isolate(input$hl.genesets.opa),
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-            highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
+            highlight.featsets.linewidth = isolate(input$hl.genesets.lw),
+            highlight.featsets.label = isolate(input$hl.genesets.label)
         )
 
         robjects$plot.gene1.lawn <- fig
@@ -455,11 +461,13 @@
             highlight.feats.opac = isolate(input$hl.genes.opa),
             highlight.feats.linecolor = isolate(input$hl.genes.lcol),
             highlight.feats.linewidth = isolate(input$hl.genes.lw),
+            highlight.feats.label = isolate(input$hl.genes.label),
             highlight.featsets.color = isolate(input$hl.genesets.col),
             highlight.featsets.size = isolate(input$hl.genesets.size),
             highlight.featsets.opac = isolate(input$hl.genesets.opa),
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-            highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
+            highlight.featsets.linewidth = isolate(input$hl.genesets.lw),
+            highlight.featsets.label = isolate(input$hl.genesets.label)
         )
 
         robjects$plot.gene2.vol <- fig
@@ -517,7 +525,7 @@
         }
 
         fig <- .make_rank(
-            df = df,
+            res = df,
             ylim = list(isolate(input$rank.y.min), isolate(input$rank.y.max)),
             y.thresh = isolate(input$gene.lfc.th),
             y.lines = isolate(input$rank.fcline),
@@ -551,11 +559,13 @@
             highlight.feats.opac = isolate(input$hl.genes.opa),
             highlight.feats.linecolor = isolate(input$hl.genes.lcol),
             highlight.feats.linewidth = isolate(input$hl.genes.lw),
+            highlight.feats.label = isolate(input$hl.genes.label),
             highlight.featsets.color = isolate(input$hl.genesets.col),
             highlight.featsets.size = isolate(input$hl.genesets.size),
             highlight.featsets.opac = isolate(input$hl.genesets.opa),
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-            highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
+            highlight.featsets.linewidth = isolate(input$hl.genesets.lw),
+            highlight.featsets.label = isolate(input$hl.genesets.label)
         )
 
         robjects$plot.gene2.rank <- fig
@@ -647,11 +657,13 @@
             highlight.feats.opac = isolate(input$hl.genes.opa),
             highlight.feats.linecolor = isolate(input$hl.genes.lcol),
             highlight.feats.linewidth = isolate(input$hl.genes.lw),
+            highlight.feats.label = isolate(input$hl.genes.label),
             highlight.featsets.color = isolate(input$hl.genesets.col),
             highlight.featsets.size = isolate(input$hl.genesets.size),
             highlight.featsets.opac = isolate(input$hl.genesets.opa),
             highlight.featsets.linecolor = isolate(input$hl.genesets.lcol),
-            highlight.featsets.linewidth = isolate(input$hl.genesets.lw)
+            highlight.featsets.linewidth = isolate(input$hl.genesets.lw),
+            highlight.featsets.label = isolate(input$hl.genesets.label)
         )
 
         robjects$plot.gene2.lawn <- fig

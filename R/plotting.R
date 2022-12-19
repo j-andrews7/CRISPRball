@@ -39,15 +39,16 @@
 
 # Generic volcano plot function.
 # TODO: Add defaults, document, and export.
-.make_volcano <- function(res, xlim, ylim, fc.thresh, fc.lines, hover.info = NULL,
+.make_volcano <- function(res, xlim, ylim, fc.thresh = 0.5, fc.lines, hover.info = NULL,
                           sig.line, h.id, feat.term, sig.term, lfc.term, down.color, up.color,
                           insig.color, sig.thresh = 0.05, fs = NULL, sig.size, insig.size,
                           sig.opacity, insig.opacity, label.size, webgl, webgl.ratio, show.counts,
                           show.hl.counts, counts.size, highlight.featsets, highlight.feats, featsets,
                           highlight.feats.color, highlight.feats.size, highlight.feats.opac,
-                          highlight.feats.linecolor, highlight.feats.linewidth,
+                          highlight.feats.linecolor, highlight.feats.linewidth, highlight.feats.label = TRUE,
                           highlight.featsets.color, highlight.featsets.size, highlight.featsets.opac,
-                          highlight.featsets.linecolor, highlight.featsets.linewidth, h.id.suffix = "_volc") {
+                          highlight.featsets.linecolor, highlight.featsets.linewidth,
+                          highlight.featsets.label = FALSE, h.id.suffix = "_volc") {
     # Styling.
     res$col <- rep(insig.color, nrow(res))
     res$cex <- rep(insig.size, nrow(res))
@@ -104,7 +105,7 @@
         res$feat <- res[[feat.term]]
     }
 
-    # Gene/geneset highlighting.
+    # Gene/geneset highlighting & labeling.
     n.fs.hl <- 0
     n.hl <- 0
 
@@ -118,6 +119,21 @@
         res$lcol[res$feat %in% highlight.fs] <- highlight.featsets.linecolor
         res$lw[res$feat %in% highlight.fs] <- highlight.featsets.linewidth
         res$order[res$feat %in% highlight.fs] <- 2
+
+        if (highlight.featsets.label) {
+            add.fs <- data.frame(
+                x = res$x[res$feat %in% highlight.fs],
+                y = res$y[res$feat %in% highlight.fs],
+                customdata = res$feat[res$feat %in% highlight.fs]
+            )
+
+            if (!is.null(fs)) {
+                fs <- fs[, c("x", "y", "customdata")]
+                fs <- rbind(fs, add.fs)
+            } else {
+                fs <- add.fs
+            }
+        }
     }
 
     # Want these to have precedence over the feature sets in case entries are in both.
@@ -131,6 +147,21 @@
         res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
         res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
         res$order[res$feat %in% highlight] <- 3
+
+        if (highlight.feats.label) {
+            add.fs <- data.frame(
+                x = res$x[res$feat %in% highlight],
+                y = res$y[res$feat %in% highlight],
+                customdata = res$feat[res$feat %in% highlight]
+            )
+
+            if (!is.null(fs)) {
+                fs <- fs[, c("x", "y", "customdata")]
+                fs <- rbind(fs, add.fs)
+            } else {
+                fs <- add.fs
+            }
+        }
     }
 
     res$hover.string <- paste0(
@@ -290,26 +321,26 @@
 
 # Generic rank plot function.
 # TODO: Add defaults, document, and export.
-.make_rank <- function(df, ylim, y.thresh, y.lines, hover.info = NULL,
+.make_rank <- function(res, ylim, y.thresh, y.lines, hover.info = NULL,
                        h.id, feat.term, sig.term, y.term, x.term, down.color, up.color,
                        insig.color, sig.thresh = 0.05, fs = NULL, sig.size, insig.size,
                        sig.opacity, insig.opacity, label.size, webgl, webgl.ratio, show.counts,
                        show.hl.counts, counts.size, highlight.featsets, highlight.feats, featsets,
                        highlight.feats.color, highlight.feats.size, highlight.feats.opac,
-                       highlight.feats.linecolor, highlight.feats.linewidth,
+                       highlight.feats.linecolor, highlight.feats.linewidth, highlight.feats.label = TRUE,
                        highlight.featsets.color, highlight.featsets.size, highlight.featsets.opac,
-                       highlight.featsets.linecolor, highlight.featsets.linewidth, h.id.suffix = "_rank") {
+                       highlight.featsets.linecolor, highlight.featsets.linewidth, highlight.featsets.label = FALSE, h.id.suffix = "_rank") {
     # Styling.
-    df$col <- rep(insig.color, nrow(df))
-    df$cex <- rep(insig.size, nrow(df))
-    df$order <- rep(0, nrow(df))
-    df$lcol <- df$col
-    df$lw <- 0
-    df$opacity <- insig.opacity
+    res$col <- rep(insig.color, nrow(res))
+    res$cex <- rep(insig.size, nrow(res))
+    res$order <- rep(0, nrow(res))
+    res$lcol <- res$col
+    res$lw <- 0
+    res$opacity <- insig.opacity
 
     # Remove features with NA significance term (due to low expression, etc).
     if (!is.null(sig.term)) {
-        df <- df[!is.na(df[[sig.term]]), ]
+        res <- res[!is.na(res[[sig.term]]), ]
     }
 
     # Get all feature IDs to be highlighted.
@@ -324,41 +355,41 @@
 
     # Significance filter, if provided.
     if (!is.null(sig.term) & !is.null(sig.thresh)) {
-        up.feats <- df[[sig.term]] < sig.thresh & df[[y.term]] > y.thresh
+        up.feats <- res[[sig.term]] < sig.thresh & res[[y.term]] > y.thresh
     } else {
-        up.feats <- df[[y.term]] > y.thresh
+        up.feats <- res[[y.term]] > y.thresh
     }
 
-    df$col[up.feats] <- up.color
-    df$cex[up.feats] <- sig.size
-    df$order[up.feats] <- 1
-    df$opacity[up.feats] <- sig.opacity
+    res$col[up.feats] <- up.color
+    res$cex[up.feats] <- sig.size
+    res$order[up.feats] <- 1
+    res$opacity[up.feats] <- sig.opacity
 
     if (!is.null(sig.term) & !is.null(sig.thresh)) {
-        dn.feats <- df[[sig.term]] < sig.thresh & df[[y.term]] < -y.thresh
+        dn.feats <- res[[sig.term]] < sig.thresh & res[[y.term]] < -y.thresh
     } else {
-        dn.feats <- df[[y.term]] < -y.thresh
+        dn.feats <- res[[y.term]] < -y.thresh
     }
 
-    df$col[dn.feats] <- down.color
-    df$cex[dn.feats] <- sig.size
-    df$order[dn.feats] <- 1
-    df$opacity[dn.feats] <- sig.opacity
+    res$col[dn.feats] <- down.color
+    res$cex[dn.feats] <- sig.size
+    res$order[dn.feats] <- 1
+    res$opacity[dn.feats] <- sig.opacity
 
-    df$x <- df[[x.term]]
-    df$y <- df[[y.term]]
+    res$x <- res[[x.term]]
+    res$y <- res[[y.term]]
 
-    df$col[df$y < y.thresh & df$y > -y.thresh] <- insig.color
+    res$col[res$y < y.thresh & res$y > -y.thresh] <- insig.color
 
-    df$sh <- ifelse(df$y > ylim[[2]], "triangle-up-open", ifelse(df$y < ylim[[1]], "triangle-down-open", 0))
+    res$sh <- ifelse(res$y > ylim[[2]], "triangle-up-open", ifelse(res$y < ylim[[1]], "triangle-down-open", 0))
 
-    df$lw <- ifelse(df$sh != 0, 1, 0)
+    res$lw <- ifelse(res$sh != 0, 1, 0)
 
     # Get feature identifier for hover/labeling.
     if (feat.term == "rows") {
-        df$feat <- rownames(df)
+        res$feat <- rownames(res)
     } else {
-        df$feat <- df[[feat.term]]
+        res$feat <- res[[feat.term]]
     }
 
     # Gene/geneset highlighting.
@@ -366,50 +397,80 @@
     n.hl <- 0
 
     if (!is.null(highlight.fs)) {
-        highlight.fs <- highlight.fs[highlight.fs %in% df$feat]
-        n.fs.hl <- length(df$col[df$feat %in% highlight.fs])
+        highlight.fs <- highlight.fs[highlight.fs %in% res$feat]
+        n.fs.hl <- length(res$col[res$feat %in% highlight.fs])
 
-        df$col[df$feat %in% highlight.fs] <- highlight.featsets.color
-        df$cex[df$feat %in% highlight.fs] <- highlight.featsets.size
-        df$opacity[df$feat %in% highlight.fs] <- highlight.featsets.opac
-        df$lcol[df$feat %in% highlight.fs] <- highlight.featsets.linecolor
-        df$lw[df$feat %in% highlight.fs] <- highlight.featsets.linewidth
-        df$order[df$feat %in% highlight.fs] <- 2
+        res$col[res$feat %in% highlight.fs] <- highlight.featsets.color
+        res$cex[res$feat %in% highlight.fs] <- highlight.featsets.size
+        res$opacity[res$feat %in% highlight.fs] <- highlight.featsets.opac
+        res$lcol[res$feat %in% highlight.fs] <- highlight.featsets.linecolor
+        res$lw[res$feat %in% highlight.fs] <- highlight.featsets.linewidth
+        res$order[res$feat %in% highlight.fs] <- 2
+
+        if (highlight.featsets.label) {
+            add.fs <- data.frame(
+                x = res$x[res$feat %in% highlight.fs],
+                y = res$y[res$feat %in% highlight.fs],
+                customdata = res$feat[res$feat %in% highlight.fs]
+            )
+
+            if (!is.null(fs)) {
+                fs <- fs[, c("x", "y", "customdata")]
+                fs <- rbind(fs, add.fs)
+            } else {
+                fs <- add.fs
+            }
+        }
     }
 
     # Want these to have precedence over the feature sets in case entries are in both.
     if (!is.null(highlight)) {
-        highlight <- highlight[highlight %in% df$feat]
-        n.hl <- length(df$col[df$feat %in% highlight])
+        highlight <- highlight[highlight %in% res$feat]
+        n.hl <- length(res$col[res$feat %in% highlight])
 
-        df$col[df$feat %in% highlight] <- highlight.feats.color
-        df$cex[df$feat %in% highlight] <- highlight.feats.size
-        df$opacity[df$feat %in% highlight] <- highlight.feats.opac
-        df$lcol[df$feat %in% highlight] <- highlight.feats.linecolor
-        df$lw[df$feat %in% highlight] <- highlight.feats.linewidth
-        df$order[df$feat %in% highlight] <- 3
+        res$col[res$feat %in% highlight] <- highlight.feats.color
+        res$cex[res$feat %in% highlight] <- highlight.feats.size
+        res$opacity[res$feat %in% highlight] <- highlight.feats.opac
+        res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
+        res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
+        res$order[res$feat %in% highlight] <- 3
+
+        if (highlight.feats.label) {
+            add.fs <- data.frame(
+                x = res$x[res$feat %in% highlight],
+                y = res$y[res$feat %in% highlight],
+                customdata = res$feat[res$feat %in% highlight]
+            )
+
+            if (!is.null(fs)) {
+                fs <- fs[, c("x", "y", "customdata")]
+                fs <- rbind(fs, add.fs)
+            } else {
+                fs <- add.fs
+            }
+        }
     }
 
-    df$hover.string <- paste(
-        "</br><b>", feat.term, ":</b> ", df$feat,
-        "</br><b>", x.term, ":</b> ", df[[x.term]],
-        "</br><b>", y.term, ":</b> ", format(round(df[[y.term]], 4), nsmall = 4),
-        "</br><b>", sig.term, ":</b> ", format(round(df[[sig.term]], 6), nsmall = 6)
+    res$hover.string <- paste(
+        "</br><b>", feat.term, ":</b> ", res$feat,
+        "</br><b>", x.term, ":</b> ", res[[x.term]],
+        "</br><b>", y.term, ":</b> ", format(round(res[[y.term]], 4), nsmall = 4),
+        "</br><b>", sig.term, ":</b> ", format(round(res[[sig.term]], 6), nsmall = 6)
     )
 
     if (!is.null(hover.info)) {
         for (n in hover.info) {
-            df$hover.string <- paste0(df$hover.string, "</br><b>", n, ":</b> ", df[[n]])
+            res$hover.string <- paste0(res$hover.string, "</br><b>", n, ":</b> ", res[[n]])
         }
     }
 
-    df <- as.data.frame(df)
-    df <- df[order(df$order), ]
+    res <- as.data.frame(res)
+    res <- res[order(res$order), ]
 
     # Get feature numbers.
     n.up.feats <- length(up.feats[up.feats == TRUE])
     n.dn.feats <- length(dn.feats[dn.feats == TRUE])
-    n.feats <- nrow(df)
+    n.feats <- nrow(res)
 
     # Add plot border.
     ay <- list(
@@ -432,7 +493,7 @@
         linecolor = toRGB("black"),
         linewidth = 0.5,
         title = x.term,
-        range = list(-(0.03 * nrow(df)), nrow(df) + (0.03 * nrow(df))),
+        range = list(-(0.03 * nrow(res)), nrow(res) + (0.03 * nrow(res))),
         showgrid = FALSE,
         layer = "below traces",
         ticks = "outside",
@@ -450,7 +511,7 @@
     }
 
     # Figure generation.
-    fig <- plot_ly(df,
+    fig <- plot_ly(res,
         x = ~x,
         y = ~y,
         customdata = ~feat,
@@ -542,15 +603,15 @@
 
 # Generic lawn plot function.
 # TODO: Add defaults, document, and export.
-.make_lawn <- function(res, ylim, fc.thresh, hover.info = NULL,
+.make_lawn <- function(res, ylim, fc.thresh = 0.5, hover.info = NULL,
                        sig.line, h.id, feat.term, x.term, sig.term, lfc.term, down.color, up.color,
                        insig.color, sig.thresh = 0.05, fs = NULL, sig.size, insig.size,
                        sig.opacity, insig.opacity, label.size, webgl, webgl.ratio, show.counts,
                        show.hl.counts, counts.size, highlight.featsets, highlight.feats, featsets,
                        highlight.feats.color, highlight.feats.size, highlight.feats.opac,
-                       highlight.feats.linecolor, highlight.feats.linewidth,
+                       highlight.feats.linecolor, highlight.feats.linewidth, highlight.feats.label = TRUE,
                        highlight.featsets.color, highlight.featsets.size, highlight.featsets.opac,
-                       highlight.featsets.linecolor, highlight.featsets.linewidth, h.id.suffix = "_lawn") {
+                       highlight.featsets.linecolor, highlight.featsets.linewidth, highlight.featsets.label = FALSE, h.id.suffix = "_lawn") {
     # Styling.
     res$col <- rep(insig.color, nrow(res))
     res$cex <- rep(insig.size, nrow(res))
@@ -616,6 +677,21 @@
         res$lcol[res$feat %in% highlight.fs] <- highlight.featsets.linecolor
         res$lw[res$feat %in% highlight.fs] <- highlight.featsets.linewidth
         res$order[res$feat %in% highlight.fs] <- 2
+
+        if (highlight.featsets.label) {
+            add.fs <- data.frame(
+                x = res$x[res$feat %in% highlight.fs],
+                y = res$y[res$feat %in% highlight.fs],
+                customdata = res$feat[res$feat %in% highlight.fs]
+            )
+
+            if (!is.null(fs)) {
+                fs <- fs[, c("x", "y", "customdata")]
+                fs <- rbind(fs, add.fs)
+            } else {
+                fs <- add.fs
+            }
+        }
     }
 
     # Want these to have precedence over the feature sets in case entries are in both.
@@ -629,6 +705,21 @@
         res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
         res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
         res$order[res$feat %in% highlight] <- 3
+
+        if (highlight.feats.label) {
+            add.fs <- data.frame(
+                x = res$x[res$feat %in% highlight],
+                y = res$y[res$feat %in% highlight],
+                customdata = res$feat[res$feat %in% highlight]
+            )
+
+            if (!is.null(fs)) {
+                fs <- fs[, c("x", "y", "customdata")]
+                fs <- rbind(fs, add.fs)
+            } else {
+                fs <- add.fs
+            }
+        }
     }
 
     res$hover.string <- paste0(
