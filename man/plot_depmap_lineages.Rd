@@ -45,6 +45,11 @@ plotly object
 \description{
 Plot selected information across lineages from DepMap.
 }
+\examples{
+library(CRISPRball)
+data("depmap_22q1_rnai")
+plot_depmap_lineages(df = depmap_22q1_rnai, plot.val = "dependency", group.by = "lineage")
+}
 \seealso{
 \code{\link{get_depmap_plot_data}}
 }

@@ -20,6 +20,11 @@ plotly object
 \description{
 Plot gene expression information from DepMap, mostly from CCLE
 }
+\examples{
+library(CRISPRball)
+data(depmap_22q1_TPM)
+plot_depmap_expression(depmap_22q1_TPM)
+}
 \seealso{
 \code{\link{get_depmap_plot_data}}
 }

@@ -20,6 +20,11 @@ plotly object
 \description{
 Plot gene copy number information from DepMap
 }
+\examples{
+library(CRISPRball)
+data(depmap_22q1_cn)
+plot_depmap_cn(depmap_22q1_cn)
+}
 \seealso{
 \code{\link{get_depmap_plot_data}}
 }

@@ -51,4 +51,6 @@ Suggests:
     RSQLite,
     mygene
 Depends:
+    R (>= 2.10),
     shinyBS
+LazyData: false

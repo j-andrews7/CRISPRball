@@ -115,6 +115,10 @@ get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
 #'
 #' @export
 #' @author Jared Andrews
+#' @examples
+#' library(CRISPRball)
+#' data(depmap_22q1_crispr_rnai)
+#' plot_depmap_dependency(depmap_22q1_crispr_rnai)
 plot_depmap_dependency <- function(df, crispr.color = "#3584B5",
                                    rnai.color = "#52288E", depline = TRUE, plot.grid = FALSE) {
     # Plot construction.
@@ -184,6 +188,10 @@ plot_depmap_dependency <- function(df, crispr.color = "#3584B5",
 #'
 #' @export
 #' @author Jared Andrews
+#' @examples 
+#' library(CRISPRball)
+#' data(depmap_22q1_TPM)
+#' plot_depmap_expression(depmap_22q1_TPM)
 plot_depmap_expression <- function(df, color = "#7B8CB2", plot.grid = FALSE) {
     if (!is.null(df) && nrow(df) > 0) {
         df$color <- color
@@ -233,6 +241,10 @@ plot_depmap_expression <- function(df, color = "#7B8CB2", plot.grid = FALSE) {
 #'
 #' @export
 #' @author Jared Andrews
+#' @examples
+#' library(CRISPRball)
+#' data(depmap_22q1_cn)
+#' plot_depmap_cn(depmap_22q1_cn)
 plot_depmap_cn <- function(df, color = "#CEA3CB", plot.grid = FALSE) {
     if (!is.null(df) && nrow(df) > 0) {
         df$color <- color
@@ -289,6 +301,10 @@ plot_depmap_cn <- function(df, color = "#CEA3CB", plot.grid = FALSE) {
 #'
 #' @export
 #' @author Jared Andrews
+#' @examples
+#' library(CRISPRball)
+#' data("depmap_22q1_rnai")
+#' plot_depmap_lineages(df = depmap_22q1_rnai, plot.val = "dependency", group.by = "lineage")
 plot_depmap_lineages <- function(df, plot.val, group.by,
                                  lineage = NULL,
                                  depline = TRUE, label.size = 12, pt.size = 5, pt.color = "#56B4E9",

@@ -22,10 +22,9 @@
         input$dm.dep.update
 
         dep.info <- get_depmap_essentiality(input$depmap.gene, robjects$depmap.gene)
-        dep.release <- depmap::depmap_release()
         .make_dependency_tag(
             dep.info = dep.info,
-            dep.release = dep.release,
+            dep.release = robjects$depmap.release,
             crispr.color = isolate(input$dep.crispr.color),
             rnai.color = isolate(input$dep.rnai.color)
         )
