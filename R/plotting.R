@@ -39,15 +39,20 @@
 
 # Generic volcano plot function.
 # TODO: Add defaults, document, and export.
-.make_volcano <- function(res, xlim, ylim, fc.thresh = 0.5, fc.lines, hover.info = NULL,
-                          sig.line, h.id, feat.term, sig.term, lfc.term, down.color, up.color,
-                          insig.color, sig.thresh = 0.05, fs = NULL, sig.size, insig.size,
-                          sig.opacity, insig.opacity, label.size, webgl, webgl.ratio, show.counts,
-                          show.hl.counts, counts.size, highlight.featsets, highlight.feats, featsets,
-                          highlight.feats.color, highlight.feats.size, highlight.feats.opac,
-                          highlight.feats.linecolor, highlight.feats.linewidth, highlight.feats.label = TRUE,
-                          highlight.featsets.color, highlight.featsets.size, highlight.featsets.opac,
-                          highlight.featsets.linecolor, highlight.featsets.linewidth,
+.make_volcano <- function(res, xlim = 5, ylim = 5, fc.thresh = 0.5, fc.lines = TRUE, hover.info = NULL,
+                          sig.line = TRUE, h.id = "crispr", feat.term = "id", sig.term = "FDR", 
+                          lfc.term = "LFC", down.color = "#0026ff", up.color = "#ff0000",
+                          insig.color = "#A6A6A6", sig.thresh = 0.05,
+                          fs = NULL, sig.size = 6, insig.size = 5,
+                          sig.opacity = 1, insig.opacity = 0.5, label.size = 10, 
+                          webgl = TRUE, webgl.ratio = 7, show.counts = TRUE,
+                          show.hl.counts = TRUE, counts.size = 8, highlight.featsets = NULL,
+                          highlight.feats = NULL, featsets = NULL,
+                          highlight.feats.color = "#E69F00", highlight.feats.size = 7, highlight.feats.opac = 1,
+                          highlight.feats.linecolor = "#000000", highlight.feats.linewidth = 1,
+                          highlight.feats.label = TRUE, highlight.featsets.color = "#009E73",
+                          highlight.featsets.size = 7, highlight.featsets.opac = 1,
+                          highlight.featsets.linecolor = "#000000", highlight.featsets.linewidth = 1,
                           highlight.featsets.label = FALSE, h.id.suffix = "_volc") {
     # Styling.
     res$col <- rep(insig.color, nrow(res))
@@ -321,15 +326,21 @@
 
 # Generic rank plot function.
 # TODO: Add defaults, document, and export.
-.make_rank <- function(res, ylim, y.thresh, y.lines, hover.info = NULL,
-                       h.id, feat.term, sig.term, y.term, x.term, down.color, up.color,
-                       insig.color, sig.thresh = 0.05, fs = NULL, sig.size, insig.size,
-                       sig.opacity, insig.opacity, label.size, webgl, webgl.ratio, show.counts,
-                       show.hl.counts, counts.size, highlight.featsets, highlight.feats, featsets,
-                       highlight.feats.color, highlight.feats.size, highlight.feats.opac,
-                       highlight.feats.linecolor, highlight.feats.linewidth, highlight.feats.label = TRUE,
-                       highlight.featsets.color, highlight.featsets.size, highlight.featsets.opac,
-                       highlight.featsets.linecolor, highlight.featsets.linewidth, highlight.featsets.label = FALSE, h.id.suffix = "_rank") {
+.make_rank <- function(res, ylim = 10, y.thresh = 0.5, y.lines = TRUE, hover.info = NULL,
+                       h.id = "crispr", feat.term = "id", sig.term = "FDR", y.term = "LFC", 
+                       x.term = "Rank", down.color = "#0026ff", 
+                       up.color = "#ff0000", insig.color = "#A6A6A6", sig.thresh = 0.05, 
+                       fs = NULL, sig.size = 6, insig.size = 5,
+                       sig.opacity = 1, insig.opacity = 0.5, label.size = 10, 
+                       webgl = TRUE, webgl.ratio = 7, show.counts = TRUE,
+                       show.hl.counts = TRUE, counts.size = TRUE, highlight.featsets = NULL,
+                          highlight.feats = NULL, featsets = NULL,
+                          highlight.feats.color = "#E69F00", highlight.feats.size = 7, highlight.feats.opac = 1,
+                          highlight.feats.linecolor = "#000000", highlight.feats.linewidth = 1,
+                          highlight.feats.label = TRUE, highlight.featsets.color = "#009E73",
+                          highlight.featsets.size = 7, highlight.featsets.opac = 1,
+                          highlight.featsets.linecolor = "#000000", highlight.featsets.linewidth = 1,
+                          highlight.featsets.label = FALSE, h.id.suffix = "_volc") {
     # Styling.
     res$col <- rep(insig.color, nrow(res))
     res$cex <- rep(insig.size, nrow(res))
