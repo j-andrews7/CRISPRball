@@ -6,7 +6,7 @@
 \usage{
 plot_rank(
   res,
-  ylim = 10,
+  ylim = c(-10, 10),
   y.thresh = 0.5,
   y.lines = TRUE,
   hover.info = NULL,
@@ -51,8 +51,7 @@ plot_rank(
 \arguments{
 \item{res}{Dataframe containing, at minimum, fold change, rank, and significance values.}
 
-\item{ylim}{Positive numeric scalar indicating y-axis limits.
-The negative value will be used for the lower limit.}
+\item{ylim}{Numeric vector of length two for the y-axis limits.}
 
 \item{y.thresh}{Numeric scalar used as the y-axis threshold for point coloring.
 The negative of this value is also used as the threshold.}
@@ -120,11 +119,23 @@ of saved plot when WebGL plotting is not used.}
 
 \item{highlight.feats.size}{Numeric scalar indicating the size of highlighted features.}
 
+\item{highlight.feats.opac}{Numeric scalar indicating the opacity of highlighted features.}
+
+\item{highlight.feats.linecolor}{Character scalar indicating the line color of highlighted features.}
+
+\item{highlight.feats.linewidth}{Numeric scalar indicating the line width of highlighted features.}
+
 \item{highlight.feats.label}{Logical indicating whether to label highlighted features.}
 
 \item{highlight.featsets.color}{Character scalar indicating the color of highlighted feature sets.}
 
 \item{highlight.featsets.size}{Numeric scalar indicating the point size of highlighted feature sets.}
+
+\item{highlight.featsets.opac}{Numeric scalar indicating the opacity of highlighted feature sets.}
+
+\item{highlight.featsets.linecolor}{Character scalar indicating the line color of highlighted feature sets.}
+
+\item{highlight.featsets.linewidth}{Numeric scalar indicating the line width of highlighted feature sets.}
 
 \item{highlight.featsets.label}{Logical indicating whether to label highlighted feature sets.}
 

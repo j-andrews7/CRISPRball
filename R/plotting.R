@@ -84,11 +84,15 @@
 #' @param featsets Named list of feature sets to be used for highlighting.
 #' @param highlight.feats.color Character scalar indicating the color of highlighted features.
 #' @param highlight.feats.size Numeric scalar indicating the size of highlighted features.
-#' @param highlight.feats.opacity Numeric scalar indicating the opacity of highlighted features.
+#' @param highlight.feats.opac Numeric scalar indicating the opacity of highlighted features.
 #' @param highlight.feats.label Logical indicating whether to label highlighted features.
+#' @param highlight.feats.linewidth Numeric scalar indicating the line width of highlighted features.
+#' @param highlight.feats.linecolor Character scalar indicating the line color of highlighted features.
 #' @param highlight.featsets.color Character scalar indicating the color of highlighted feature sets.
 #' @param highlight.featsets.size Numeric scalar indicating the point size of highlighted feature sets.
-#' @param highlight.featsets.opacity Numeric scalar indicating the opacity of highlighted feature sets.
+#' @param highlight.featsets.opac Numeric scalar indicating the opacity of highlighted feature sets.
+#' @param highlight.featsets.linewidth Numeric scalar indicating the line width of highlighted feature sets.
+#' @param highlight.featsets.linecolor Character scalar indicating the line color of highlighted feature sets.
 #' @param highlight.featsets.label Logical indicating whether to label highlighted feature sets.
 #' @param h.id.suffix Character scalar indicating the suffix to be added to the plotly object ID.
 #' 
@@ -422,6 +426,7 @@ plot_volcano <- function(res,
 #'
 #' @inheritParams plot_volcano
 #' @param res Dataframe containing, at minimum, fold change, rank, and significance values.
+#' @param ylim Numeric vector of length two for the y-axis limits.
 #' @param y.thresh Numeric scalar used as the y-axis threshold for point coloring.
 #'   The negative of this value is also used as the threshold.
 #' @param y.lines Logical as for whether or not to show horizontal lines at \code{y.thresh}.
@@ -441,7 +446,7 @@ plot_volcano <- function(res,
 #' plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
 #' plot_rank(plot.df, feat.term = "id")
 plot_rank <- function(res,
-                      ylim = 10,
+                      ylim = c(-10, 10),
                       y.thresh = 0.5,
                       y.lines = TRUE,
                       hover.info = NULL,

@@ -120,11 +120,23 @@ of saved plot when WebGL plotting is not used.}
 
 \item{highlight.feats.size}{Numeric scalar indicating the size of highlighted features.}
 
+\item{highlight.feats.opac}{Numeric scalar indicating the opacity of highlighted features.}
+
+\item{highlight.feats.linecolor}{Character scalar indicating the line color of highlighted features.}
+
+\item{highlight.feats.linewidth}{Numeric scalar indicating the line width of highlighted features.}
+
 \item{highlight.feats.label}{Logical indicating whether to label highlighted features.}
 
 \item{highlight.featsets.color}{Character scalar indicating the color of highlighted feature sets.}
 
 \item{highlight.featsets.size}{Numeric scalar indicating the point size of highlighted feature sets.}
+
+\item{highlight.featsets.opac}{Numeric scalar indicating the opacity of highlighted feature sets.}
+
+\item{highlight.featsets.linecolor}{Character scalar indicating the line color of highlighted feature sets.}
+
+\item{highlight.featsets.linewidth}{Numeric scalar indicating the line width of highlighted feature sets.}
 
 \item{highlight.featsets.label}{Logical indicating whether to label highlighted feature sets.}
 
