@@ -16,7 +16,7 @@
     # nocov start
     observeEvent(c(input$gene.sel1, input$gene.update), {
         df <- robjects$gene.data[[input$gene.sel1]]
-        robjects$set1.genes <- .gene_ingress(df,
+        robjects$set1.genes <- gene_ingress(df,
             sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
             positive.ctrl.genes = robjects$positive.ctrl.genes, essential.genes = robjects$essential.genes,
             depmap.genes = robjects$depmap.gene
@@ -29,7 +29,7 @@
         if (length(robjects$gene.data) > 1) {
             df <- robjects$gene.data[[input$gene.sel2]]
             if (!is.null(df)) {
-                robjects$set2.genes <- .gene_ingress(df,
+                robjects$set2.genes <- gene_ingress(df,
                     sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
                     positive.ctrl.genes = robjects$positive.ctrl.genes, essential.genes = robjects$essential.genes,
                     depmap.genes = robjects$depmap.gene

@@ -37,23 +37,115 @@
 }
 
 
-# Generic volcano plot function.
-# TODO: Add defaults, document, and export.
-.make_volcano <- function(res, xlim = 5, ylim = 5, fc.thresh = 0.5, fc.lines = TRUE, hover.info = NULL,
-                          sig.line = TRUE, h.id = "crispr", feat.term = "id", sig.term = "FDR", 
-                          lfc.term = "LFC", down.color = "#0026ff", up.color = "#ff0000",
-                          insig.color = "#A6A6A6", sig.thresh = 0.05,
-                          fs = NULL, sig.size = 6, insig.size = 5,
-                          sig.opacity = 1, insig.opacity = 0.5, label.size = 10, 
-                          webgl = TRUE, webgl.ratio = 7, show.counts = TRUE,
-                          show.hl.counts = TRUE, counts.size = 8, highlight.featsets = NULL,
-                          highlight.feats = NULL, featsets = NULL,
-                          highlight.feats.color = "#E69F00", highlight.feats.size = 7, highlight.feats.opac = 1,
-                          highlight.feats.linecolor = "#000000", highlight.feats.linewidth = 1,
-                          highlight.feats.label = TRUE, highlight.featsets.color = "#009E73",
-                          highlight.featsets.size = 7, highlight.featsets.opac = 1,
-                          highlight.featsets.linecolor = "#000000", highlight.featsets.linewidth = 1,
-                          highlight.featsets.label = FALSE, h.id.suffix = "_volc") {
+#' Create an interactive volcano plot
+#'
+#' Create an interactive volcano plot for data with fold change and significance terms.
+#'
+#' @param res Dataframe containing, at minimum, fold change and significance values.
+#' @param xlim Positive numeric scalar indicating x-axis limits.
+#'   The negative value will be used for the lower limit.
+#' @param ylim Positive numeric scalar indicating y-axis limits.
+#'   The negative value will be used for the lower limit.
+#' @param fc.thresh Numeric scalar indicating the fold change threshold for coloring
+#'   significant features.
+#' @param fc.lines Logical indicating whether to add fold change threshold lines to the plot.
+#' @param hover.info Character vector indicating which additional columns from \code{res}
+#'   to include in the hover info.
+#' @param sig.line Logical indicating whether to add a significance threshold line to the plot.
+#' @param h.id Character scalar indicating the unique ID of the plotly object. Can usually be ignored,
+#'   but should be used if multiple plots are being created in the same R session (e.g. Shiny app).
+#' @param feat.term Character scalar indicating the column name of the feature IDs in \code{res}.
+#' @param sig.term Character scalar indicating the column name of the significance values in \code{res}.
+#' @param lfc.term Character scalar indicating the column name of the log fold change values in \code{res}.
+#' @param down.color Character scalar indicating the color of down-regulated features.
+#' @param up.color Character scalar indicating the color of up-regulated features.
+#' @param insig.color Character scalar indicating the color of insignificant features.
+#' @param sig.thresh Numeric scalar indicating the significance threshold for coloring significant features.
+#' @param fs Dataframe containing coordinates and label information for points that should be labeled.
+#'   Columns should be:
+#'   \itemize{
+#'    \item \code{x} - x coordinate of the point
+#'    \item \code{y} - y coordinate of the point
+#'    \item \code{customdata} - label to be displayed
+#'   }
+#' @param sig.size Numeric scalar indicating the size of significant feature points.
+#' @param insig.size Numeric scalar indicating the size of insignificant feature points.
+#' @param sig.opacity Numeric scalar indicating the opacity of significant feature points.
+#' @param insig.opacity Numeric scalar indicating the opacity of insignificant feature points.
+#' @param label.size Numeric scalar indicating the size of feature labels.
+#' @param webgl Logical indicating whether to use WebGL for rendering the plot.
+#' @param webgl.ratio Numeric scalar indicating the ratio of WebGL to HTML5 canvas rendering, increases resolution
+#'   of saved plot when WebGL plotting is not used.
+#' @param show.counts Logical indicating whether to show annotations for the number of features in the plot.
+#' @param show.hl.counts Logical indicating whether to show annotations for the number of highlighted features in the plot.
+#' @param counts.size Numeric scalar indicating the size of the feature counts labels.
+#' @param highlight.featsets Character vector indicating which feature sets should be highlighted.
+#' @param highlight.feats Character vector indicating which features should be highlighted.
+#' @param featsets Named list of feature sets to be used for highlighting.
+#' @param highlight.feats.color Character scalar indicating the color of highlighted features.
+#' @param highlight.feats.size Numeric scalar indicating the size of highlighted features.
+#' @param highlight.feats.opacity Numeric scalar indicating the opacity of highlighted features.
+#' @param highlight.feats.label Logical indicating whether to label highlighted features.
+#' @param highlight.featsets.color Character scalar indicating the color of highlighted feature sets.
+#' @param highlight.featsets.size Numeric scalar indicating the point size of highlighted feature sets.
+#' @param highlight.featsets.opacity Numeric scalar indicating the opacity of highlighted feature sets.
+#' @param highlight.featsets.label Logical indicating whether to label highlighted feature sets.
+#' @param h.id.suffix Character scalar indicating the suffix to be added to the plotly object ID.
+#' 
+#' @return An interactive plotly volcano plot.
+#'
+#' @importFrom plotly plot_ly toWebGL layout config add_annotations
+#'
+#' @author Jared Andrews
+#' @export
+#' @examples 
+#' library(CRISPRball)
+#' d1.genes <-  read.delim(system.file("extdata", "esc1.gene_summary.txt", 
+#'                                    package = "CRISPRball"), check.names = FALSE)
+#' plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
+#' plot_volcano(plot.df, feat.term = "id")
+plot_volcano <- function(res,
+                         xlim = 5,
+                         ylim = 5,
+                         fc.thresh = 0.5,
+                         fc.lines = TRUE,
+                         hover.info = NULL,
+                         sig.line = TRUE,
+                         h.id = "crispr",
+                         feat.term = "rows",
+                         sig.term = "FDR",
+                         lfc.term = "LFC",
+                         down.color = "#0026ff",
+                         up.color = "#ff0000",
+                         insig.color = "#A6A6A6",
+                         sig.thresh = 0.05,
+                         fs = NULL,
+                         sig.size = 6,
+                         insig.size = 5,
+                         sig.opacity = 1,
+                         insig.opacity = 0.5,
+                         label.size = 10,
+                         webgl = TRUE,
+                         webgl.ratio = 7,
+                         show.counts = TRUE,
+                         show.hl.counts = TRUE,
+                         counts.size = 8,
+                         highlight.featsets = NULL,
+                         highlight.feats = NULL,
+                         featsets = NULL,
+                         highlight.feats.color = "#E69F00",
+                         highlight.feats.size = 7,
+                         highlight.feats.opac = 1,
+                         highlight.feats.linecolor = "#000000",
+                         highlight.feats.linewidth = 1,
+                         highlight.feats.label = TRUE,
+                         highlight.featsets.color = "#009E73",
+                         highlight.featsets.size = 7,
+                         highlight.featsets.opac = 1,
+                         highlight.featsets.linecolor = "#000000",
+                         highlight.featsets.linewidth = 1,
+                         highlight.featsets.label = FALSE,
+                         h.id.suffix = "_volc") {
     # Styling.
     res$col <- rep(insig.color, nrow(res))
     res$cex <- rep(insig.size, nrow(res))
@@ -324,23 +416,71 @@
 }
 
 
-# Generic rank plot function.
-# TODO: Add defaults, document, and export.
-.make_rank <- function(res, ylim = 10, y.thresh = 0.5, y.lines = TRUE, hover.info = NULL,
-                       h.id = "crispr", feat.term = "id", sig.term = "FDR", y.term = "LFC", 
-                       x.term = "Rank", down.color = "#0026ff", 
-                       up.color = "#ff0000", insig.color = "#A6A6A6", sig.thresh = 0.05, 
-                       fs = NULL, sig.size = 6, insig.size = 5,
-                       sig.opacity = 1, insig.opacity = 0.5, label.size = 10, 
-                       webgl = TRUE, webgl.ratio = 7, show.counts = TRUE,
-                       show.hl.counts = TRUE, counts.size = TRUE, highlight.featsets = NULL,
-                          highlight.feats = NULL, featsets = NULL,
-                          highlight.feats.color = "#E69F00", highlight.feats.size = 7, highlight.feats.opac = 1,
-                          highlight.feats.linecolor = "#000000", highlight.feats.linewidth = 1,
-                          highlight.feats.label = TRUE, highlight.featsets.color = "#009E73",
-                          highlight.featsets.size = 7, highlight.featsets.opac = 1,
-                          highlight.featsets.linecolor = "#000000", highlight.featsets.linewidth = 1,
-                          highlight.featsets.label = FALSE, h.id.suffix = "_volc") {
+#' Create an interactive rank plot
+#'
+#' Create an interactive rank plot for data with fold change, significance terms, and rank.
+#'
+#' @inheritParams plot_volcano
+#' @param res Dataframe containing, at minimum, fold change, rank, and significance values.
+#' @param y.thresh Numeric scalar used as the y-axis threshold for point coloring.
+#'   The negative of this value is also used as the threshold.
+#' @param y.lines Logical as for whether or not to show horizontal lines at \code{y.thresh}.
+#' @param y.term Character scalar for the y-axis term from \code{res} to be plotted.
+#' @param x.term Character scalar for the x-axis term from \code{res} to be plotted.
+#' 
+#' @return An interactive plotly rank plot.
+#'
+#' @importFrom plotly plot_ly toWebGL layout config add_annotations
+#'
+#' @author Jared Andrews
+#' @export
+#' @examples 
+#' library(CRISPRball)
+#' d1.genes <-  read.delim(system.file("extdata", "esc1.gene_summary.txt", 
+#'                                    package = "CRISPRball"), check.names = FALSE)
+#' plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
+#' plot_rank(plot.df, feat.term = "id")
+plot_rank <- function(res,
+                      ylim = 10,
+                      y.thresh = 0.5,
+                      y.lines = TRUE,
+                      hover.info = NULL,
+                      h.id = "crispr",
+                      feat.term = "rows",
+                      sig.term = "FDR",
+                      y.term = "LFC",
+                      x.term = "Rank",
+                      down.color = "#0026ff",
+                      up.color = "#ff0000",
+                      insig.color = "#A6A6A6",
+                      sig.thresh = 0.05,
+                      fs = NULL,
+                      sig.size = 6,
+                      insig.size = 5,
+                      sig.opacity = 1,
+                      insig.opacity = 0.5,
+                      label.size = 10,
+                      webgl = TRUE,
+                      webgl.ratio = 7,
+                      show.counts = TRUE,
+                      show.hl.counts = TRUE,
+                      counts.size = TRUE,
+                      highlight.featsets = NULL,
+                      highlight.feats = NULL,
+                      featsets = NULL,
+                      highlight.feats.color = "#E69F00",
+                      highlight.feats.size = 7,
+                      highlight.feats.opac = 1,
+                      highlight.feats.linecolor = "#000000",
+                      highlight.feats.linewidth = 1,
+                      highlight.feats.label = TRUE,
+                      highlight.featsets.color = "#009E73",
+                      highlight.featsets.size = 7,
+                      highlight.featsets.opac = 1,
+                      highlight.featsets.linecolor = "#000000",
+                      highlight.featsets.linewidth = 1,
+                      highlight.featsets.label = FALSE,
+                      h.id.suffix = "_volc") {
     # Styling.
     res$col <- rep(insig.color, nrow(res))
     res$cex <- rep(insig.size, nrow(res))
@@ -612,17 +752,68 @@
 }
 
 
-# Generic lawn plot function.
-# TODO: Add defaults, document, and export.
-.make_lawn <- function(res, ylim, fc.thresh = 0.5, hover.info = NULL,
-                       sig.line, h.id, feat.term, x.term, sig.term, lfc.term, down.color, up.color,
-                       insig.color, sig.thresh = 0.05, fs = NULL, sig.size, insig.size,
-                       sig.opacity, insig.opacity, label.size, webgl, webgl.ratio, show.counts,
-                       show.hl.counts, counts.size, highlight.featsets, highlight.feats, featsets,
-                       highlight.feats.color, highlight.feats.size, highlight.feats.opac,
-                       highlight.feats.linecolor, highlight.feats.linewidth, highlight.feats.label = TRUE,
-                       highlight.featsets.color, highlight.featsets.size, highlight.featsets.opac,
-                       highlight.featsets.linecolor, highlight.featsets.linewidth, highlight.featsets.label = FALSE, h.id.suffix = "_lawn") {
+#' Create an interactive lawn plot
+#'
+#' Create an interactive lawn plot for data with significance values. Typically, this plot is randomly
+#' ordered along the x-axis, but the user is free to order it by any term in \code{res} that they'd like. 
+#'
+#' @inheritParams plot_volcano
+#' @param res Dataframe containing, at minimum significance values and a term by which the x-axis can be ordered.
+#' @param x.term Character scalar for the x-axis term from \code{res} to be plotted.
+#' 
+#' @return An interactive plotly rank plot.
+#'
+#' @importFrom plotly plot_ly toWebGL layout config add_annotations
+#'
+#' @author Jared Andrews
+#' @export
+#' @examples 
+#' library(CRISPRball)
+#' d1.genes <-  read.delim(system.file("extdata", "esc1.gene_summary.txt", 
+#'                                    package = "CRISPRball"), check.names = FALSE)
+#' plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
+#' plot_lawn(plot.df, feat.term = "id")
+plot_lawn <- function(res,
+                      ylim = 5,
+                      fc.thresh = 0.5,
+                      hover.info = NULL,
+                      sig.line = TRUE,
+                      h.id = "crispr",
+                      feat.term = "rows",
+                      x.term = "RandomIndex",
+                      sig.term = "FDR",
+                      lfc.term = "LFC",
+                      down.color = "#0026ff",
+                      up.color = "#ff0000",
+                      insig.color = "#A6A6A6",
+                      sig.thresh = 0.05,
+                      fs = NULL,
+                      sig.size = 6,
+                      insig.size = 5,
+                      sig.opacity = 1,
+                      insig.opacity = 0.5,
+                      label.size = 10,
+                      webgl = TRUE,
+                      webgl.ratio = 7,
+                      show.counts = TRUE,
+                      show.hl.counts = TRUE,
+                      counts.size = TRUE,
+                      highlight.featsets = NULL,
+                      highlight.feats = NULL,
+                      featsets = NULL,
+                      highlight.feats.color = "#E69F00",
+                      highlight.feats.size = 7,
+                      highlight.feats.opac = 1,
+                      highlight.feats.linecolor = "#000000",
+                      highlight.feats.linewidth = 1,
+                      highlight.feats.label = TRUE,
+                      highlight.featsets.color = "#009E73",
+                      highlight.featsets.size = 7,
+                      highlight.featsets.opac = 1,
+                      highlight.featsets.linecolor = "#000000",
+                      highlight.featsets.linewidth = 1,
+                      highlight.featsets.label = FALSE,
+                      h.id.suffix = "_lawn") {
     # Styling.
     res$col <- rep(insig.color, nrow(res))
     res$cex <- rep(insig.size, nrow(res))

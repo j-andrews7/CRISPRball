@@ -63,5 +63,5 @@ though adding labels will reset the positions, so it's recommended to add all la
 Features with no variation will be removed prior to \code{\link[PCAtools]{pca}} being run for the PCA visualization.
 }
 \author{
-Jared Andrews
+Jared Andrews, Jacob Steele
 }

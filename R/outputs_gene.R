@@ -98,7 +98,7 @@
         }
 
 
-        fig <- .make_volcano(
+        fig <- plot_volcano(
             res = df,
             xlim = isolate(input$vol.x),
             ylim = isolate(input$vol.y),
@@ -197,7 +197,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        fig <- .make_rank(
+        fig <- plot_rank(
             res = df,
             ylim = list(isolate(input$rank.y.min), isolate(input$rank.y.max)),
             y.thresh = isolate(input$gene.lfc.th),
@@ -294,7 +294,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        fig <- .make_lawn(
+        fig <- plot_lawn(
             res = df,
             ylim = isolate(input$lawn.y),
             fc.thresh = isolate(input$gene.lfc.th),
@@ -425,7 +425,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        fig <- .make_volcano(
+        fig <- plot_volcano(
             res = df,
             xlim = isolate(input$vol.x),
             ylim = isolate(input$vol.y),
@@ -524,7 +524,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        fig <- .make_rank(
+        fig <- plot_rank(
             res = df,
             ylim = list(isolate(input$rank.y.min), isolate(input$rank.y.max)),
             y.thresh = isolate(input$gene.lfc.th),
@@ -622,7 +622,7 @@
             highlight <- unique(c(robjects$common.hits, highlight))
         }
 
-        fig <- .make_lawn(
+        fig <- plot_lawn(
             res = df,
             ylim = isolate(input$lawn.y),
             fc.thresh = isolate(input$gene.lfc.th),

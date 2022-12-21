@@ -16,42 +16,6 @@ shinyjs.enableTab = function(name) {
 }
 "
 
-#' Read user-uploaded gene summary files and assign sample names
-#' @param fileList A list of gene summary files uploaded by the user.
-#'
-#' @importFrom utils read.delim
-#'
-#' @return A named list of data.frames read from gene summary files uploaded by the user.
-#' @author Jared Andrews
-#' @rdname INTERNAL_gene_summ_ingress
-.gene_summ_ingress <- function(fileList) {
-    out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-    names(out) <- sapply(fileList$name, gsub,
-        pattern = ".gene_summary.txt",
-        replacement = "", fixed = TRUE
-    )
-    return(out)
-}
-
-
-#' Read user-uploaded sgrna summary files and assign sample names
-#' @param fileList A list of sgrna summary files uploaded by the user.
-#'
-#' @return A named list of data.frames read from sgrna summary files uploaded by the user.
-#'
-#' @importFrom utils read.delim
-#'
-#' @author Jared Andrews
-#' @rdname INTERNAL_sgrna_summ_ingress
-.sgrna_summ_ingress <- function(fileList) {
-    out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-    names(out) <- sapply(fileList$name, gsub,
-        pattern = ".sgrna_summary.txt",
-        replacement = "", fixed = TRUE
-    )
-    return(out)
-}
-
 #' Parse gene summary data for easier plotting and display
 #' @param df data.frame of gene summary data
 #' @param sig.thresh Numeric scalar for significance threshold to consider a gene a hit.
@@ -60,10 +24,15 @@ shinyjs.enableTab = function(name) {
 #' @param essential.genes Character vector of gene identifiers to label as essential genes.
 #' @param depmap.genes data.frame of DepMap gene summary data.
 #'
-#' @return A data.frame with additional columns added.
+#' @return A data.frame of gene summary with additional, easier to plot, columns added.
 #' @author Jared Andrews
-#' @rdname INTERNAL_gene_ingress
-.gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
+#' @export
+#' @examples
+#' library(CRISPRball)
+#' d1.genes <-  read.delim(system.file("extdata", "esc1.gene_summary.txt", 
+#'                                    package = "CRISPRball"), check.names = FALSE)
+#' out.df <- gene_ingress(d1.genes, 0.05, 0.5)
+gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
                           essential.genes = NULL, depmap.genes = NULL) {
     if (!is.null(essential.genes)) {
         df$essential <- df$id %in% essential.genes
@@ -128,4 +97,40 @@ shinyjs.enableTab = function(name) {
     df$RandomIndex <- sample(1:nrow(df), nrow(df))
 
     return(df)
+}
+
+#' Read user-uploaded gene summary files and assign sample names
+#' @param fileList A list of gene summary files uploaded by the user.
+#'
+#' @importFrom utils read.delim
+#'
+#' @return A named list of data.frames read from gene summary files uploaded by the user.
+#' @author Jared Andrews
+#' @rdname INTERNAL_gene_summ_ingress
+.gene_summ_ingress <- function(fileList) {
+    out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
+    names(out) <- sapply(fileList$name, gsub,
+        pattern = ".gene_summary.txt",
+        replacement = "", fixed = TRUE
+    )
+    return(out)
+}
+
+
+#' Read user-uploaded sgrna summary files and assign sample names
+#' @param fileList A list of sgrna summary files uploaded by the user.
+#'
+#' @return A named list of data.frames read from sgrna summary files uploaded by the user.
+#'
+#' @importFrom utils read.delim
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_sgrna_summ_ingress
+.sgrna_summ_ingress <- function(fileList) {
+    out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
+    names(out) <- sapply(fileList$name, gsub,
+        pattern = ".sgrna_summary.txt",
+        replacement = "", fixed = TRUE
+    )
+    return(out)
 }
