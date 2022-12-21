@@ -1069,7 +1069,16 @@ plot_lawn <- function(res,
     fig
 }
 
-# sgRNA pair plot.
+
+#' Create a sgRNA pair plot
+#' 
+#' This function creates a pair plot of sgRNA counts for control and treatment conditions.
+#' 
+#' @param df A data frame containing sgRNA counts for control and treatment.
+#' @return A plotly object.
+#' 
+#' @author Jared Andrews
+#' @rdname INTERNAL_make_sgrna_pairplot
 .make_sgrna_pairplot <- function(df) {
     gene <- df$Gene[1]
 
