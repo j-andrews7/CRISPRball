@@ -294,6 +294,14 @@
                                 tipify(colourInput("hl.genes.lcol", "Genes border:", value = "#000000"),
                                     "Border color of highlighted genes.", "right",
                                     options = list(container = "body")
+                                ),
+                                tipify(
+                                    prettyCheckbox("hl.genes.label",
+                                        label = "Label highlighted genes", value = TRUE,
+                                        animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")
+                                    ),
+                                    "Add labels to highlighted genes.", "right",
+                                    options = list(container = "body")
                                 )
                             ),
                             column(
@@ -316,6 +324,14 @@
                                 ),
                                 tipify(colourInput("hl.genesets.lcol", "Sets border:", value = "#000000"),
                                     "Border color of genes in highlighted geneset(s).", "right",
+                                    options = list(container = "body")
+                                ),
+                                tipify(
+                                    prettyCheckbox("hl.genesets.label",
+                                        label = "Label highlighted sets", value = FALSE,
+                                        animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")
+                                    ),
+                                    "Add labels to highlighted genesets.", "right",
                                     options = list(container = "body")
                                 )
                             )

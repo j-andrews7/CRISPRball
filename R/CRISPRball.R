@@ -47,7 +47,7 @@
 #' @importFrom stats cor as.formula
 #' @importFrom utils read.csv read.delim
 #'
-#' @author Jared Andrews
+#' @author Jared Andrews, Jacob Steele
 #' @export
 CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL, norm.counts = NULL, h.id = "mag1",
                        positive.ctrl.genes = NULL, essential.genes = NULL,

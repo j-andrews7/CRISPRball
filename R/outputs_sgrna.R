@@ -63,8 +63,8 @@
         highlight <- NULL
         highlight <- df$sgrna[df$Gene == input$sgrna.gene]
 
-        fig <- .make_rank(
-            df = df,
+        fig <- plot_rank(
+            res = df,
             ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
             y.thresh = 0,
             y.lines = FALSE,
@@ -181,8 +181,8 @@
         highlight <- NULL
         highlight <- df$sgrna[df$Gene == input$sgrna.gene]
 
-        fig <- .make_rank(
-            df = df,
+        fig <- plot_rank(
+            res = df,
             ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
             y.thresh = 0,
             y.lines = FALSE,

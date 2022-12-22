@@ -62,6 +62,15 @@
                                     ),
                                     "Limit PCA to top N features ranked by variance.", "right",
                                     options = list(container = "body")
+                                ),
+                                tipify(
+                                    prettyCheckbox("meta.filt", strong("Filter via metadata table"), TRUE,
+                                        bigger = FALSE,
+                                        animation = "smooth", status = "success",
+                                        icon = icon("check"), width = "100%"
+                                    ),
+                                    "Filter PCA samples to those in metadata table.", "right",
+                                    options = list(container = "body")
                                 )
                             ),
                             column(
@@ -83,15 +92,6 @@
                                     options = list(container = "body")
                                 )
                             )
-                        ),
-                        tipify(
-                            prettyCheckbox("meta.filt", strong("Filter via metadata table"), TRUE,
-                                bigger = FALSE,
-                                animation = "smooth", status = "success",
-                                icon = icon("check"), width = "100%"
-                            ),
-                            "Filter PCA samples to those in metadata table.", "right",
-                            options = list(container = "body")
                         ),
                         fluidRow(
                             column(6, tipify(

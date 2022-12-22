@@ -20,11 +20,11 @@
 .create_comparisons_observers <- function(input, session, output, robjects) {
     # nocov start
     observeEvent(input$comp.update, {
-        if (length(robjects$gene.data) > 1 & !is.null(input$comp.sets)) {
+        if (length(robjects$gene.data) > 1 & !is.null(input$comp.sets) & any(input$comp.sets %in% names(robjects$gene.data))) {
             # Get hits for each dataset based on thresholds.
             robjects$comps <- lapply(input$comp.sets, function(x) {
                 df <- robjects$gene.data[[x]]
-                .gene_ingress(df,
+                gene_ingress(df,
                     sig.thresh = input$comp.fdr.th, lfc.thresh = input$comp.lfc.th,
                     positive.ctrl.genes = robjects$positive.ctrl.genes,
                     essential.genes = robjects$essential.genes, depmap.genes = robjects$depmap.gene

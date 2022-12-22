@@ -4,7 +4,10 @@
 \alias{build_depmap_db}
 \title{Build SQLite database of DepMap data}
 \usage{
-build_depmap_db()
+build_depmap_db(file = "depmap_db.sqlite")
+}
+\arguments{
+\item{file}{Name of SQLite database file to create.}
 }
 \value{
 Name of SQLite database containing DepMap data.

@@ -28,6 +28,8 @@
 
 #' Build SQLite database of DepMap data
 #'
+#' @param file Name of SQLite database file to create. 
+#'
 #' @return Name of SQLite database containing DepMap data.
 #'
 #' @export
@@ -42,12 +44,12 @@
 #' \dontrun{
 #' build_depmap_db()
 #' }
-build_depmap_db <- function() {
+build_depmap_db <- function(file = "depmap_db.sqlite") {
     .error_if_no_depmap()
     .error_if_no_pool()
     .error_if_no_rsqlite()
 
-    pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
+    pool <- pool::dbPool(RSQLite::SQLite(), dbname = file)
 
     # Get depmap data and make table in database.
     rnai <- depmap::depmap_rnai()
@@ -91,7 +93,7 @@ build_depmap_db <- function() {
 
     pool::poolClose(pool)
 
-    return("depmap_db.sqlite")
+    return(file)
 }
 
 
