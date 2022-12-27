@@ -65,5 +65,33 @@ css <- tags$head(
         font-size: 11px;
         line-height: 0.428571;
         }
+        .navbar {
+        margin-bottom: 10px;
+        }
+        .navbar-nav>li>a {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        }
+        .navbar-brand {
+        float: left;
+        height: 60px;
+        padding: 5px 15px;
+        font-size: 18px;
+        line-height: 24px;
+        }
+        .navbar-header {
+        height: 60px;
+        }
+        .white {
+        background-color: white;
+        padding: 8px;
+        border-color: gray;
+        border-radius: 5px;
+        border-style: solid;
+        border-width: 1px;
+        }
+        h2 {
+        margin-top: 0px;
+        }
     "))
 )

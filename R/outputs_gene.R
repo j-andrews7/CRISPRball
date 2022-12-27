@@ -144,6 +144,15 @@
         )
 
         robjects$plot.gene1.vol <- fig
+
+        if (robjects$click.obs$volc1$.suspended) {
+            robjects$click.obs$volc1$resume()
+        }
+
+        if (robjects$dclick.obs$volc1$.suspended) {
+            robjects$dclick.obs$volc1$resume()
+        }
+
         fig
     })
     # nocov end
@@ -242,6 +251,15 @@
         )
 
         robjects$plot.gene1.rank <- fig
+
+        if (robjects$click.obs$rank1$.suspended) {
+            robjects$click.obs$rank1$resume()
+        }
+
+        if (robjects$dclick.obs$rank1$.suspended) {
+            robjects$dclick.obs$rank1$resume()
+        }
+
         fig
     })
     # nocov end
@@ -339,6 +357,15 @@
         )
 
         robjects$plot.gene1.lawn <- fig
+
+        if (robjects$click.obs$lawn1$.suspended) {
+            robjects$click.obs$lawn1$resume()
+        }
+
+        if (robjects$dclick.obs$lawn1$.suspended) {
+            robjects$dclick.obs$lawn1$resume()
+        }
+
         fig
     })
     # nocov end
@@ -471,6 +498,16 @@
         )
 
         robjects$plot.gene2.vol <- fig
+
+        # Resume click observers if needed. Necessary to prevent warnings on load.
+        if (robjects$click.obs$volc2$.suspended) {
+            robjects$click.obs$volc2$resume()
+        }
+
+        if (robjects$dclick.obs$volc2$.suspended) {
+            robjects$dclick.obs$volc2$resume()
+        }
+
         fig
     })
     # nocov end
@@ -569,6 +606,15 @@
         )
 
         robjects$plot.gene2.rank <- fig
+
+        if (robjects$click.obs$rank2$.suspended) {
+            robjects$click.obs$rank2$resume()
+        }
+
+        if (robjects$dclick.obs$rank2$.suspended) {
+            robjects$dclick.obs$rank2$resume()
+        }
+
         fig
     })
     # nocov end
@@ -667,6 +713,15 @@
         )
 
         robjects$plot.gene2.lawn <- fig
+
+        if (robjects$click.obs$lawn2$.suspended) {
+            robjects$click.obs$lawn2$resume()
+        }
+
+        if (robjects$dclick.obs$lawn2$.suspended) {
+            robjects$dclick.obs$lawn2$resume()
+        }
+
         fig
     })
     # nocov end
