@@ -52,11 +52,13 @@
 
     # On click, the key field of the event data contains the gene symbol.
     # Add that gene to the set of all "selected" genes. Double click will clear all labels.
+    # Necessary to keep these suspended at first so that they don't fire before the plot is made.
+    # Plot generation code will resume these.
     # nocov start
     plot.suf <- list("volc1", "volc2", "rank1", "rank2", "lawn1", "lawn2")
-    lapply(plot.suf, function(x) {
+    obs.click <- lapply(plot.suf, function(x) {
         obj <- paste0("clicked.", x)
-        observeEvent(event_data("plotly_click", source = paste0(robjects$h.id, "_", x)), {
+        observeEvent(event_data("plotly_click", source = paste0(robjects$h.id, "_", x)), suspended = TRUE, {
             gene <- event_data("plotly_click", source = paste0(robjects$h.id, "_", x))
             gene_old_new <- rbind(robjects[[obj]], gene)
             keep <- gene_old_new[gene_old_new$customdata %in% names(which(table(gene_old_new$customdata) == 1)), ]
@@ -67,11 +69,21 @@
                 robjects[[obj]] <- keep
             }
         })
+    })
 
-        observeEvent(event_data("plotly_doubleclick", source = paste0(robjects$h.id, "_", x)), {
+    obs.dclick <- lapply(plot.suf, function(x) {
+        obj <- paste0("clicked.", x)
+
+        observeEvent(event_data("plotly_doubleclick", source = paste0(robjects$h.id, "_", x)), suspended = TRUE, {
             robjects[[obj]] <- NULL
         })
     })
+
+    names(obs.click) <- plot.suf
+    names(obs.dclick) <- plot.suf
+
+    robjects[["click.obs"]] <- obs.click
+    robjects[["dclick.obs"]] <- obs.dclick
     # nocov end
 
     invisible(NULL)
