@@ -8,9 +8,9 @@ Authors@R:
            email = "jared.andrews07@gmail.com",
            comment = c(ORCID = "0000-0002-0780-6248")),
         person(given = "Jacob",
-        family = "Steele",
-        role = "ctb",
-        comment = c(ORCID = "0000-0001-9924-2226")))
+            family = "Steele",
+            role = "ctb",
+            comment = c(ORCID = "0000-0001-9924-2226")))
 Description: A Shiny application for visualization, exploration, comparison, 
     and filtering of CRISPR screens analyzed with MAGeCK RRA.
 License: MIT + file LICENSE
