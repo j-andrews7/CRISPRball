@@ -102,10 +102,12 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     ui <- navbarPage(
         title = div(a(img(src = "logo/CRISPRball_Hex.png", height = "50"), href = "https://bioconductor.org/packages/CRISPRball"), "CRISPRball"),
         selected = default.tab,
-        useShinyjs(),
-        extendShinyjs(text = .utils.js, functions = c("disableTab", "enableTab")),
-        css,
-        tags$head(tags$link(rel = "shortcut icon", href = "logo/CRISPRball_Hex.png")),
+        header = list(
+            useShinyjs(),
+            extendShinyjs(text = .utils.js, functions = c("disableTab", "enableTab")),
+            css,
+            tags$head(tags$link(rel = "shortcut icon", href = "logo/CRISPRball_Hex.png"))
+        ),
         # ---------------Data Upload-----------------
         tab_data_upload,
         # ----------------QC--------------------
