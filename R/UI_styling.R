@@ -82,5 +82,16 @@ css <- tags$head(
         .navbar-header {
         height: 60px;
         }
+        .white {
+        background-color: white;
+        padding: 8px;
+        border-color: gray;
+        border-radius: 5px;
+        border-style: solid;
+        border-width: 1px;
+        }
+        h2 {
+        margin-top: 0px;
+        }
     "))
 )
