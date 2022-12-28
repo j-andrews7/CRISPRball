@@ -35,9 +35,12 @@ tab_data_upload <- tabPanel(
                         column(
                             12,
                             h2("Getting Started with CRISPRball"),
-                            "CRISPRball is a web application for visualizing MAGeCK RRA analysis results.",
+                            strong("CRISPRball"), " is a Shiny/web application for visualizing MAGeCK RRA analysis results.",
                             "For more information on running the analysis, see the ",
-                            a("MAGeCK RRA Analysis User Guide", href = "https://sourceforge.net/p/mageck/wiki/Home/"),
+                            a("MAGeCK RRA Analysis User Guide.", href = "https://sourceforge.net/p/mageck/wiki/Home/"),
+                            "This tool complements the ",
+                            a("MAGeCKFlute package", href = "https://www.bioconductor.org/packages/release/bioc/html/MAGeCKFlute.html"),
+                            " by focusing on an interactive experience and the simple production of publication-quality figures.",
                             br(),
                             br(),
                             hr()
@@ -48,8 +51,8 @@ tab_data_upload <- tabPanel(
                             span("The ", strong("Data Upload"), "tab allows you to upload a normalized counts file, a count summary file, and gene and sgRNA summary files."),
                             span(
                                 "The normalized counts and count summary files should be tab-delimited text files returned by ", code("mageck count"),
-                                " with *.countsummary.txt and *.count_norm.txt extensions, respectively. ",
-                                "The gene and sgRNA summary files should be tab-delimited text files with *.gene_summary.txt and *.sgrna_summary.txt extensions, ",
+                                " with ", code("*.countsummary.txt"), "and ", code("*.count_norm.txt"), " extensions, respectively. ",
+                                "The gene and sgRNA summary files should be tab-delimited text files with ", code("*.gene_summary.txt"), " and ", code("*.sgrna_summary.txt"), "  extensions, ",
                                 "multiple sets of which can be uploaded. The prefixes of the gene summary and sgrna summary files should match, ",
                                 "e.g. P7.gene_summary.txt and P7.sgrna_summary.txt."
                             ),
@@ -58,10 +61,9 @@ tab_data_upload <- tabPanel(
                             br(),
                             h3("Plot Content, Gene(set) Highlighting, and Labeling"),
                             span(
-                                "All plots have explanations of their context that can be accessed by hovering and/or clicking the ",
+                                "All plots have explanations of their content that can be accessed by hovering and/or clicking the ",
                                 icon("circle-info", style = "font-size: 14px"), " icon above each plot."
                             ),
-                            br(),
                             br(),
                             br(),
                             span(
@@ -70,16 +72,16 @@ tab_data_upload <- tabPanel(
                                 "Individual labels can be removed by clicking the same point. ",
                                 "The other text annotations can also be re-positioned by dragging. ",
                                 "Genes or genesets (if provided) can be highlighted on the plots using the ",
-                                "'Highlight Gene(sets)' inputs in the sidebar",
-                                "button that can be used to highlight a set of genes in the plot. "
+                                strong("Highlight Gene(sets)"), " inputs in the sidebar. ",
+                                "Highlighted gene(set)s can also be automatically labeled."
                             ),
                             br(),
                             br(),
                             br(),
                             h3("Adjusting Plot Settings/Appearance"),
-                            "Nearly all plots have adjustable settings that can be adjusted by adjusting the input in the sidebar for each tab. ",
+                            "Nearly all plots have settings that can be adjusted by changing the input in the sidebar for each tab. ",
                             "Hovering over an input field will display a tooltip with a description of the input and how it affects the plot.",
-                            span("After tweaking the settings for a given, click the ", strong("Update Plot"), " button to update the plot."),
+                            span("After tweaking the settings for a given, click the ", strong("Update Plot"), " button to update the plot.")
                         ),
                         column(
                             6,
@@ -87,14 +89,25 @@ tab_data_upload <- tabPanel(
                             span(
                                 "All data in tables can be easily downloaded via the buttons above the table. Filtering will be applied. ",
                                 "Plots can be downloaded as SVG files by clicking the ", strong("Download Plot"),
-                                " button above the plot visible on hover. "
+                                " button above the plot visible on hover. Standalone, interactive versions of plots can be downloaded by clicking ",
+                                "the associated ", strong("Download Plot"), " button above/below the plot. Aesthetics and labels will be retained."
+                            ),
+                            br(),
+                            br(),
+                            br(),
+                            h3("Comparing Datasets"),
+                            span(
+                                "In the", strong("Comparisons"), " tab, hits from multiple datasets or lines can be compared to each other. ",
+                                "The Upset plots displays the number of hits that are shared between datasets. ",
+                                "The datasets to compare can be selected in the sidebar. ",
+                                "Clicking on the connected points in the Upset plot will display the corresponding genes in the right-side table. "
                             ),
                             br(),
                             br(),
                             br(),
                             h3("DepMap Integration"),
                             span(
-                                "If provided, the ", strong("DepMap"), " tab will contain plots for the DepMap data. ",
+                                "If the DepMap database is provided, the ", strong("DepMap"), " tab will contain plots for the DepMap data. ",
                                 "This can be useful to explore potential ",
                                 "hits for selectivity, expression, and copy number in a given lineage or disease. ",
                                 "Common essential genes from DepMap's CRISPR and/or RNAi screens can be removed from the gene plots by ",
