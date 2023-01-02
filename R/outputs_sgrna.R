@@ -102,7 +102,8 @@
             highlight.featsets.size = 7,
             highlight.featsets.opac = 1,
             highlight.featsets.linecolor = "black",
-            highlight.featsets.linewidth = 0.5
+            highlight.featsets.linewidth = 0.5,
+            highlight.feats.label = FALSE
         )
 
         robjects$plot.sgrna1.rank <- fig
@@ -220,7 +221,8 @@
             highlight.featsets.size = 7,
             highlight.featsets.opac = 1,
             highlight.featsets.linecolor = "black",
-            highlight.featsets.linewidth = 0.5
+            highlight.featsets.linewidth = 0.5,
+            highlight.feats.label = FALSE
         )
 
         robjects$plot.sgrna2.rank <- fig
