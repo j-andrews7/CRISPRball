@@ -17,6 +17,13 @@
 #'
 #' @rdname INTERNAL_create_tab_comparison
 .create_tab_comparison <- function(datasets) {
+    # Upset plots only allow 30 sets max, so need to adjust default selected sets.
+    if (length(datasets) > 30) {
+        limit.selected <- TRUE
+    } else {
+        limit.selected <- FALSE
+    }
+
     tabPanel(
         title = "Comparisons",
         id = "comparisons",
@@ -33,10 +40,19 @@
                                 div(
                                     id = "comp_select",
                                     selectizeInput("comp.sets", "Datasets:",
-                                        choices = ifelse(length(datasets > 30), datasets[1:30], datasets),
-                                        selected = ifelse(length(datasets > 30), datasets[1:30], datasets), multiple = TRUE,
-                                        # Upset plots only allow 30 sets max.
+                                        if (limit.selected) {
+                                            selected = datasets[1:30]
+                                        } else {
+                                            selected = datasets
+                                        },
+                                        choices = datasets,
+                                        multiple = TRUE,
                                         options = list(maxItems = 30)
+
+                                        # choices = ifelse(length(datasets > 30), datasets[1:30], datasets),
+                                        # selected = ifelse(length(datasets > 30), datasets[1:30], datasets), multiple = TRUE,
+                                        # # Upset plots only allow 30 sets max.
+                                        # options = list(maxItems = 30)
                                     )
                                 ),
                                 "Datasets to compare.", "right",
