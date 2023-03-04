@@ -48,11 +48,6 @@
                                         choices = datasets,
                                         multiple = TRUE,
                                         options = list(maxItems = 30)
-
-                                        # choices = ifelse(length(datasets > 30), datasets[1:30], datasets),
-                                        # selected = ifelse(length(datasets > 30), datasets[1:30], datasets), multiple = TRUE,
-                                        # # Upset plots only allow 30 sets max.
-                                        # options = list(maxItems = 30)
                                     )
                                 ),
                                 "Datasets to compare.", "right",
