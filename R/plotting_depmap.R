@@ -4,7 +4,8 @@
 #' from the DepMap database that can be used for plotting.
 #'
 #' @param gene Character scalar of gene name.
-#' @param data.type Character scalar of data type to retrieve. One of "dependency", "cn", or "ccle_tpm".
+#' @param data.type Character scalar of data type to retrieve. One of "dependency",
+#'   "crispr", "rnai", "cn", or "ccle_tpm".
 #' @param depmap.meta data.frame of DepMap cell line metadata, as stored in the 'meta' table
 #'   of the SQLite database built by \code{\link{build_depmap_db}}.
 #' @param depmap.pool pool connection to DepMap SQLite database built with \code{\link{build_depmap_db}}.
@@ -34,8 +35,15 @@ get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
             h.text <- "Dependency"
             colname <- "dependency"
 
-            df.c <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "crispr" WHERE "gene_name" == (:x)', params = list(x = gene))
-            df.r <- pool::dbGetQuery(depmap.pool, 'SELECT * FROM "rnai" WHERE "gene_name" == (:x)', params = list(x = gene))
+            df.c <- pool::dbGetQuery(depmap.pool,
+                'SELECT * FROM "crispr" WHERE "gene_name" == (:x)',
+                params = list(x = gene)
+            )
+            
+            df.r <- pool::dbGetQuery(depmap.pool,
+                'SELECT * FROM "rnai" WHERE "gene_name" == (:x)',
+                params = list(x = gene)
+            )
 
             df <- data.frame()
 
@@ -188,7 +196,7 @@ plot_depmap_dependency <- function(df, crispr.color = "#3584B5",
 #'
 #' @export
 #' @author Jared Andrews
-#' @examples 
+#' @examples
 #' library(CRISPRball)
 #' data(depmap_22q1_TPM)
 #' plot_depmap_expression(depmap_22q1_TPM)
