@@ -53,8 +53,10 @@ Suggests:
     depmap,
     pool,
     RSQLite,
-    mygene
+    mygene,
+    testthat (>= 3.0.0)
 Depends:
     R (>= 2.10),
     shinyBS
 LazyData: false
+Config/testthat/edition: 3
