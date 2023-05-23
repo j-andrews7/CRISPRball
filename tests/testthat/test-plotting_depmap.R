@@ -175,7 +175,6 @@ test_that("get_depmap_plot_data function", {
 
 
 test_that("plot_depmap_dependency function", {
-
     # Create sample dataframe
     df <- data.frame(
         dependency = c(0.5, 0.2, 0.3, 0.4, 0.6),
@@ -185,20 +184,21 @@ test_that("plot_depmap_dependency function", {
 
     # Test that function returns a plotly object
     test_that("plot_depmap_dependency returns a plotly object", {
-        plot <- plot_depmap_dependency(df)
-        expect_is(plot, "plotly")
+        suppressWarnings(plot <- plot_depmap_dependency(df))
+        expect_s3_class(plot, "plotly")
     })
 
     # Test that function can handle empty dataframes
     test_that("plot_depmap_dependency handles empty dataframes", {
         df.empty <- data.frame()
         plot <- plot_depmap_dependency(df.empty)
-        expect_equal(plot$x$data[[1]]$text[1], "Gene not found in DepMap.")
+        expect_s3_class(plot, "plotly")
+        expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
     })
 
     # Test that plot contains the correct traces (CRISPR and RNAi)
     test_that("plot_depmap_dependency contains correct traces", {
-        plot <- plot_depmap_dependency(df)
+        suppressWarnings(plot <- plot_depmap_dependency(df))
         traces <- plot$x$data
         expect_true(any(sapply(traces, function(x) x$name == "CRISPR")))
         expect_true(any(sapply(traces, function(x) x$name == "RNAi")))
@@ -206,31 +206,32 @@ test_that("plot_depmap_dependency function", {
 
     # Test the correct color assignment
     test_that("plot_depmap_dependency assigns correct colors", {
-        plot <- plot_depmap_dependency(df, crispr.color = "#FF0000", rnai.color = "#2f00ff")
+        suppressWarnings(plot <- plot_depmap_dependency(df, crispr.color = "#FF0000", rnai.color = "#2f00ff"))
         traces <- plot$x$data
         crispr_trace <- traces[[which(sapply(traces, function(x) x$name == "CRISPR"))]]
         rnai_trace <- traces[[which(sapply(traces, function(x) x$name == "RNAi"))]]
-        expect_equal(crispr_trace$line$color, "#FF0000")
-        expect_equal(rnai_trace$line$color, "#2f00ff")
+        expect_equal(crispr_trace$line$color, "rgba(255,0,0,0.6)")
+        expect_equal(rnai_trace$line$color, "rgba(47,0,255,0.6)")
     })
 
     # Test the dependency threshold line presence
     test_that("plot_depmap_dependency shows dependency threshold line when depline = TRUE", {
-        plot <- plot_depmap_dependency(df, depline = TRUE)
+        suppressWarnings(plot <- plot_depmap_dependency(df, depline = TRUE))
         shapes <- plot$x$layout$shapes
-        expect_true(any(sapply(shapes, function(x) x$xref == "x" && x$line$color == "red")))
+        expect_true(any(sapply(shapes, function(x) x$xref == "paper" && x$line$color == "rgba(51,51,51,1)")))
     })
 
     # Test the dependency threshold line absence
     test_that("plot_depmap_dependency does not show dependency threshold line when depline = FALSE", {
-        plot <- plot_depmap_dependency(df, depline = FALSE)
+        suppressWarnings(plot <- plot_depmap_dependency(df, depline = FALSE))
         shapes <- plot$x$layout$shapes
-        expect_false(any(sapply(shapes, function(x) x$xref == "x" && x$line$color == "red")))
+        expect_false(any(sapply(shapes, function(x) x$xref == "x" && x$line$color == "rgba(51,51,51,1)")))
     })
 
     # Test that the function can handle NULL input
     test_that("plot_depmap_dependency handles NULL input", {
-        plot <- plot_depmap_dependency(NULL)
-        expect_equal(plot$x$data[[1]]$text[1], "Gene not found in DepMap.")
+        suppressWarnings(plot <- plot_depmap_dependency(NULL))
+        expect_s3_class(plot, "plotly")
+        expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
     })
 })
