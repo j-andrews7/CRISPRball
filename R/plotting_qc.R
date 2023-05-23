@@ -34,9 +34,14 @@
 #'     x = "Label", y = "Zerocounts", title = "Fully Depleted sgRNAs",
 #'     fill = "#394E80", ylab = "Zero Count sgRNAs", yaxis.addition = 10
 #' )
-plot_bar <- function(count.summary, x = "Label",
-                     y = "GiniIndex", title = "sgRNA Read Distribution", xlab = NULL,
-                     ylab = "Gini Index", fill = "#E69F00", yaxis.addition = 0.05) {
+plot_bar <- function(count.summary,
+                     x = "Label",
+                     y = "GiniIndex",
+                     title = "sgRNA Read Distribution",
+                     xlab = NULL,
+                     ylab = "Gini Index",
+                     fill = "#E69F00",
+                     yaxis.addition = 0.05) {
     gg <- BarView(count.summary,
         x = x,
         y = y,
@@ -98,8 +103,11 @@ plot_bar <- function(count.summary, x = "Label",
 #'     title = "Distribution of read counts",
 #'     xlab = "log2(counts + 1)", ylab = "Frequency"
 #' )
-plot_hist <- function(mat, title = NULL, xlab = "Values",
-                      ylab = "Frequency", show.grid = FALSE) {
+plot_hist <- function(mat,
+                      title = NULL,
+                      xlab = "Values",
+                      ylab = "Frequency",
+                      show.grid = FALSE) {
     histo <- hist(mat, breaks = 40)
 
     if (ncol(mat) >= 1) {
@@ -210,8 +218,10 @@ plot_hist <- function(mat, title = NULL, xlab = "Values",
 #' plot_correlation_heatmap(cor.mat)
 #' @author Jared Andrews
 #' @export
-plot_correlation_heatmap <- function(mat, min.color = "#FF0000",
-                                     max.color = "#0000FF", legend.title = "Pearson Corr.",
+plot_correlation_heatmap <- function(mat,
+                                     min.color = "#FF0000",
+                                     max.color = "#0000FF",
+                                     legend.title = "Pearson Corr.",
                                      plot.title = "Correlation Matrix") {
     Heatmap(mat,
         name = legend.title,

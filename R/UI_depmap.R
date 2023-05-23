@@ -20,6 +20,7 @@
 #'
 #' @rdname INTERNAL_create_tab_depmap
 .create_tab_depmap <- function(depmap.genes, depmap.meta) {
+    # nocov start
     tabPanel(
         title = "DepMap",
         id = "depmap",
@@ -326,4 +327,5 @@
             )
         )
     )
+    # nocov end
 }

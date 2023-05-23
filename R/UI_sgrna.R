@@ -19,6 +19,7 @@
 #'
 #' @rdname INTERNAL_create_tab_sgrna
 .create_tab_sgrna <- function(sgrna.choices, sgrna.gene) {
+    # nocov start
     tabPanel(
         title = "sgRNA",
         id = "sgrna",
@@ -116,6 +117,7 @@
             )
         )
     )
+    # nocov end
 }
 
 tab_sgrna_summary <- tabPanel(

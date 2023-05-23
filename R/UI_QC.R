@@ -17,6 +17,7 @@
 #'
 #' @rdname INTERNAL_create_tab_qc
 .create_tab_qc <- function(meta.choices) {
+    # nocov start
     tabPanel(
         title = "QC",
         id = "qc",
@@ -252,6 +253,7 @@
             )
         )
     )
+    # nocov end
 }
 
 tab_qc_summary <- tabPanel(

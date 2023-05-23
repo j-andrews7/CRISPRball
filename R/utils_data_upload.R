@@ -99,6 +99,7 @@ gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
     return(df)
 }
 
+
 #' Read user-uploaded gene summary files and assign sample names
 #' @param fileList A list of gene summary files uploaded by the user.
 #'

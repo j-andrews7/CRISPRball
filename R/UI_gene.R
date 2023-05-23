@@ -20,6 +20,7 @@
 #'
 #' @rdname INTERNAL_create_tab_gene
 .create_tab_gene <- function(dataset.choices, genesets) {
+    # nocov start
     tabPanel(
         title = "Gene (Overview)",
         id = "gene-overview",
@@ -417,6 +418,7 @@
             )
         )
     )
+    # nocov end
 }
 
 tab_gene_summary <- tabPanel(
