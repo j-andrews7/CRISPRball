@@ -235,3 +235,125 @@ test_that("plot_depmap_dependency function", {
         expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
     })
 })
+
+
+test_that("plot_depmap_expression function", {
+    # Create sample dataframe
+    df <- data.frame(
+        rna_expression = c(0.5, 0.2, 0.3, 0.4, 0.6),
+        hover.string = c("string1", "string2", "string3", "string4", "string5")
+    )
+
+    # Test that function returns a plotly object
+    test_that("plot_depmap_expression returns a plotly object", {
+        suppressWarnings(plot <- plot_depmap_expression(df))
+        expect_s3_class(plot, "plotly")
+    })
+
+    # Test that function can handle empty dataframes
+    test_that("plot_depmap_expression handles empty dataframes", {
+        df.empty <- data.frame()
+        suppressWarnings(plot <- plot_depmap_expression(df.empty))
+        expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    })
+
+    # Test the correct color assignment
+    test_that("plot_depmap_expression assigns correct colors", {
+        suppressWarnings(plot <- plot_depmap_expression(df, color = "#FF0000"))
+        traces <- plot$x$data
+        expect_equal(traces[[1]]$line$color, "rgba(255,0,0,1)")
+    })
+
+    # Test that the function can handle NULL input
+    test_that("plot_depmap_expression handles NULL input", {
+        suppressWarnings(plot <- plot_depmap_expression(NULL))
+        expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    })
+})
+
+
+test_that("plot_depmap_cn function", {
+    # Create sample dataframe
+    df <- data.frame(
+        log_copy_number = c(1, 1.2, 1.3, 1.4, 0.6),
+        hover.string = c("string1", "string2", "string3", "string4", "string5")
+    )
+
+    # Test that function returns a plotly object
+    test_that("plot_depmap_cn returns a plotly object", {
+        suppressWarnings(plot <- plot_depmap_cn(df))
+        expect_s3_class(plot, "plotly")
+    })
+
+    # Test that function can handle empty dataframes
+    test_that("plot_depmap_cn handles empty dataframes", {
+        df.empty <- data.frame()
+        suppressWarnings(plot <- plot_depmap_cn(df.empty))
+        expect_s3_class(plot, "plotly")
+        expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    })
+
+    # Test the correct color assignment
+    test_that("plot_depmap_cn assigns correct colors", {
+        suppressWarnings(plot <- plot_depmap_cn(df, color = "#FF0000"))
+        traces <- plot$x$data
+        expect_equal(traces[[1]]$line$color, "rgba(255,0,0,1)")
+    })
+
+    # Test that the function can handle NULL input
+    test_that("plot_depmap_cn handles NULL input", {
+        suppressWarnings(plot <- plot_depmap_cn(NULL))
+        expect_s3_class(plot, "plotly")
+        expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    })
+})
+
+
+test_that("plot_depmap_lineages function", {
+    # Create sample dataframe
+    df <- data.frame(
+        dependency = c(0.5, 0.2, 0.3, 0.4, 0.6),
+        lineage = c("A", "B", "A", "B", "A"),
+        hover.string = c("string1", "string2", "string3", "string4", "string5")
+    )
+
+    # Test that function returns a plotly object
+    test_that("plot_depmap_lineages returns a plotly object", {
+        suppressWarnings(plot <- plot_depmap_lineages(df, plot.val = "dependency", group.by = "lineage"))
+        expect_s3_class(plot, "plotly")
+    })
+
+    # Test that function can handle empty dataframes
+    test_that("plot_depmap_lineages handles empty dataframes", {
+        df.empty <- data.frame()
+        suppressWarnings(plot <- plot_depmap_lineages(df.empty, plot.val = "dependency", group.by = "lineage"))
+        expect_s3_class(plot, "plotly")
+        expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    })
+
+    # Test that function handles NULL lineage
+    test_that("plot_depmap_lineages handles NULL lineage", {
+        suppressWarnings(plot <- plot_depmap_lineages(df, plot.val = "dependency", group.by = "lineage", lineage = NULL))
+        suppressWarnings(pp <- plotly_build(plot))
+        traces <- pp$x$data
+        expect_equal(length(traces), 2) # Should be box and scatter plots
+    })
+
+    # Test that function filters data by specified lineage
+    test_that("plot_depmap_lineages filters data by specified lineage", {
+        suppressWarnings(plot <- plot_depmap_lineages(df, plot.val = "dependency", group.by = "lineage", lineage = "A"))
+        suppressWarnings(pp <- plotly_build(plot))
+        traces <- pp$x$data
+        expect_equal(length(traces), 2) # Should be box and scatter plots
+        # Verify data for each trace
+        expect_equal(length(traces[[1]]$x), 3) # 3 points in lineage "A"
+        expect_equal(length(traces[[2]]$x), 3) # 3 points in lineage "A"
+    })
+
+    # Test that the function can handle NULL input
+    test_that("plot_depmap_lineages handles NULL input", {
+        suppressWarnings(plot <- plot_depmap_lineages(NULL, plot.val = "dependency", group.by = "lineage"))
+        expect_s3_class(plot, "plotly")
+        expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    })
+})

@@ -212,7 +212,9 @@ plot_depmap_dependency <- function(df,
 #' library(CRISPRball)
 #' data(depmap_22q1_TPM)
 #' plot_depmap_expression(depmap_22q1_TPM)
-plot_depmap_expression <- function(df, color = "#7B8CB2", plot.grid = FALSE) {
+plot_depmap_expression <- function(df,
+                                   color = "#7B8CB2",
+                                   plot.grid = FALSE) {
     if (!is.null(df) && nrow(df) > 0) {
         df$color <- color
 
@@ -284,7 +286,7 @@ plot_depmap_cn <- function(df,
                 color = .data[["color"]], fill = .data[["color"]]
             )) +
             geom_rug(data = df, aes(
-                x = "log_copy_number",
+                x = .data[["log_copy_number"]],
                 color = .data[["color"]], text = .data[["hover.string"]],
                 fill = .data[["color"]]
             ), outside = FALSE) +
