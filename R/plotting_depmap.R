@@ -39,7 +39,7 @@ get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
                 'SELECT * FROM "crispr" WHERE "gene_name" == (:x)',
                 params = list(x = gene)
             )
-            
+
             df.r <- pool::dbGetQuery(depmap.pool,
                 'SELECT * FROM "rnai" WHERE "gene_name" == (:x)',
                 params = list(x = gene)
@@ -127,14 +127,26 @@ get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
 #' library(CRISPRball)
 #' data(depmap_22q1_crispr_rnai)
 #' plot_depmap_dependency(depmap_22q1_crispr_rnai)
-plot_depmap_dependency <- function(df, crispr.color = "#3584B5",
-                                   rnai.color = "#52288E", depline = TRUE, plot.grid = FALSE) {
+plot_depmap_dependency <- function(df,
+                                   crispr.color = "#3584B5",
+                                   rnai.color = "#52288E",
+                                   depline = TRUE,
+                                   plot.grid = FALSE) {
     # Plot construction.
     if (!is.null(df) && nrow(df) > 0) {
         gg <- ggplot() +
-            geom_density(data = df, aes_string(x = "dependency", color = "dataset", fill = "dataset"), alpha = 0.6) +
-            geom_rug(data = df[df$dataset == "CRISPR", ], aes_string(x = "dependency", color = "dataset", text = "hover.string"), outside = FALSE) +
-            geom_rug(data = df[df$dataset == "RNAi", ], aes_string(x = "dependency", color = "dataset", text = "hover.string"), sides = "t") +
+            geom_density(data = df, aes(
+                x = .data[["dependency"]], color = .data[["dataset"]],
+                fill = .data[["dataset"]]
+            ), alpha = 0.6) +
+            geom_rug(data = df[df$dataset == "CRISPR", ], aes(
+                x = .data[["dependency"]],
+                color = .data[["dataset"]], text = .data[["hover.string"]]
+            ), outside = FALSE) +
+            geom_rug(data = df[df$dataset == "RNAi", ], aes(
+                x = .data[["dependency"]],
+                color = .data[["dataset"]], text = .data[["hover.string"]]
+            ), sides = "t") +
             ylab("") +
             xlab("") +
             theme_bw() +
@@ -205,8 +217,15 @@ plot_depmap_expression <- function(df, color = "#7B8CB2", plot.grid = FALSE) {
         df$color <- color
 
         gg <- ggplot(show.legend = FALSE) +
-            geom_density(data = df, aes_string(x = "rna_expression", color = "color", fill = "color")) +
-            geom_rug(data = df, aes_string(x = "rna_expression", color = "color", text = "hover.string", fill = "color"), outside = FALSE) +
+            geom_density(data = df, aes(
+                x = .data[["rna_expression"]],
+                color = .data[["color"]], fill = .data[["color"]]
+            )) +
+            geom_rug(data = df, aes(
+                x = .data[["rna_expression"]],
+                color = .data[["color"]], text = .data[["hover.string"]],
+                fill = .data[["color"]]
+            ), outside = FALSE) +
             ylab("Density") +
             xlab("log2(TPM+1)") +
             theme_bw() +
@@ -253,13 +272,22 @@ plot_depmap_expression <- function(df, color = "#7B8CB2", plot.grid = FALSE) {
 #' library(CRISPRball)
 #' data(depmap_22q1_cn)
 #' plot_depmap_cn(depmap_22q1_cn)
-plot_depmap_cn <- function(df, color = "#CEA3CB", plot.grid = FALSE) {
+plot_depmap_cn <- function(df,
+                           color = "#CEA3CB",
+                           plot.grid = FALSE) {
     if (!is.null(df) && nrow(df) > 0) {
         df$color <- color
 
         gg <- ggplot(show.legend = FALSE) +
-            geom_density(data = df, aes_string(x = "log_copy_number", color = "color", fill = "color")) +
-            geom_rug(data = df, aes_string(x = "log_copy_number", color = "color", text = "hover.string", fill = "color"), outside = FALSE) +
+            geom_density(data = df, aes(
+                x = .data[["log_copy_number"]],
+                color = .data[["color"]], fill = .data[["color"]]
+            )) +
+            geom_rug(data = df, aes(
+                x = "log_copy_number",
+                color = .data[["color"]], text = .data[["hover.string"]],
+                fill = .data[["color"]]
+            ), outside = FALSE) +
             ylab("Density") +
             xlab("log2(Copy Number)") +
             theme_bw() +
@@ -294,7 +322,8 @@ plot_depmap_cn <- function(df, color = "#CEA3CB", plot.grid = FALSE) {
 #' @inheritParams plot_depmap_dependency
 #' @param plot.val Character scalar of column name to plot values from.
 #' @param group.by Character scalar of column name to group by.
-#' @param lineage Character scalar of lineage for which to plot sub-lineage data.
+#' @param lineage Character scalar of lineage for which
+#'   to plot sub-lineage data.
 #' @param label.size Numeric scaler for axis label size.
 #' @param pt.size Numeric scalar for point size.
 #' @param pt.color Character scalar for point color.
@@ -313,9 +342,14 @@ plot_depmap_cn <- function(df, color = "#CEA3CB", plot.grid = FALSE) {
 #' library(CRISPRball)
 #' data("depmap_22q1_rnai")
 #' plot_depmap_lineages(df = depmap_22q1_rnai, plot.val = "dependency", group.by = "lineage")
-plot_depmap_lineages <- function(df, plot.val, group.by,
+plot_depmap_lineages <- function(df,
+                                 plot.val,
+                                 group.by,
                                  lineage = NULL,
-                                 depline = TRUE, label.size = 12, pt.size = 5, pt.color = "#56B4E9",
+                                 depline = TRUE,
+                                 label.size = 12,
+                                 pt.size = 5,
+                                 pt.color = "#56B4E9",
                                  boxplot.fill = "#E2E2E2",
                                  boxplot.line.color = "#000000") {
     if (!is.null(df) && nrow(df) > 0) {
