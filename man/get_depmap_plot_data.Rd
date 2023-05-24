@@ -9,7 +9,8 @@ get_depmap_plot_data(gene, data.type, depmap.meta, depmap.pool)
 \arguments{
 \item{gene}{Character scalar of gene name.}
 
-\item{data.type}{Character scalar of data type to retrieve. One of "dependency", "cn", or "ccle_tpm".}
+\item{data.type}{Character scalar of data type to retrieve. One of "dependency",
+"crispr", "rnai", "cn", or "ccle_tpm".}
 
 \item{depmap.meta}{data.frame of DepMap cell line metadata, as stored in the 'meta' table
 of the SQLite database built by \code{\link{build_depmap_db}}.}

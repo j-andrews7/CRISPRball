@@ -26,7 +26,7 @@ the maximum values in the heatmap.}
 \item{plot.title}{Character scalar for title of the plot.}
 }
 \value{
-A Heatmap object. If only one column is present in the \code{data} matrix,
+A Heatmap object. If only one column is present in the \code{mat} matrix,
 returns a text grob indicating only one sample was provided.
 }
 \description{
