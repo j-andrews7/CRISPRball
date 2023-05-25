@@ -422,7 +422,7 @@ plot_pca_biplot <- function(pca.res,
         ))
 
         # get scaling parameter to match between variable loadings and rotated loadings
-        # This is cribbed almost verbatim from PCAtools code.
+        # This is identical to PCAtools approach.
         r <- min(
             (max(pca.res$rotated[, dim.x]) - min(pca.res$rotated[, dim.x]) /
                 (max(pca.res$loadings[, dim.x]) - min(pca.res$loadings[, dim.x]))),
