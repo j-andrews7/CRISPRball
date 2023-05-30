@@ -49,7 +49,7 @@ plot_lawn(
 )
 }
 \arguments{
-\item{res}{Dataframe containing, at minimum significance values and a term by which the x-axis can be ordered.}
+\item{res}{Dataframe containing, at minimum, significance values and a term by which the x-axis can be ordered.}
 
 \item{ylim}{Positive numeric scalar indicating y-axis limits.
 The negative value will be used for the lower limit.}
@@ -146,13 +146,15 @@ of saved plot when WebGL plotting is not used.}
 An interactive plotly rank plot.
 }
 \description{
-Create an interactive lawn plot for data with significance values. Typically, this plot is randomly
-ordered along the x-axis, but the user is free to order it by any term in \code{res} that they'd like.
+Create an interactive lawn plot for data with significance values.
+Typically, this plot is randomly ordered along the x-axis,
+but the user is free to order it by any term in \code{res} that they'd like.
 }
 \examples{
 library(CRISPRball)
-d1.genes <-  read.delim(system.file("extdata", "esc1.gene_summary.txt", 
-                                   package = "CRISPRball"), check.names = FALSE)
+d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
+    package = "CRISPRball"
+), check.names = FALSE)
 plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
 plot_lawn(plot.df, feat.term = "id")
 }
