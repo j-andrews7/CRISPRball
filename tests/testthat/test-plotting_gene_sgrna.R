@@ -84,7 +84,7 @@ test_that("plot_rank handles NULL significance term gracefully", {
 ## plot_lawn
 test_that("plot_lawn runs without errors with required inputs", {
     plot <- plot_lawn(
-        res = dummy.data,
+        res = df.lawn,
         x.term = "RandomIndex",
         lfc.term = "LFC",
         sig.term = "FDR",
@@ -95,7 +95,7 @@ test_that("plot_lawn runs without errors with required inputs", {
 
 test_that("plot_lawn fails gracefully with non-existent x.term", {
     plot <- plot_lawn(
-        res = dummy.data,
+        res = df.lawn,
         x.term = "NonExistentColumn",
         lfc.term = "LFC",
         sig.term = "FDR",
@@ -107,7 +107,7 @@ test_that("plot_lawn fails gracefully with non-existent x.term", {
 
 test_that("plot_lawn fails gracefully with non-existent lfc.term", {
     plot <- plot_lawn(
-        res = dummy.data,
+        res = df.lawn,
         x.term = "RandomIndex",
         lfc.term = "NonExistentColumn",
         sig.term = "FDR",
@@ -119,7 +119,7 @@ test_that("plot_lawn fails gracefully with non-existent lfc.term", {
 
 test_that("plot_lawn fails gracefully with non-existent sig.term", {
     plot <- plot_lawn(
-        res = dummy.data,
+        res = df.lawn,
         x.term = "RandomIndex",
         lfc.term = "LFC",
         sig.term = "NonExistentColumn",
@@ -131,7 +131,7 @@ test_that("plot_lawn fails gracefully with non-existent sig.term", {
 
 test_that("plot_lawn fails gracefully with non-existent feat.term", {
     plot <- plot_lawn(
-        res = dummy.data,
+        res = df.lawn,
         x.term = "RandomIndex",
         lfc.term = "LFC",
         sig.term = "FDR",

@@ -52,6 +52,7 @@
 CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL, norm.counts = NULL, h.id = "mag1",
                        positive.ctrl.genes = NULL, essential.genes = NULL,
                        depmap.db = NULL, genesets = NULL, return.app = TRUE) {
+                        
     # Increase file upload size limit to 50MB, which should cover pretty much any use case.
     options(shiny.maxRequestSize = 50 * 1024^2)
 
@@ -100,7 +101,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     }
 
     ui <- navbarPage(
-        title = div(a(img(src = "logo/CRISPRball_Hex.png", height = "50"), href = "https://bioconductor.org/packages/CRISPRball"), "CRISPRball"),
+        title = div(a(img(src = "logo/CRISPRball_Hex.png", height = "50"),
+            href = "https://bioconductor.org/packages/CRISPRball"
+        ), "CRISPRball"),
         selected = default.tab,
         header = list(
             useShinyjs(),
@@ -134,21 +137,47 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     server <- function(input, output, session) {
         # -------------Reactive Values---------------
         robjects <- reactiveValues(
-            gene.data = gene.data, sgrna.data = sgrna.data,
-            count.summary = count.summary, norm.counts = norm.counts,
-            depmap.meta = depmap.meta, depmap.gene = depmap.gene, depmap.release = depmap.release, pool = pool,
-            clicked.volc1 = NULL, clicked.rank1 = NULL, clicked.lawn1 = NULL,
-            clicked.volc2 = NULL, clicked.rank2 = NULL, clicked.lawn2 = NULL,
-            comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
-            positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
-            genesets = genesets, pc = NULL, h.id = h.id,
-            plot.qc.pca = NULL, plot.qc.missed = NULL, plot.qc.gini = NULL,
-            plot.qc.hist = NULL, plot.qc.corr = NULL, plot.qc.map = NULL,
-            plot.gene1.vol = NULL, plot.gene1.rank = NULL, plot.gene1.lawn = NULL,
-            plot.gene2.vol = NULL, plot.gene2.rank = NULL, plot.gene2.lawn = NULL,
-            plot.sgrna1.counts = NULL, plot.sgrna1.rank = NULL,
-            plot.depmap.essplot = NULL, plot.depmap.expplot = NULL, plot.depmap.cnplot = NULL,
-            plot.depmap.lineages = NULL, plot.depmap.sublineage = NULL
+            gene.data = gene.data,
+            sgrna.data = sgrna.data,
+            count.summary = count.summary,
+            norm.counts = norm.counts,
+            depmap.meta = depmap.meta,
+            depmap.gene = depmap.gene,
+            depmap.release = depmap.release,
+            pool = pool,
+            clicked.volc1 = NULL,
+            clicked.rank1 = NULL,
+            clicked.lawn1 = NULL,
+            clicked.volc2 = NULL,
+            clicked.rank2 = NULL,
+            clicked.lawn2 = NULL,
+            comps = list(),
+            comp.neg.genes = list(),
+            comp.pos.genes = list(),
+            positive.ctrl.genes = positive.ctrl.genes,
+            essential.genes = essential.genes,
+            genesets = genesets,
+            pc = NULL,
+            h.id = h.id,
+            plot.qc.pca = NULL,
+            plot.qc.missed = NULL,
+            plot.qc.gini = NULL,
+            plot.qc.hist = NULL,
+            plot.qc.corr = NULL,
+            plot.qc.map = NULL,
+            plot.gene1.vol = NULL,
+            plot.gene1.rank = NULL,
+            plot.gene1.lawn = NULL,
+            plot.gene2.vol = NULL,
+            plot.gene2.rank = NULL,
+            plot.gene2.lawn = NULL,
+            plot.sgrna1.counts = NULL,
+            plot.sgrna1.rank = NULL,
+            plot.depmap.essplot = NULL,
+            plot.depmap.expplot = NULL,
+            plot.depmap.cnplot = NULL,
+            plot.depmap.lineages = NULL,
+            plot.depmap.sublineage = NULL
         )
 
         # Create downloadHander outputs.

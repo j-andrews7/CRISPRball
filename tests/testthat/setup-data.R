@@ -1,6 +1,8 @@
 # Example data for tests
-library(pool)
-library(RSQLite)
+stopifnot(
+    require(pool),
+    require(RSQLite)
+)
 
 # plot_bar
 count.summary <- data.frame(
@@ -88,25 +90,25 @@ df.empty <- data.frame()
 
 # plot_depmap_expression
 df.expression <- data.frame(
-        rna_expression = c(0.5, 0.2, 0.3, 0.4, 0.6),
-        hover.string = c("string1", "string2", "string3", "string4", "string5")
-    )
+    rna_expression = c(0.5, 0.2, 0.3, 0.4, 0.6),
+    hover.string = c("string1", "string2", "string3", "string4", "string5")
+)
 
 # plot_depmap_cn
 df.cn <- data.frame(
-        log_copy_number = c(1, 1.2, 1.3, 1.4, 0.6),
-        hover.string = c("string1", "string2", "string3", "string4", "string5")
-    )
+    log_copy_number = c(1, 1.2, 1.3, 1.4, 0.6),
+    hover.string = c("string1", "string2", "string3", "string4", "string5")
+)
 
 # plot_depmap_lineages
 df.lineages <- data.frame(
-        dependency = c(0.5, 0.2, 0.3, 0.4, 0.6),
-        lineage = c("A", "B", "A", "B", "A"),
-        hover.string = c("string1", "string2", "string3", "string4", "string5")
-    )
+    dependency = c(0.5, 0.2, 0.3, 0.4, 0.6),
+    lineage = c("A", "B", "A", "B", "A"),
+    hover.string = c("string1", "string2", "string3", "string4", "string5")
+)
 
 # plot_lawn
-dummy.data <- data.frame(
+df.lawn <- data.frame(
     RandomIndex = runif(50),
     LFC = rnorm(50),
     FDR = runif(50),
