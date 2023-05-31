@@ -421,11 +421,29 @@
     # nocov end
 }
 
-tab_gene_summary <- tabPanel(
-    title = "Gene Summary Tables",
-    id = "gene-summ",
-    br(),
-    div(withSpinner(DT::dataTableOutput("gene1.summary")), style = "font-size:80%;"),
-    br(),
-    div(withSpinner(DT::dataTableOutput("gene2.summary")), style = "font-size:80%;")
-)
+
+#' Create a tabPanel for the gene summary tab
+#'
+#' Create a \code{\link{tabPanel}} with UI elements for the gene summary tab.
+#'
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the gene summary tab.
+#'
+#' @author Jared Andrews
+#'
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shinycssloaders withSpinner
+#'
+#' @rdname INTERNAL_create_tab_gene_summary
+.create_tab_gene_summary <- function() {
+    # nocov start
+    tabPanel(
+        title = "Gene Summary Tables",
+        id = "gene-summ",
+        br(),
+        div(withSpinner(DT::dataTableOutput("gene1.summary")), style = "font-size:80%;"),
+        br(),
+        div(withSpinner(DT::dataTableOutput("gene2.summary")), style = "font-size:80%;")
+    )
+    # nocov end
+}

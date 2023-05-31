@@ -120,11 +120,29 @@
     # nocov end
 }
 
-tab_sgrna_summary <- tabPanel(
-    title = "sgRNA Summary Tables",
-    id = "sgrna-tables",
-    br(),
-    div(withSpinner(DT::dataTableOutput("sgrna1.summary")), style = "font-size:80%;"),
-    br(),
-    div(withSpinner(DT::dataTableOutput("sgrna2.summary")), style = "font-size:80%;")
-)
+
+#' Create a tabPanel for the sgrna summary tab
+#'
+#' Create a \code{\link{tabPanel}} with UI elements for the sgrna summary tab.
+#'
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the sgrna summary tab.
+#'
+#' @author Jared Andrews
+#'
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shinycssloaders withSpinner
+#'
+#' @rdname INTERNAL_create_tab_sgrna_summary
+.create_tab_sgrna_summary <- function() {
+    # nocov start
+    tabPanel(
+        title = "sgRNA Summary Tables",
+        id = "sgrna-tables",
+        br(),
+        div(withSpinner(DT::dataTableOutput("sgrna1.summary")), style = "font-size:80%;"),
+        br(),
+        div(withSpinner(DT::dataTableOutput("sgrna2.summary")), style = "font-size:80%;")
+    )
+    # nocov end
+}

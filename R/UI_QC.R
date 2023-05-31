@@ -256,9 +256,26 @@
     # nocov end
 }
 
-tab_qc_summary <- tabPanel(
-    title = "QC Table",
-    id = "qc-table",
-    br(),
-    DTOutput("count.summary")
-)
+
+#' Create a tabPanel for the qc summary tab
+#'
+#' Create a \code{\link{tabPanel}} with UI elements for the qc summary tab.
+#'
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the qc summary tab.
+#'
+#' @author Jared Andrews
+#'
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#'
+#' @rdname INTERNAL_create_tab_qc_summary
+.create_tab_qc_summary <- function() {
+    # nocov start
+    tabPanel(
+        title = "QC Table",
+        id = "qc-table",
+        br(),
+        DTOutput("count.summary")
+    )
+    # nocov end
+}

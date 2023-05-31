@@ -52,7 +52,7 @@
 CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL, norm.counts = NULL, h.id = "mag1",
                        positive.ctrl.genes = NULL, essential.genes = NULL,
                        depmap.db = NULL, genesets = NULL, return.app = TRUE) {
-                        
+
     # Increase file upload size limit to 50MB, which should cover pretty much any use case.
     options(shiny.maxRequestSize = 50 * 1024^2)
 
@@ -112,25 +112,25 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
             tags$head(tags$link(rel = "shortcut icon", href = "logo/CRISPRball_Hex.png"))
         ),
         # ---------------Data Upload-----------------
-        tab_data_upload,
+        .create_tab_data_upload(),
         # ----------------QC--------------------
         .create_tab_qc(meta.choices),
         # -------------------QC Table----------------
-        tab_qc_summary,
+        .create_tab_qc_summary(),
         # ------------------Gene (Overview)-------------
         .create_tab_gene(gene.choices, genesets),
         # ----------------Gene Summary Tables--------------
-        tab_gene_summary,
+        .create_tab_gene_summary(),
         # ----------------sgRNA---------------------
         .create_tab_sgrna(sgrna.choices, sgrna.gene),
         # --------------------sgRNA Summary Tables----------------
-        tab_sgrna_summary,
+        .create_tab_sgrna_summary(),
         # --------------------Dataset Comparisons----------------
         .create_tab_comparison(gene.choices),
         # -----------------DepMap-------------------
         .create_tab_depmap(depmap.gene, depmap.meta),
         # -----------------About-------------------
-        tab_about
+        .create_tab_about()
     )
 
 
