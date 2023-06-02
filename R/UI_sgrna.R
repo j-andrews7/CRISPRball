@@ -51,7 +51,12 @@
                             pickerInput("sgrna.gene", "Choose gene:",
                                 choices = sgrna.gene,
                                 multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE)
-                            )
+                            ),
+                            prettyCheckbox("sgrna.rank.ascending",
+                                label = "Ascending Rank", value = TRUE,
+                                animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")
+                            ),
+                            uiOutput("sgrna.rank.options"),
                         )
                     ),
                     style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "
@@ -82,7 +87,7 @@
                             popify(icon("circle-info", style = "font-size: 20px"),
                                 title = "Rank Plot",
                                 c(
-                                    "This rank plot shows the log2 fold change on the y-axis and the sgRNA rank on the x-axis. ",
+                                    "This rank plot shows the 'rank by' term on the y-axis and the sgRNA rank on the x-axis. ",
                                     "sgRNAs for the selected gene will be highlighted. ",
                                     "Click and drag to zoom in. Hover over a point for additional info."
                                 ),

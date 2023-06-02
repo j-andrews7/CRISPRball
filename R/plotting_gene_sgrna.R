@@ -435,13 +435,13 @@ plot_volcano <- function(res,
 #' Create an interactive rank plot for data with fold change, significance terms, and rank.
 #'
 #' @inheritParams plot_volcano
-#' @param res Dataframe containing, at minimum, fold change, rank, and significance values.
+#' @param res Dataframe containing, at minimum, significance values and something to rank by (LFC, RRA score, betas, etc).
 #' @param ylim Numeric vector of length two for the y-axis limits.
 #' @param y.thresh Numeric scalar used as the y-axis threshold for point coloring.
 #'   The negative of this value is also used as the threshold.
 #' @param y.lines Logical as for whether or not to show horizontal lines at \code{y.thresh}.
-#' @param y.term Character scalar for the y-axis term from \code{res} to be plotted.
-#' @param x.term Character scalar for the x-axis term from \code{res} to be plotted.
+#' @param rank.term Character scalar for the term to rank by from \code{res}. This will be used as the y-axis.
+#' @param rank.ascending Boolean indicating whether or not the rank should be ascending.
 #'
 #' @return An interactive plotly rank plot.
 #'
@@ -464,8 +464,8 @@ plot_rank <- function(res,
                       h.id = "crispr",
                       feat.term = "rows",
                       sig.term = "FDR",
-                      y.term = "LFC",
-                      x.term = "Rank",
+                      rank.term = "LFC",
+                      rank.ascending = TRUE,
                       down.color = "#0026ff",
                       up.color = "#ff0000",
                       insig.color = "#A6A6A6",
@@ -498,9 +498,7 @@ plot_rank <- function(res,
                       highlight.featsets.label = FALSE,
                       h.id.suffix = "_volc") {
     # Check for required columns.
-    if (!x.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", x.term, "' not found in dataframe."))
-    } else if (!y.term %in% colnames(res)) {
+    if (!rank.term %in% colnames(res)) {
         fig <- .empty_plot(paste0("Column '", y.term, "' not found in dataframe."))
     } else if (!is.null(sig.term) & !sig.term %in% colnames(res)) {
         fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."))
@@ -532,11 +530,11 @@ plot_rank <- function(res,
 
         # Significance filter, if provided.
         if (!is.null(sig.term) & !is.null(sig.thresh)) {
-            up.feats <- res[[sig.term]] < sig.thresh & res[[y.term]] > y.thresh
-            dn.feats <- res[[sig.term]] < sig.thresh & res[[y.term]] < -y.thresh
+            up.feats <- res[[sig.term]] < sig.thresh & res[[rank.term]] > y.thresh
+            dn.feats <- res[[sig.term]] < sig.thresh & res[[rank.term]] < -y.thresh
         } else {
-            up.feats <- res[[y.term]] > y.thresh
-            dn.feats <- res[[y.term]] < -y.thresh
+            up.feats <- res[[rank.term]] > y.thresh
+            dn.feats <- res[[rank.term]] < -y.thresh
         }
 
         res$col[up.feats] <- up.color
@@ -549,8 +547,14 @@ plot_rank <- function(res,
         res$order[dn.feats] <- 1
         res$opacity[dn.feats] <- sig.opacity
 
-        res$x <- res[[x.term]]
-        res$y <- res[[y.term]]
+        # Add rank column by rank.term
+        if (rank.ascending) {
+            res$x <- rank(res[[rank.term]], ties.method = "first")
+        } else {
+            res$x <- rank(-res[[rank.term]], ties.method = "first")
+        }
+
+        res$y <- res[[rank.term]]
 
         res$col[res$y < y.thresh & res$y > -y.thresh] <- insig.color
 
@@ -628,8 +632,8 @@ plot_rank <- function(res,
 
         res$hover.string <- paste(
             "</br><b>", feat.term, ":</b> ", res$feat,
-            "</br><b>", x.term, ":</b> ", res[[x.term]],
-            "</br><b>", y.term, ":</b> ", format(round(res[[y.term]], 4), nsmall = 4),
+            "</br><b>Rank:</b> ", res$x,
+            "</br><b>", rank.term, ":</b> ", format(round(res[[rank.term]], 4), nsmall = 4),
             "</br><b>", sig.term, ":</b> ", format(round(res[[sig.term]], 6), nsmall = 6)
         )
 
@@ -653,7 +657,7 @@ plot_rank <- function(res,
             mirror = TRUE,
             linecolor = toRGB("black"),
             linewidth = 0.5,
-            title = y.term,
+            title = rank.term,
             range = ylim,
             showgrid = FALSE,
             layer = "below traces",
@@ -667,7 +671,7 @@ plot_rank <- function(res,
             mirror = TRUE,
             linecolor = toRGB("black"),
             linewidth = 0.5,
-            title = x.term,
+            title = "Rank",
             range = list(-(0.03 * nrow(res)), nrow(res) + (0.03 * nrow(res))),
             showgrid = FALSE,
             layer = "below traces",

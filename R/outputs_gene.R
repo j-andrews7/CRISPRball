@@ -11,11 +11,22 @@
 #'
 #' @author Jared Andrews
 #'
-#' @importFrom shiny isolate
+#' @importFrom shiny isolate selectInput tagList renderUI
 #' @importFrom plotly renderPlotly
 #' @importFrom DT renderDT datatable formatStyle
 #' @rdname INTERNAL_create_gene_outputs
 .create_gene_outputs <- function(input, output, robjects) {
+    # nocov start
+    output$gene.rank.options <- renderUI({
+        req(robjects$set1.genes)
+        df <- robjects$set1.genes
+
+        tagList(
+            selectInput("gene.rankby", "Rank by:", choices = names(df), selected = ifelse("LFC" %in% names(df), "LFC", NULL))
+        )
+    })
+    # nocov end
+
     # nocov start
     output$gene1.summary <- renderDT(server = FALSE, {
         req(robjects$set1.genes)
@@ -159,7 +170,7 @@
 
     # nocov start
     output$gene1.rank <- renderPlotly({
-        req(robjects$set1.genes)
+        req(robjects$set1.genes, input$gene.rankby)
         input$rank.update
 
         df <- robjects$set1.genes
@@ -215,8 +226,8 @@
             h.id = robjects$h.id,
             h.id.suffix = "_rank1",
             sig.term = "FDR",
-            y.term = "LFC",
-            x.term = "Rank",
+            rank.term = isolate(input$gene.rankby),
+            rank.ascending = isolate(input$gene.rank.ascending),
             feat.term = "id",
             hover.info = c("hit_type", "goodsgrna"),
             fs = robjects$clicked.rank1,
@@ -514,7 +525,7 @@
 
     # nocov start
     output$gene2.rank <- renderPlotly({
-        req(robjects$set2.genes)
+        req(robjects$set2.genes, input$gene.rankby)
         input$rank.update
 
         hov.info <- c("hit_type", "num", "goodsgrna")
@@ -570,8 +581,8 @@
             h.id = robjects$h.id,
             h.id.suffix = "_rank2",
             sig.term = "FDR",
-            y.term = "LFC",
-            x.term = "Rank",
+            rank.term = isolate(input$gene.rankby),
+            rank.ascending = isolate(input$gene.rank.ascending),
             feat.term = "id",
             hover.info = hov.info,
             fs = robjects$clicked.rank2,

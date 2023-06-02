@@ -280,6 +280,9 @@ CRISPRball <- function(gene.data = NULL,
         # Summary tables and plots.
         .create_gene_outputs(input, output, robjects)
 
+        # This ensures the rank options are updated even when initially hidden in the collapsible panel.
+        outputOptions(output, "gene.rank.options", suspendWhenHidden = FALSE)
+
         #---------------sgRNA & Summary Tables Tabs-----------------
         # Load the gene summaries for easy plotting.
         .create_sgrna_observers(input, robjects)
