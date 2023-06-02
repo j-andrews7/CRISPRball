@@ -49,6 +49,47 @@
 #'
 #' @author Jared Andrews, Jacob Steele
 #' @export
+#' @examples
+#' library(CRISPRball)
+#' # Create app with no data loaded.
+#' app <- CRISPRball()
+#' if (interactive()) {
+#'     shiny::runApp(app)
+#' }
+#'
+#' # Create app with data loaded.
+#' # Create lists of results summaries for each dataset.
+#' d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#' d2.genes <- read.delim(system.file("extdata", "plasmid.gene_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#'
+#' d1.sgrnas <- read.delim(system.file("extdata", "esc1.sgrna_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#' d2.sgrnas <- read.delim(system.file("extdata", "plasmid.sgrna_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#'
+#' count.summ <- read.delim(system.file("extdata", "escneg.countsummary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#' norm.counts <- read.delim(system.file("extdata", "escneg.count_normalized.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#'
+#' genes <- list(ESC = d1.genes, plasmid = d2.genes)
+#' sgrnas <- list(ESC = d1.sgrnas, plasmid = d2.sgrnas)
+#'
+#' app <- CRISPRball(
+#'     gene.data = genes, sgrna.data = sgrnas,
+#'     count.summary = count.summ, norm.counts = norm.counts
+#' )
+#' if (interactive()) {
+#'     shiny::runApp(app)
+#' }
 CRISPRball <- function(gene.data = NULL,
                        sgrna.data = NULL,
                        count.summary = NULL,
@@ -59,7 +100,6 @@ CRISPRball <- function(gene.data = NULL,
                        depmap.db = NULL,
                        genesets = NULL,
                        return.app = TRUE) {
-
     # Increase file upload size limit to 50MB, which should cover pretty much any use case.
     options(shiny.maxRequestSize = 50 * 1024^2)
 
