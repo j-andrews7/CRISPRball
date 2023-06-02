@@ -49,9 +49,16 @@
 #'
 #' @author Jared Andrews, Jacob Steele
 #' @export
-CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL, norm.counts = NULL, h.id = "mag1",
-                       positive.ctrl.genes = NULL, essential.genes = NULL,
-                       depmap.db = NULL, genesets = NULL, return.app = TRUE) {
+CRISPRball <- function(gene.data = NULL,
+                       sgrna.data = NULL,
+                       count.summary = NULL,
+                       norm.counts = NULL,
+                       h.id = "mag1",
+                       positive.ctrl.genes = NULL,
+                       essential.genes = NULL,
+                       depmap.db = NULL,
+                       genesets = NULL,
+                       return.app = TRUE) {
 
     # Increase file upload size limit to 50MB, which should cover pretty much any use case.
     options(shiny.maxRequestSize = 50 * 1024^2)
@@ -215,7 +222,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         .create_upload_observers(input, session, robjects)
 
         # -----------QC & QC Summary Tabs------------
-        # PCA.
         .create_qc_observers(input, robjects)
 
         .create_qc_outputs(input, output, robjects)
@@ -228,7 +234,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         })
 
         #---------Gene (Overview) & Summary Tables Tabs-------------
-
         # Load the gene summaries for easy plotting.
         .create_gene_observers(input, robjects)
 
@@ -236,7 +241,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         .create_gene_outputs(input, output, robjects)
 
         #---------------sgRNA & Summary Tables Tabs-----------------
-
         # Load the gene summaries for easy plotting.
         .create_sgrna_observers(input, robjects)
 

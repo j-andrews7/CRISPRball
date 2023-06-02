@@ -3,5 +3,4 @@
 *.dcf
 *.sqlite
 INTERNAL_*
-.Rbuildignore
 *.Rproj
