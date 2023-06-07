@@ -49,9 +49,57 @@
 #'
 #' @author Jared Andrews, Jacob Steele
 #' @export
-CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL, norm.counts = NULL, h.id = "mag1",
-                       positive.ctrl.genes = NULL, essential.genes = NULL,
-                       depmap.db = NULL, genesets = NULL, return.app = TRUE) {
+#' @examples
+#' library(CRISPRball)
+#' # Create app with no data loaded.
+#' app <- CRISPRball()
+#' if (interactive()) {
+#'     shiny::runApp(app)
+#' }
+#'
+#' # Create app with data loaded.
+#' # Create lists of results summaries for each dataset.
+#' d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#' d2.genes <- read.delim(system.file("extdata", "plasmid.gene_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#'
+#' d1.sgrnas <- read.delim(system.file("extdata", "esc1.sgrna_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#' d2.sgrnas <- read.delim(system.file("extdata", "plasmid.sgrna_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#'
+#' count.summ <- read.delim(system.file("extdata", "escneg.countsummary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#' norm.counts <- read.delim(system.file("extdata", "escneg.count_normalized.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
+#'
+#' genes <- list(ESC = d1.genes, plasmid = d2.genes)
+#' sgrnas <- list(ESC = d1.sgrnas, plasmid = d2.sgrnas)
+#'
+#' app <- CRISPRball(
+#'     gene.data = genes, sgrna.data = sgrnas,
+#'     count.summary = count.summ, norm.counts = norm.counts
+#' )
+#' if (interactive()) {
+#'     shiny::runApp(app)
+#' }
+CRISPRball <- function(gene.data = NULL,
+                       sgrna.data = NULL,
+                       count.summary = NULL,
+                       norm.counts = NULL,
+                       h.id = "mag1",
+                       positive.ctrl.genes = NULL,
+                       essential.genes = NULL,
+                       depmap.db = NULL,
+                       genesets = NULL,
+                       return.app = TRUE) {
     # Increase file upload size limit to 50MB, which should cover pretty much any use case.
     options(shiny.maxRequestSize = 50 * 1024^2)
 
@@ -100,7 +148,9 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
     }
 
     ui <- navbarPage(
-        title = div(a(img(src = "logo/CRISPRball_Hex.png", height = "50"), href = "https://bioconductor.org/packages/CRISPRball"), "CRISPRball"),
+        title = div(a(img(src = "logo/CRISPRball_Hex.png", height = "50"),
+            href = "https://bioconductor.org/packages/CRISPRball"
+        ), "CRISPRball"),
         selected = default.tab,
         header = list(
             useShinyjs(),
@@ -109,46 +159,72 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
             tags$head(tags$link(rel = "shortcut icon", href = "logo/CRISPRball_Hex.png"))
         ),
         # ---------------Data Upload-----------------
-        tab_data_upload,
+        .create_tab_data_upload(),
         # ----------------QC--------------------
         .create_tab_qc(meta.choices),
         # -------------------QC Table----------------
-        tab_qc_summary,
+        .create_tab_qc_summary(),
         # ------------------Gene (Overview)-------------
         .create_tab_gene(gene.choices, genesets),
         # ----------------Gene Summary Tables--------------
-        tab_gene_summary,
+        .create_tab_gene_summary(),
         # ----------------sgRNA---------------------
         .create_tab_sgrna(sgrna.choices, sgrna.gene),
         # --------------------sgRNA Summary Tables----------------
-        tab_sgrna_summary,
+        .create_tab_sgrna_summary(),
         # --------------------Dataset Comparisons----------------
         .create_tab_comparison(gene.choices),
         # -----------------DepMap-------------------
         .create_tab_depmap(depmap.gene, depmap.meta),
         # -----------------About-------------------
-        tab_about
+        .create_tab_about()
     )
 
 
     server <- function(input, output, session) {
         # -------------Reactive Values---------------
         robjects <- reactiveValues(
-            gene.data = gene.data, sgrna.data = sgrna.data,
-            count.summary = count.summary, norm.counts = norm.counts,
-            depmap.meta = depmap.meta, depmap.gene = depmap.gene, depmap.release = depmap.release, pool = pool,
-            clicked.volc1 = NULL, clicked.rank1 = NULL, clicked.lawn1 = NULL,
-            clicked.volc2 = NULL, clicked.rank2 = NULL, clicked.lawn2 = NULL,
-            comps = list(), comp.neg.genes = list(), comp.pos.genes = list(),
-            positive.ctrl.genes = positive.ctrl.genes, essential.genes = essential.genes,
-            genesets = genesets, pc = NULL, h.id = h.id,
-            plot.qc.pca = NULL, plot.qc.missed = NULL, plot.qc.gini = NULL,
-            plot.qc.hist = NULL, plot.qc.corr = NULL, plot.qc.map = NULL,
-            plot.gene1.vol = NULL, plot.gene1.rank = NULL, plot.gene1.lawn = NULL,
-            plot.gene2.vol = NULL, plot.gene2.rank = NULL, plot.gene2.lawn = NULL,
-            plot.sgrna1.counts = NULL, plot.sgrna1.rank = NULL,
-            plot.depmap.essplot = NULL, plot.depmap.expplot = NULL, plot.depmap.cnplot = NULL,
-            plot.depmap.lineages = NULL, plot.depmap.sublineage = NULL
+            gene.data = gene.data,
+            sgrna.data = sgrna.data,
+            count.summary = count.summary,
+            norm.counts = norm.counts,
+            depmap.meta = depmap.meta,
+            depmap.gene = depmap.gene,
+            depmap.release = depmap.release,
+            pool = pool,
+            clicked.volc1 = NULL,
+            clicked.rank1 = NULL,
+            clicked.lawn1 = NULL,
+            clicked.volc2 = NULL,
+            clicked.rank2 = NULL,
+            clicked.lawn2 = NULL,
+            comps = list(),
+            comp.neg.genes = list(),
+            comp.pos.genes = list(),
+            positive.ctrl.genes = positive.ctrl.genes,
+            essential.genes = essential.genes,
+            genesets = genesets,
+            pc = NULL,
+            h.id = h.id,
+            plot.qc.pca = NULL,
+            plot.qc.missed = NULL,
+            plot.qc.gini = NULL,
+            plot.qc.hist = NULL,
+            plot.qc.corr = NULL,
+            plot.qc.map = NULL,
+            plot.gene1.vol = NULL,
+            plot.gene1.rank = NULL,
+            plot.gene1.lawn = NULL,
+            plot.gene2.vol = NULL,
+            plot.gene2.rank = NULL,
+            plot.gene2.lawn = NULL,
+            plot.sgrna1.counts = NULL,
+            plot.sgrna1.rank = NULL,
+            plot.depmap.essplot = NULL,
+            plot.depmap.expplot = NULL,
+            plot.depmap.cnplot = NULL,
+            plot.depmap.lineages = NULL,
+            plot.depmap.sublineage = NULL
         )
 
         # Create downloadHander outputs.
@@ -186,7 +262,6 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         .create_upload_observers(input, session, robjects)
 
         # -----------QC & QC Summary Tabs------------
-        # PCA.
         .create_qc_observers(input, robjects)
 
         .create_qc_outputs(input, output, robjects)
@@ -199,15 +274,16 @@ CRISPRball <- function(gene.data = NULL, sgrna.data = NULL, count.summary = NULL
         })
 
         #---------Gene (Overview) & Summary Tables Tabs-------------
-
         # Load the gene summaries for easy plotting.
         .create_gene_observers(input, robjects)
 
         # Summary tables and plots.
         .create_gene_outputs(input, output, robjects)
 
-        #---------------sgRNA & Summary Tables Tabs-----------------
+        # This ensures the rank options are updated even when initially hidden in the collapsible panel.
+        outputOptions(output, "gene.rank.options", suspendWhenHidden = FALSE)
 
+        #---------------sgRNA & Summary Tables Tabs-----------------
         # Load the gene summaries for easy plotting.
         .create_sgrna_observers(input, robjects)
 

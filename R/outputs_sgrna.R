@@ -17,6 +17,17 @@
 #' @rdname INTERNAL_create_sgrna_outputs
 .create_sgrna_outputs <- function(input, output, robjects) {
     # nocov start
+    output$sgrna.rank.options <- renderUI({
+        req(robjects$set1.sgrnas)
+        df <- robjects$set1.sgrnas
+
+        tagList(
+            selectInput("sgrna.rankby", "Rank by:", choices = names(df), selected = ifelse("LFC" %in% names(df), "LFC", NULL))
+        )
+    })
+    # nocov end
+
+    # nocov start
     output$sgrna1.summary <- renderDT(server = FALSE, {
         req(robjects$set1.sgrnas)
 
@@ -53,7 +64,7 @@
 
     # nocov start
     output$sgrna1.rank <- renderPlotly({
-        req(robjects$set1.sgrnas)
+        req(robjects$set1.sgrnas, input$sgrna.rankby)
         input$rank.update
 
         df <- robjects$set1.sgrnas
@@ -65,15 +76,18 @@
 
         fig <- plot_rank(
             res = df,
-            ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
+            ylim = list(
+                min(df[[isolate(input$sgrna.rankby)]]) - 0.5,
+                max(df[[isolate(input$sgrna.rankby)]]) + 0.5
+            ),
             y.thresh = 0,
             y.lines = FALSE,
             sig.thresh = 0,
             h.id = robjects$h.id,
             h.id.suffix = "_sgrank1",
             sig.term = "FDR",
-            y.term = "LFC",
-            x.term = "Rank",
+            rank.term = isolate(input$sgrna.rankby),
+            rank.ascending = isolate(input$sgrna.rank.ascending),
             feat.term = "sgrna",
             hover.info = hov.info,
             fs = NULL,
@@ -172,7 +186,7 @@
 
     # nocov start
     output$sgrna2.rank <- renderPlotly({
-        req(robjects$set2.sgrnas)
+        req(robjects$set2.sgrnas, input$sgrna.rankby)
         input$rank.update
 
         df <- robjects$set2.sgrnas
@@ -184,15 +198,18 @@
 
         fig <- plot_rank(
             res = df,
-            ylim = list(min(df$LFC) - 0.5, max(df$LFC) + 0.5),
+            ylim = list(
+                min(df[[isolate(input$sgrna.rankby)]]) - 0.5,
+                max(df[[isolate(input$sgrna.rankby)]]) + 0.5
+            ),
             y.thresh = 0,
             y.lines = FALSE,
             sig.thresh = 0,
             h.id = robjects$h.id,
             h.id.suffix = "_sgrank1",
             sig.term = "FDR",
-            y.term = "LFC",
-            x.term = "Rank",
+            rank.term = isolate(input$sgrna.rankby),
+            rank.ascending = isolate(input$sgrna.rank.ascending),
             feat.term = "sgrna",
             hover.info = hov.info,
             fs = NULL,

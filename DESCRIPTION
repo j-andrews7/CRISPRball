@@ -12,7 +12,7 @@ Authors@R:
             role = "ctb",
             comment = c(ORCID = "0000-0001-9924-2226")))
 Description: A Shiny application for visualization, exploration, comparison, 
-    and filtering of CRISPR screens analyzed with MAGeCK RRA.
+    and filtering of CRISPR screens analyzed with MAGeCK RRA or MLE.
 License: MIT + file LICENSE
 URL: https://github.com/j-andrews7/CRISPRball
 BugReports: https://support.bioconductor.org/
@@ -53,8 +53,10 @@ Suggests:
     depmap,
     pool,
     RSQLite,
-    mygene
+    mygene,
+    testthat (>= 3.0.0)
 Depends:
     R (>= 2.10),
     shinyBS
 LazyData: false
+Config/testthat/edition: 3

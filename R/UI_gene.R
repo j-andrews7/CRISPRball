@@ -20,6 +20,7 @@
 #'
 #' @rdname INTERNAL_create_tab_gene
 .create_tab_gene <- function(dataset.choices, genesets) {
+    # nocov start
     tabPanel(
         title = "Gene (Overview)",
         id = "gene-overview",
@@ -230,6 +231,7 @@
                         fluidRow(
                             column(
                                 width = 6,
+                                uiOutput("gene.rank.options"),
                                 numericInput("rank.y.max", label = "y-axis max:", value = 10, step = 0.5),
                                 prettyCheckbox("rank.fcline",
                                     label = "Show FC threshold", value = TRUE,
@@ -239,6 +241,10 @@
                             column(
                                 width = 6,
                                 numericInput("rank.y.min", label = "y-axis min:", value = -10, step = 0.5, min = 1),
+                                prettyCheckbox("gene.rank.ascending",
+                                    label = "Ascending Rank", value = TRUE,
+                                    animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")
+                                ),
                             )
                         ),
                         div(actionButton("rank.update", "Update Rank Plots"), align = "center")
@@ -367,7 +373,7 @@
                             popify(icon("circle-info", style = "font-size: 20px"),
                                 title = "Rank Plot",
                                 c(
-                                    "This rank plot shows the log2 fold change on the y-axis and the gene rank on the x-axis. ",
+                                    "This rank plot shows the 'rank by' term on the y-axis and the gene rank on the x-axis. ",
                                     "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
                                     "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
                                     "Click and drag to zoom in. Hover over a point for additional info."
@@ -417,13 +423,32 @@
             )
         )
     )
+    # nocov end
 }
 
-tab_gene_summary <- tabPanel(
-    title = "Gene Summary Tables",
-    id = "gene-summ",
-    br(),
-    div(withSpinner(DT::dataTableOutput("gene1.summary")), style = "font-size:80%;"),
-    br(),
-    div(withSpinner(DT::dataTableOutput("gene2.summary")), style = "font-size:80%;")
-)
+
+#' Create a tabPanel for the gene summary tab
+#'
+#' Create a \code{\link{tabPanel}} with UI elements for the gene summary tab.
+#'
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the gene summary tab.
+#'
+#' @author Jared Andrews
+#'
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shinycssloaders withSpinner
+#'
+#' @rdname INTERNAL_create_tab_gene_summary
+.create_tab_gene_summary <- function() {
+    # nocov start
+    tabPanel(
+        title = "Gene Summary Tables",
+        id = "gene-summ",
+        br(),
+        div(withSpinner(DT::dataTableOutput("gene1.summary")), style = "font-size:80%;"),
+        br(),
+        div(withSpinner(DT::dataTableOutput("gene2.summary")), style = "font-size:80%;")
+    )
+    # nocov end
+}

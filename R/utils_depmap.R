@@ -1,3 +1,4 @@
+# nocov start
 .error_if_no_depmap <- function() {
     if (!requireNamespace("depmap", quietly = TRUE)) {
         stop("'depmap' installation required for using depmap data.")
@@ -24,7 +25,7 @@
         stop("'mygene' installation required to display gene information.")
     }
 }
-
+# nocov end
 
 #' Build SQLite database of DepMap data
 #'
@@ -45,6 +46,7 @@
 #' build_depmap_db()
 #' }
 build_depmap_db <- function(file = "depmap_db.sqlite") {
+    # nocov start
     .error_if_no_depmap()
     .error_if_no_pool()
     .error_if_no_rsqlite()
@@ -94,6 +96,7 @@ build_depmap_db <- function(file = "depmap_db.sqlite") {
     pool::poolClose(pool)
 
     return(file)
+    # nocov end
 }
 
 
@@ -249,7 +252,7 @@ get_depmap_essentiality <- function(gene, depmap.summary) {
     .error_if_no_mygene()
     info <- mygene::query(gene, fields = "all", size = 1)
 
-    if (length(info) > 0) {
+    if (length(info$hits) > 0) {
         info <- info$hits
         out <- tagList(
             splitLayout(span(strong("Gene: "), info$symbol), span(strong("Aliases: "), paste0(unlist(info$alias), collapse = ", "))),

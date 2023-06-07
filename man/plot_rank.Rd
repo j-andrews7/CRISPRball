@@ -13,8 +13,8 @@ plot_rank(
   h.id = "crispr",
   feat.term = "rows",
   sig.term = "FDR",
-  y.term = "LFC",
-  x.term = "Rank",
+  rank.term = "LFC",
+  rank.ascending = TRUE,
   down.color = "#0026ff",
   up.color = "#ff0000",
   insig.color = "#A6A6A6",
@@ -49,7 +49,7 @@ plot_rank(
 )
 }
 \arguments{
-\item{res}{Dataframe containing, at minimum, fold change, rank, and significance values.}
+\item{res}{Dataframe containing, at minimum, significance values and something to rank by (LFC, RRA score, betas, etc).}
 
 \item{ylim}{Numeric vector of length two for the y-axis limits.}
 
@@ -68,9 +68,9 @@ but should be used if multiple plots are being created in the same R session (e.
 
 \item{sig.term}{Character scalar indicating the column name of the significance values in \code{res}.}
 
-\item{y.term}{Character scalar for the y-axis term from \code{res} to be plotted.}
+\item{rank.term}{Character scalar for the term to rank by from \code{res}. This will be used as the y-axis.}
 
-\item{x.term}{Character scalar for the x-axis term from \code{res} to be plotted.}
+\item{rank.ascending}{Boolean indicating whether or not the rank should be ascending.}
 
 \item{down.color}{Character scalar indicating the color of down-regulated features.}
 
@@ -149,8 +149,9 @@ Create an interactive rank plot for data with fold change, significance terms, a
 }
 \examples{
 library(CRISPRball)
-d1.genes <-  read.delim(system.file("extdata", "esc1.gene_summary.txt", 
-                                   package = "CRISPRball"), check.names = FALSE)
+d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
+    package = "CRISPRball"
+), check.names = FALSE)
 plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
 plot_rank(plot.df, feat.term = "id")
 }

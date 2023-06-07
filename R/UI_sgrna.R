@@ -19,6 +19,7 @@
 #'
 #' @rdname INTERNAL_create_tab_sgrna
 .create_tab_sgrna <- function(sgrna.choices, sgrna.gene) {
+    # nocov start
     tabPanel(
         title = "sgRNA",
         id = "sgrna",
@@ -50,7 +51,12 @@
                             pickerInput("sgrna.gene", "Choose gene:",
                                 choices = sgrna.gene,
                                 multiple = FALSE, options = list(`live-search` = TRUE, `actions-box` = TRUE)
-                            )
+                            ),
+                            prettyCheckbox("sgrna.rank.ascending",
+                                label = "Ascending Rank", value = TRUE,
+                                animation = "smooth", status = "success", bigger = TRUE, icon = icon("check")
+                            ),
+                            uiOutput("sgrna.rank.options"),
                         )
                     ),
                     style = "background-color: #FFFFFF; padding: 3px; margin-bottom: 3px; border: 1px solid #bce8f1; "
@@ -81,7 +87,7 @@
                             popify(icon("circle-info", style = "font-size: 20px"),
                                 title = "Rank Plot",
                                 c(
-                                    "This rank plot shows the log2 fold change on the y-axis and the sgRNA rank on the x-axis. ",
+                                    "This rank plot shows the 'rank by' term on the y-axis and the sgRNA rank on the x-axis. ",
                                     "sgRNAs for the selected gene will be highlighted. ",
                                     "Click and drag to zoom in. Hover over a point for additional info."
                                 ),
@@ -116,13 +122,32 @@
             )
         )
     )
+    # nocov end
 }
 
-tab_sgrna_summary <- tabPanel(
-    title = "sgRNA Summary Tables",
-    id = "sgrna-tables",
-    br(),
-    div(withSpinner(DT::dataTableOutput("sgrna1.summary")), style = "font-size:80%;"),
-    br(),
-    div(withSpinner(DT::dataTableOutput("sgrna2.summary")), style = "font-size:80%;")
-)
+
+#' Create a tabPanel for the sgrna summary tab
+#'
+#' Create a \code{\link{tabPanel}} with UI elements for the sgrna summary tab.
+#'
+#' @return
+#' A \code{\link{tabPanel}} with UI elements for the sgrna summary tab.
+#'
+#' @author Jared Andrews
+#'
+#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shinycssloaders withSpinner
+#'
+#' @rdname INTERNAL_create_tab_sgrna_summary
+.create_tab_sgrna_summary <- function() {
+    # nocov start
+    tabPanel(
+        title = "sgRNA Summary Tables",
+        id = "sgrna-tables",
+        br(),
+        div(withSpinner(DT::dataTableOutput("sgrna1.summary")), style = "font-size:80%;"),
+        br(),
+        div(withSpinner(DT::dataTableOutput("sgrna2.summary")), style = "font-size:80%;")
+    )
+    # nocov end
+}

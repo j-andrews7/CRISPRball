@@ -19,6 +19,8 @@ export(plot_volcano)
 import(DT)
 import(ggplot2)
 import(shiny, except = c(dataTableOutput, renderDataTable))
+import(shiny, except = c(dataTableOutput, renderDataTable))
+
 importFrom(ComplexHeatmap,Heatmap)
 importFrom(ComplexHeatmap,UpSet)
 importFrom(ComplexHeatmap,comb_name)

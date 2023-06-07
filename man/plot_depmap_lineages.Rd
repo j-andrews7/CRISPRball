@@ -25,7 +25,8 @@ as returned by \code{\link{get_depmap_plot_data}}.}
 
 \item{group.by}{Character scalar of column name to group by.}
 
-\item{lineage}{Character scalar of lineage for which to plot sub-lineage data.}
+\item{lineage}{Character scalar of lineage for which
+to plot sub-lineage data.}
 
 \item{depline}{Boolean indicating whether to show the dependency threshold line.}
 
