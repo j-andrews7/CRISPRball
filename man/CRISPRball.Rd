@@ -2,7 +2,7 @@
 % Please edit documentation in R/CRISPRball.R
 \name{CRISPRball}
 \alias{CRISPRball}
-\title{Create an interactive Shiny app for visualization & exploration of MAGeCK RRA CRISPR analyses}
+\title{Create an interactive Shiny app for visualization & exploration of CRISPR analyses}
 \usage{
 CRISPRball(
   gene.data = NULL,
@@ -49,10 +49,10 @@ The elements of the list should each be a geneset with gene identifiers matching
 a named list of app elements (ui and server) will be returned instead. Useful for deploying as a standalone shiny app.}
 }
 \value{
-A Shiny app containing interactive visualizations of MAGeCK RRA analysis results.
+A Shiny app containing interactive visualizations of CRISPR analysis results.
 }
 \description{
-This shiny app is composed of multiple tabs to peruse RRA results and compare them between timepoints or samples.
+This shiny app is composed of multiple tabs to peruse analysis results and compare them between timepoints or samples.
 Also included are numerous QC plots. Almost all plots are interactive and their aesthetics can be easily tweaked
 using the sidebar. See the Details section for more information.
 }

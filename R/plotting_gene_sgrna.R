@@ -1175,25 +1175,3 @@ plot_lawn <- function(res,
             plotGlPixelRatio = 7
         )
 }
-
-
-#' Plot text on empty plotly plot
-#'
-#' @param title Character scalar to show in plot area.
-#' @author Jared Andrews
-#' @rdname INTERNAL_empty_plot
-#' @importFrom plotly plotly_empty config layout
-.empty_plot <- function(title = NULL) {
-    p <- plotly_empty(type = "scatter", mode = "markers") %>%
-        config(
-            displayModeBar = FALSE
-        ) %>%
-        layout(
-            title = list(
-                text = title,
-                yref = "paper",
-                y = 0.5
-            )
-        )
-    return(p)
-}

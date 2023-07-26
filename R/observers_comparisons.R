@@ -45,13 +45,24 @@
 
             names(robjects$comp.neg.genes) <- input$comp.sets
 
-            # Get the combination matrices.
-            robjects$pos.m <- make_comb_mat(robjects$comp.pos.genes)
-            robjects$neg.m <- make_comb_mat(robjects$comp.neg.genes)
-
-            # Make upset plots.
-            ht.pos <- draw(UpSet(robjects$pos.m))
-            ht.neg <- draw(UpSet(robjects$neg.m))
+            # Get the combination matrices. 
+            # If there are no hits in any dataset, make empty annotation.
+            # Otherwise, make the UpSet plot.
+            if (any(lapply(robjects$comp.pos.genes, length) > 0)) {
+                robjects$pos.m <- make_comb_mat(robjects$comp.pos.genes)
+                ht.pos <- draw(UpSet(robjects$pos.m))
+            } else {
+                robjects$pos.m <- NULL
+                ht.pos <- .empty_heatmap("No positively selected hits in any dataset.")
+            }
+                
+            if (any(lapply(robjects$comp.neg.genes, length) > 0)) {
+                robjects$neg.m <- make_comb_mat(robjects$comp.neg.genes)
+                ht.neg <- draw(UpSet(robjects$neg.m))
+            } else {
+                robjects$neg.m <- NULL
+                ht.neg <- .empty_heatmap("No negatively selected hits in any dataset.")
+            }
 
             # TODO: See if there's a way to move these out of this function.
             .pos_click_action <- function(df, output) {
