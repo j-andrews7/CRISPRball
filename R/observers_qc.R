@@ -57,9 +57,9 @@
             var.remove <- input$var.remove
         }
 
-        pca.meta <- pca.meta[colnames(pca.mat), ]
+        pca.meta <- pca.meta[pca.meta$Label %in% colnames(pca.mat), ]
 
-        if (ncol(pca.mat) > 1) {
+        if (ncol(pca.mat) > 1 & all(colnames(pca.mat) %in% rownames(pca.meta))) {
             robjects$pc <- pca(pca.mat,
                 metadata = pca.meta,
                 removeVar = var.remove,
