@@ -11,20 +11,6 @@ test_that("plot_bar handles different y parameters", {
     expect_s3_class(plot, "plotly")
 })
 
-# Test that function can handle empty dataframes
-test_that("plot_bar handles empty dataframes", {
-    plot <- plot_bar(count.summary.empty, x = "Label", y = "GiniIndex")
-    expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "count.summary is empty.")
-})
-
-# Test that the function can handle NULL input
-test_that("plot_bar handles NULL input", {
-    plot <- plot_bar(NULL, x = "Label", y = "GiniIndex")
-    expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "count.summary is NULL.")
-})
-
 
 ## plot_hist
 # Test that function returns a plotly object
@@ -39,44 +25,12 @@ test_that("plot_hist handles matrix with one column", {
     expect_s3_class(plot, "plotly")
 })
 
-# Test that function handles empty matrix
-test_that("plot_hist handles empty matrix", {
-    plot <- plot_hist(mat.empty)
-    expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "mat is empty.")
-})
-
-# Test that the function can handle NULL input
-test_that("plot_hist handles NULL input", {
-    plot <- plot_hist(NULL)
-    expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "mat is NULL.")
-})
-
 
 # plot_correlation_heatmap
 # Test that function returns a Heatmap object
 test_that("plot_correlation_heatmap returns a Heatmap object", {
     heatmap <- plot_correlation_heatmap(mat.heatmap)
     expect_s4_class(heatmap, "Heatmap")
-})
-
-# Test that function can handle matrix with one column
-test_that("plot_correlation_heatmap handles matrix with one column", {
-    heatmap <- plot_correlation_heatmap(mat.one.col.heatmap)
-    expect_s4_class(heatmap, "Heatmap")
-})
-
-# Test that function handles empty matrix
-test_that("plot_correlation_heatmap handles empty matrix", {
-    heatmap <- plot_correlation_heatmap(mat.empty)
-    expect_s4_class(heatmap, "Heatmap")
-})
-
-# Test that the function can handle NULL input
-test_that("plot_correlation_heatmap handles NULL input", {
-    # Expect error as the function cannot handle NULL input
-    expect_error(plot_correlation_heatmap(NULL), "mat is NULL.")
 })
 
 

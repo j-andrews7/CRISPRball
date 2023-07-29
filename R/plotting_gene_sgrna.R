@@ -501,7 +501,7 @@ plot_rank <- function(res,
                       h.id.suffix = "_volc") {
     # Check for required columns.
     if (!rank.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", y.term, "' not found in dataframe."), plotly = TRUE)
+        fig <- .empty_plot(paste0("Column '", rank.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!is.null(sig.term) & !sig.term %in% colnames(res)) {
         fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!feat.term %in% colnames(res) & feat.term != "rows") {

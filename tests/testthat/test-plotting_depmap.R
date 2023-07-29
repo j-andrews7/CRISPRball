@@ -148,7 +148,7 @@ test_that("plot_depmap_dependency returns a plotly object", {
 test_that("plot_depmap_dependency handles empty dataframes", {
     plot <- plot_depmap_dependency(df.empty)
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    expect_equal(plot$x$data[[1]]$text, "Gene not found in DepMap.")
 })
 
 # Test that plot contains the correct traces (CRISPR and RNAi)
@@ -187,7 +187,7 @@ test_that("plot_depmap_dependency does not show dependency threshold line when d
 test_that("plot_depmap_dependency handles NULL input", {
     suppressWarnings(plot <- plot_depmap_dependency(NULL))
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    expect_equal(plot$x$data[[1]]$text, "Gene not found in DepMap.")
 })
 
 
@@ -201,7 +201,7 @@ test_that("plot_depmap_expression returns a plotly object", {
 # Test that function can handle empty dataframes
 test_that("plot_depmap_expression handles empty dataframes", {
     suppressWarnings(plot <- plot_depmap_expression(df.empty))
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    expect_equal(plot$x$data[[1]]$text, "Gene not found in DepMap.")
 })
 
 # Test the correct color assignment
@@ -214,7 +214,7 @@ test_that("plot_depmap_expression assigns correct colors", {
 # Test that the function can handle NULL input
 test_that("plot_depmap_expression handles NULL input", {
     suppressWarnings(plot <- plot_depmap_expression(NULL))
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    expect_equal(plot$x$data[[1]]$text, "Gene not found in DepMap.")
 })
 
 
@@ -230,7 +230,7 @@ test_that("plot_depmap_cn handles empty dataframes", {
     df.empty <- data.frame()
     suppressWarnings(plot <- plot_depmap_cn(df.empty))
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    expect_equal(plot$x$data[[1]]$text, "Gene not found in DepMap.")
 })
 
 # Test the correct color assignment
@@ -244,7 +244,7 @@ test_that("plot_depmap_cn assigns correct colors", {
 test_that("plot_depmap_cn handles NULL input", {
     suppressWarnings(plot <- plot_depmap_cn(NULL))
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    expect_equal(plot$x$data[[1]]$text, "Gene not found in DepMap.")
 })
 
 
@@ -260,7 +260,7 @@ test_that("plot_depmap_lineages handles empty dataframes", {
     df.empty <- data.frame()
     suppressWarnings(plot <- plot_depmap_lineages(df.empty, plot.val = "dependency", group.by = "lineage"))
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    expect_equal(plot$x$data[[1]]$text, "Gene not found in DepMap.")
 })
 
 # Test that function handles NULL lineage
@@ -286,5 +286,5 @@ test_that("plot_depmap_lineages filters data by specified lineage", {
 test_that("plot_depmap_lineages handles NULL input", {
     suppressWarnings(plot <- plot_depmap_lineages(NULL, plot.val = "dependency", group.by = "lineage"))
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Gene not found in DepMap.")
+    expect_equal(plot$x$data[[1]]$text, "Gene not found in DepMap.")
 })
