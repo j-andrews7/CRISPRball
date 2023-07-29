@@ -26,8 +26,7 @@ the maximum values in the heatmap.}
 \item{plot.title}{Character scalar for title of the plot.}
 }
 \value{
-A Heatmap object. If only one column is present in the \code{mat} matrix,
-returns a text grob indicating only one sample was provided.
+A Heatmap object.
 }
 \description{
 This function creates a heatmap using ComplexHeatmap to display the correlation values

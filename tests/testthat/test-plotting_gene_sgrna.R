@@ -39,13 +39,13 @@ test_that("plot_volcano throws an error with missing columns", {
 
     # check that the output is a plotly object
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Column 'LFC' not found in dataframe.")
+    expect_equal(plot$x$data[[1]]$text, "Column 'LFC' not found in dataframe.")
 
     plot <- plot_volcano(res, sig.term = "p_value", feat.term = "genes")
 
     # check that the output is a plotly object
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Column 'genes' not found in dataframe.")
+    expect_equal(plot$x$data[[1]]$text, "Column 'genes' not found in dataframe.")
 })
 
 
@@ -66,12 +66,12 @@ test_that("plot_rank returns error when necessary columns are not present", {
         test3 = c(0.04, 0.06, 0.03, 0.07, 0.01)
     )
 
-    plot <- plot_rank(incorrect_df)
+    plot <- plot_rank(incorrect_df, rank.term = "Rank", sig.term = "test3")
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Column 'Rank' not found in dataframe.")
+    expect_equal(plot$x$data[[1]]$text, "Column 'Rank' not found in dataframe.")
 })
 
-test_that("plot_rank handles NULL significance term gracefully", {
+test_that("plot_rank handles NULL/NA significance term gracefully", {
     test_df <- data.frame(
         Rank = c(1, 2, 3, 4, 5),
         LFC = c(-0.5, 0.5, -0.6, 0.6, 0),
@@ -102,7 +102,7 @@ test_that("plot_lawn fails gracefully with non-existent x.term", {
         feat.term = "id"
     )
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Column 'NonExistentColumn' not found in dataframe.")
+    expect_equal(plot$x$data[[1]]$text, "Column 'NonExistentColumn' not found in dataframe.")
 })
 
 test_that("plot_lawn fails gracefully with non-existent lfc.term", {
@@ -114,7 +114,7 @@ test_that("plot_lawn fails gracefully with non-existent lfc.term", {
         feat.term = "id"
     )
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Column 'NonExistentColumn' not found in dataframe.")
+    expect_equal(plot$x$data[[1]]$text, "Column 'NonExistentColumn' not found in dataframe.")
 })
 
 test_that("plot_lawn fails gracefully with non-existent sig.term", {
@@ -126,7 +126,7 @@ test_that("plot_lawn fails gracefully with non-existent sig.term", {
         feat.term = "id"
     )
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Column 'NonExistentColumn' not found in dataframe.")
+    expect_equal(plot$x$data[[1]]$text, "Column 'NonExistentColumn' not found in dataframe.")
 })
 
 test_that("plot_lawn fails gracefully with non-existent feat.term", {
@@ -138,5 +138,5 @@ test_that("plot_lawn fails gracefully with non-existent feat.term", {
         feat.term = "NonExistentColumn"
     )
     expect_s3_class(plot, "plotly")
-    expect_equal(plot$x$layoutAttrs[[2]]$title$text, "Column 'NonExistentColumn' not found in dataframe.")
+    expect_equal(plot$x$data[[1]]$text, "Column 'NonExistentColumn' not found in dataframe.")
 })

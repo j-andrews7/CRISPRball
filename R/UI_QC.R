@@ -97,7 +97,8 @@
                         fluidRow(
                             column(6, tipify(
                                 selectizeInput("bip.color", "Color by:",
-                                    choices = c("", meta.choices), selected = ifelse("Label" %in% meta.choices, "Label", NULL)
+                                    # ifelse apparently can't return NULL.
+                                    choices = c("", meta.choices), selected = ifelse("Label" %in% meta.choices, "Label", "")
                                 ),
                                 "Metadata variable by which samples are colored.", "right",
                                 options = list(container = "body")

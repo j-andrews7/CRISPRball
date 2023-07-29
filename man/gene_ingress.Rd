@@ -34,8 +34,9 @@ Parse gene summary data for easier plotting and display
 }
 \examples{
 library(CRISPRball)
-d1.genes <-  read.delim(system.file("extdata", "esc1.gene_summary.txt", 
-                                   package = "CRISPRball"), check.names = FALSE)
+d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
+    package = "CRISPRball"
+), check.names = FALSE)
 out.df <- gene_ingress(d1.genes, 0.05, 0.5)
 }
 \author{

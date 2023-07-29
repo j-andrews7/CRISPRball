@@ -190,7 +190,7 @@ plot_depmap_dependency <- function(df,
                 plotGlPixelRatio = 7
             )
     } else {
-        .empty_plot("Gene not found in DepMap.")
+        .empty_plot("Gene not found in DepMap.", plotly = TRUE)
     }
 }
 
@@ -252,7 +252,7 @@ plot_depmap_expression <- function(df,
                 plotGlPixelRatio = 7
             )
     } else {
-        .empty_plot("Gene not found in DepMap.")
+        .empty_plot("Gene not found in DepMap.", plotly = TRUE)
     }
 }
 
@@ -314,7 +314,7 @@ plot_depmap_cn <- function(df,
                 plotGlPixelRatio = 7
             )
     } else {
-        .empty_plot("Gene not found in DepMap.")
+        .empty_plot("Gene not found in DepMap.", plotly = TRUE)
     }
 }
 
@@ -441,6 +441,6 @@ plot_depmap_lineages <- function(df,
                 plotGlPixelRatio = 7
             )
     } else {
-        .empty_plot("Gene not found in DepMap.")
+        .empty_plot("Gene not found in DepMap.", plotly = TRUE)
     }
 }

@@ -20,9 +20,14 @@
     output$gene.rank.options <- renderUI({
         req(robjects$set1.genes)
         df <- robjects$set1.genes
+        # Get only numeric variables.
+        choices <- names(df)[vapply(df, is.numeric, logical(1))]
 
         tagList(
-            selectInput("gene.rankby", "Rank by:", choices = names(df), selected = ifelse("LFC" %in% names(df), "LFC", NULL))
+            selectInput("gene.rankby", "Rank by:",
+                choices = choices,
+                selected = ifelse("LFC" %in% choices, "LFC", NULL)
+            )
         )
     })
     # nocov end

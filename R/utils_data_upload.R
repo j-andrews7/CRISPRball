@@ -1,5 +1,6 @@
 # js code to enable/disable tabs.
-.utils.js <- "
+.utils.js <- function() {
+    out <- "
 shinyjs.disableTab = function(name) {
   var tab = $('.nav.navbar-nav li a[data-value=\"' + name + '\"]');
   tab.bind('click.tab', function(e) {
@@ -15,6 +16,9 @@ shinyjs.enableTab = function(name) {
   tab.removeClass('disabled');
 }
 "
+    out
+}
+
 
 #' Parse gene summary data for easier plotting and display
 #' @param df data.frame of gene summary data
@@ -29,11 +33,12 @@ shinyjs.enableTab = function(name) {
 #' @export
 #' @examples
 #' library(CRISPRball)
-#' d1.genes <-  read.delim(system.file("extdata", "esc1.gene_summary.txt", 
-#'                                    package = "CRISPRball"), check.names = FALSE)
+#' d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
+#'     package = "CRISPRball"
+#' ), check.names = FALSE)
 #' out.df <- gene_ingress(d1.genes, 0.05, 0.5)
 gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
-                          essential.genes = NULL, depmap.genes = NULL) {
+                         essential.genes = NULL, depmap.genes = NULL) {
     if (!is.null(essential.genes)) {
         df$essential <- df$id %in% essential.genes
     }
@@ -59,6 +64,21 @@ gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
             depmap.genes$strongly_selective == TRUE]
     }
 
+    if ("neg|score" %in% colnames(df)) {
+        df <- .RRA_ingress(df, sig.thresh, lfc.thresh)
+    }
+
+    return(df)
+}
+
+
+#' Rename columns and add additional columns to gene summary data
+#' @param df data.frame of gene summary data
+#'
+#' @return data.frame of gene summary data with renamed columns.
+#' @author Jared Andrews
+#' @rdname INTERNAL_RRA_ingress
+.RRA_ingress <- function(df, fdr.thresh, lfc.thresh) {
     df$LFC <- as.numeric(df$`neg|lfc`)
 
     df$RRAscore <- apply(df, 1, function(x) {
@@ -73,8 +93,8 @@ gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
 
     df$hit_type <- apply(df, 1, function(x) {
         x <- split(unname(x), names(x))
-        ifelse(as.numeric(x$`neg|fdr`) < sig.thresh & as.numeric(x$LFC) < -as.numeric(lfc.thresh), "neg",
-            ifelse(as.numeric(x$`pos|fdr`) < sig.thresh & as.numeric(x$LFC) > as.numeric(lfc.thresh), "pos", NA)
+        ifelse(as.numeric(x$`neg|fdr`) < fdr.thresh & as.numeric(x$LFC) < -as.numeric(lfc.thresh), "neg",
+            ifelse(as.numeric(x$`pos|fdr`) < fdr.thresh & as.numeric(x$LFC) > as.numeric(lfc.thresh), "pos", NA)
         )
     })
 
@@ -93,8 +113,7 @@ gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
     })
 
     df$Rank <- rank(df$LFC)
-
-    df$RandomIndex <- sample(1:nrow(df), nrow(df))
+    df$RandomIndex <- sample(seq(nrow(df)), nrow(df))
 
     return(df)
 }

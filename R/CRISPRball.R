@@ -1,6 +1,6 @@
-#' Create an interactive Shiny app for visualization & exploration of MAGeCK RRA CRISPR analyses
+#' Create an interactive Shiny app for visualization & exploration of CRISPR analyses
 #'
-#' This shiny app is composed of multiple tabs to peruse RRA results and compare them between timepoints or samples.
+#' This shiny app is composed of multiple tabs to peruse analysis results and compare them between timepoints or samples.
 #' Also included are numerous QC plots. Almost all plots are interactive and their aesthetics can be easily tweaked
 #' using the sidebar. See the Details section for more information.
 #'
@@ -30,7 +30,7 @@
 #' @param return.app Optional boolean indicating whether a Shiny app should be returned. \code{TRUE} by default. If \code{FALSE},
 #'   a named list of app elements (ui and server) will be returned instead. Useful for deploying as a standalone shiny app.
 #'
-#' @return A Shiny app containing interactive visualizations of MAGeCK RRA analysis results.
+#' @return A Shiny app containing interactive visualizations of CRISPR analysis results.
 #'
 #' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
 #' @import DT
@@ -125,6 +125,10 @@ CRISPRball <- function(gene.data = NULL,
         default.tab <- "QC"
     }
 
+    if (!is.null(norm.counts)) {
+        default.tab <- "QC"
+    }
+
     # Load cell line metadata, gene summaries, and release if depmap db provided.
     if (!is.null(depmap.db)) {
         .error_if_no_pool()
@@ -154,35 +158,35 @@ CRISPRball <- function(gene.data = NULL,
         selected = default.tab,
         header = list(
             useShinyjs(),
-            extendShinyjs(text = .utils.js, functions = c("disableTab", "enableTab")),
+            extendShinyjs(text = .utils.js(), functions = c("disableTab", "enableTab")),
             css,
             tags$head(tags$link(rel = "shortcut icon", href = "logo/CRISPRball_Hex.png"))
         ),
-        # ---------------Data Upload-----------------
+        ##---------------Data Upload-----------------
         .create_tab_data_upload(),
-        # ----------------QC--------------------
+        ##----------------QC--------------------
         .create_tab_qc(meta.choices),
-        # -------------------QC Table----------------
+        ##-------------------QC Table----------------
         .create_tab_qc_summary(),
-        # ------------------Gene (Overview)-------------
+        ##------------------Gene (Overview)-------------
         .create_tab_gene(gene.choices, genesets),
-        # ----------------Gene Summary Tables--------------
+        ##----------------Gene Summary Tables--------------
         .create_tab_gene_summary(),
-        # ----------------sgRNA---------------------
+        ##----------------sgRNA---------------------
         .create_tab_sgrna(sgrna.choices, sgrna.gene),
-        # --------------------sgRNA Summary Tables----------------
+        ##--------------------sgRNA Summary Tables----------------
         .create_tab_sgrna_summary(),
-        # --------------------Dataset Comparisons----------------
+        ##--------------------Dataset Comparisons----------------
         .create_tab_comparison(gene.choices),
-        # -----------------DepMap-------------------
+        ##-----------------DepMap-------------------
         .create_tab_depmap(depmap.gene, depmap.meta),
-        # -----------------About-------------------
+        ##-----------------About-------------------
         .create_tab_about()
     )
 
 
     server <- function(input, output, session) {
-        # -------------Reactive Values---------------
+        ##-------------Reactive Values---------------
         robjects <- reactiveValues(
             gene.data = gene.data,
             sgrna.data = sgrna.data,
@@ -230,7 +234,7 @@ CRISPRball <- function(gene.data = NULL,
         # Create downloadHander outputs.
         .create_dl_outputs(output, robjects)
 
-        # --------------Disable Tabs-----------------
+        ##--------------Disable Tabs-----------------
         defaultDisabledTabs <- c()
 
         if (is.null(gene.data)) {
@@ -245,35 +249,39 @@ CRISPRball <- function(gene.data = NULL,
             defaultDisabledTabs <- c(defaultDisabledTabs, "sgRNA", "sgRNA Summary Tables")
         }
 
-        if (is.null(count.summary) | is.null(norm.counts)) {
+        if (is.null(count.summary) & is.null(norm.counts)) {
             defaultDisabledTabs <- c(defaultDisabledTabs, "QC", "QC Table")
+        }
+
+        if (is.null(count.summary)) {
+            defaultDisabledTabs <- c(defaultDisabledTabs, "QC Table")
         }
 
         for (tabname in defaultDisabledTabs) {
             js$disableTab(tabname)
         }
 
-        # --------------Disable Inputs-----------------
+        ##--------------Disable Inputs-----------------
         # Disable certain inputs if no data is provided.
         .create_ui_observers(robjects)
 
-        # ------------Data Upload Tab----------------
+        ##------------Data Upload Tab----------------
         # Create data upload observers.
         .create_upload_observers(input, session, robjects)
 
-        # -----------QC & QC Summary Tabs------------
+        ##-----------QC & QC Summary Tabs------------
         .create_qc_observers(input, robjects)
 
         .create_qc_outputs(input, output, robjects)
 
         # Initialize plots by simulating button click once.
         o <- observe({
-            req(robjects$pca.mat, robjects$pca.meta)
+            req(robjects$pca.mat)
             shinyjs::click("pca.update")
             o$destroy
         })
 
-        #---------Gene (Overview) & Summary Tables Tabs-------------
+        ##---------Gene (Overview) & Summary Tables Tabs-------------
         # Load the gene summaries for easy plotting.
         .create_gene_observers(input, robjects)
 
@@ -283,14 +291,14 @@ CRISPRball <- function(gene.data = NULL,
         # This ensures the rank options are updated even when initially hidden in the collapsible panel.
         outputOptions(output, "gene.rank.options", suspendWhenHidden = FALSE)
 
-        #---------------sgRNA & Summary Tables Tabs-----------------
+        ##---------------sgRNA & Summary Tables Tabs-----------------
         # Load the gene summaries for easy plotting.
         .create_sgrna_observers(input, robjects)
 
         # Summary tables and plots.
         .create_sgrna_outputs(input, output, robjects)
 
-        #--------------Comparisons Tab------------
+        ##--------------Comparisons Tab------------
         .create_comparisons_observers(input, session, output, robjects)
 
         # Initialize plots by simulating button click once.
@@ -300,7 +308,7 @@ CRISPRball <- function(gene.data = NULL,
             o$destroy
         })
 
-        #--------------DepMap Tab-----------------
+        ##--------------DepMap Tab-----------------
         if (!is.null(depmap.gene)) {
             .create_depmap_outputs(input, output, robjects)
         }

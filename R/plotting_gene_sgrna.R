@@ -153,11 +153,11 @@ plot_volcano <- function(res,
                          h.id.suffix = "_volc") {
     # Check for required columns.
     if (!feat.term %in% colnames(res) & feat.term != "rows") {
-        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!sig.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!lfc.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", lfc.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", lfc.term, "' not found in dataframe."), plotly = TRUE)
     } else {
         # Styling.
         res$col <- rep(insig.color, nrow(res))
@@ -249,27 +249,29 @@ plot_volcano <- function(res,
         # Want these to have precedence over the feature sets in case entries are in both.
         if (!is.null(highlight)) {
             highlight <- highlight[highlight %in% res$feat]
-            n.hl <- length(res$col[res$feat %in% highlight])
+            if (length(highlight) > 0) {
+                n.hl <- length(res$col[res$feat %in% highlight])
 
-            res$col[res$feat %in% highlight] <- highlight.feats.color
-            res$cex[res$feat %in% highlight] <- highlight.feats.size
-            res$opacity[res$feat %in% highlight] <- highlight.feats.opac
-            res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
-            res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
-            res$order[res$feat %in% highlight] <- 3
+                res$col[res$feat %in% highlight] <- highlight.feats.color
+                res$cex[res$feat %in% highlight] <- highlight.feats.size
+                res$opacity[res$feat %in% highlight] <- highlight.feats.opac
+                res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
+                res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
+                res$order[res$feat %in% highlight] <- 3
 
-            if (highlight.feats.label) {
-                add.fs <- data.frame(
-                    x = res$x[res$feat %in% highlight],
-                    y = res$y[res$feat %in% highlight],
-                    customdata = res$feat[res$feat %in% highlight]
-                )
+                if (highlight.feats.label) {
+                    add.fs <- data.frame(
+                        x = res$x[res$feat %in% highlight],
+                        y = res$y[res$feat %in% highlight],
+                        customdata = res$feat[res$feat %in% highlight]
+                    )
 
-                if (!is.null(fs)) {
-                    fs <- fs[, c("x", "y", "customdata")]
-                    fs <- rbind(fs, add.fs)
-                } else {
-                    fs <- add.fs
+                    if (!is.null(fs)) {
+                        fs <- fs[, c("x", "y", "customdata")]
+                        fs <- rbind(fs, add.fs)
+                    } else {
+                        fs <- add.fs
+                    }
                 }
             }
         }
@@ -499,11 +501,11 @@ plot_rank <- function(res,
                       h.id.suffix = "_volc") {
     # Check for required columns.
     if (!rank.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", y.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", rank.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!is.null(sig.term) & !sig.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!feat.term %in% colnames(res) & feat.term != "rows") {
-        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."), plotly = TRUE)
     } else {
         # Styling.
         res$col <- rep(insig.color, nrow(res))
@@ -605,27 +607,29 @@ plot_rank <- function(res,
         # Want these to have precedence over the feature sets in case entries are in both.
         if (!is.null(highlight)) {
             highlight <- highlight[highlight %in% res$feat]
-            n.hl <- length(res$col[res$feat %in% highlight])
+            if (length(highlight) > 0) {
+                n.hl <- length(res$col[res$feat %in% highlight])
 
-            res$col[res$feat %in% highlight] <- highlight.feats.color
-            res$cex[res$feat %in% highlight] <- highlight.feats.size
-            res$opacity[res$feat %in% highlight] <- highlight.feats.opac
-            res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
-            res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
-            res$order[res$feat %in% highlight] <- 3
+                res$col[res$feat %in% highlight] <- highlight.feats.color
+                res$cex[res$feat %in% highlight] <- highlight.feats.size
+                res$opacity[res$feat %in% highlight] <- highlight.feats.opac
+                res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
+                res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
+                res$order[res$feat %in% highlight] <- 3
 
-            if (highlight.feats.label) {
-                add.fs <- data.frame(
-                    x = res$x[res$feat %in% highlight],
-                    y = res$y[res$feat %in% highlight],
-                    customdata = res$feat[res$feat %in% highlight]
-                )
+                if (highlight.feats.label) {
+                    add.fs <- data.frame(
+                        x = res$x[res$feat %in% highlight],
+                        y = res$y[res$feat %in% highlight],
+                        customdata = res$feat[res$feat %in% highlight]
+                    )
 
-                if (!is.null(fs)) {
-                    fs <- fs[, c("x", "y", "customdata")]
-                    fs <- rbind(fs, add.fs)
-                } else {
-                    fs <- add.fs
+                    if (!is.null(fs)) {
+                        fs <- fs[, c("x", "y", "customdata")]
+                        fs <- rbind(fs, add.fs)
+                    } else {
+                        fs <- add.fs
+                    }
                 }
             }
         }
@@ -796,7 +800,7 @@ plot_rank <- function(res,
 #'
 #' @return An interactive plotly rank plot.
 #'
-#' @importFrom plotly plot_ly toWebGL layout config add_annotations
+#' @importFrom plotly plot_ly toWebGL layout config add_annotations ggplotly
 #'
 #' @author Jared Andrews
 #' @export
@@ -850,13 +854,13 @@ plot_lawn <- function(res,
                       h.id.suffix = "_lawn") {
     # Check for required columns.
     if (!x.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", x.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", x.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!lfc.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", lfc.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", lfc.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!is.null(sig.term) & !sig.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!feat.term %in% colnames(res) & feat.term != "rows") {
-        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."), plotly = TRUE)
     } else {
         # Styling.
         res$col <- rep(insig.color, nrow(res))
@@ -943,27 +947,29 @@ plot_lawn <- function(res,
         # Want these to have precedence over the feature sets in case entries are in both.
         if (!is.null(highlight)) {
             highlight <- highlight[highlight %in% res$feat]
-            n.hl <- length(res$col[res$feat %in% highlight])
+            if (length(highlight) > 0) {
+                n.hl <- length(res$col[res$feat %in% highlight])
 
-            res$col[res$feat %in% highlight] <- highlight.feats.color
-            res$cex[res$feat %in% highlight] <- highlight.feats.size
-            res$opacity[res$feat %in% highlight] <- highlight.feats.opac
-            res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
-            res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
-            res$order[res$feat %in% highlight] <- 3
+                res$col[res$feat %in% highlight] <- highlight.feats.color
+                res$cex[res$feat %in% highlight] <- highlight.feats.size
+                res$opacity[res$feat %in% highlight] <- highlight.feats.opac
+                res$lcol[res$feat %in% highlight] <- highlight.feats.linecolor
+                res$lw[res$feat %in% highlight] <- highlight.feats.linewidth
+                res$order[res$feat %in% highlight] <- 3
 
-            if (highlight.feats.label) {
-                add.fs <- data.frame(
-                    x = res$x[res$feat %in% highlight],
-                    y = res$y[res$feat %in% highlight],
-                    customdata = res$feat[res$feat %in% highlight]
-                )
+                if (highlight.feats.label) {
+                    add.fs <- data.frame(
+                        x = res$x[res$feat %in% highlight],
+                        y = res$y[res$feat %in% highlight],
+                        customdata = res$feat[res$feat %in% highlight]
+                    )
 
-                if (!is.null(fs)) {
-                    fs <- fs[, c("x", "y", "customdata")]
-                    fs <- rbind(fs, add.fs)
-                } else {
-                    fs <- add.fs
+                    if (!is.null(fs)) {
+                        fs <- fs[, c("x", "y", "customdata")]
+                        fs <- rbind(fs, add.fs)
+                    } else {
+                        fs <- add.fs
+                    }
                 }
             }
         }
@@ -1174,26 +1180,4 @@ plot_lawn <- function(res,
             displaylogo = FALSE,
             plotGlPixelRatio = 7
         )
-}
-
-
-#' Plot text on empty plotly plot
-#'
-#' @param title Character scalar to show in plot area.
-#' @author Jared Andrews
-#' @rdname INTERNAL_empty_plot
-#' @importFrom plotly plotly_empty config layout
-.empty_plot <- function(title = NULL) {
-    p <- plotly_empty(type = "scatter", mode = "markers") %>%
-        config(
-            displayModeBar = FALSE
-        ) %>%
-        layout(
-            title = list(
-                text = title,
-                yref = "paper",
-                y = 0.5
-            )
-        )
-    return(p)
 }

@@ -42,7 +42,7 @@
 
     # nocov start
     output$qc.pca <- renderPlotly({
-        req(input$dim1, input$dim2, robjects$pc)
+        req(input$dim1, input$dim2)
 
         input$pca.update
 
@@ -65,19 +65,22 @@
             dizzy <- isolate(input$dim3)
         }
 
-
-        fig <- plot_pca_biplot(
-            pca.res = pca.res,
-            dim.x = isolate(input$dim1),
-            dim.y = isolate(input$dim2),
-            dim.z = dizzy,
-            color.by = colorb,
-            shape.by = shapeb,
-            hover.info = "Label",
-            show.loadings = isolate(input$bip.loadings),
-            n.loadings = isolate(input$bip.n.loadings),
-            pt.size = isolate(input$pca.pt.size)
-        )
+        if (any(unlist(lapply(list(pca.res, isolate(input$dim1), isolate(input$dim2)), is.null)))) {
+            fig <- .empty_plot("No counts provided.\nNo PCA performed.", plotly = TRUE)
+        } else {
+            fig <- plot_pca_biplot(
+                pca.res = pca.res,
+                dim.x = isolate(input$dim1),
+                dim.y = isolate(input$dim2),
+                dim.z = dizzy,
+                color.by = colorb,
+                shape.by = shapeb,
+                hover.info = "Label",
+                show.loadings = isolate(input$bip.loadings),
+                n.loadings = isolate(input$bip.n.loadings),
+                pt.size = isolate(input$pca.pt.size)
+            )
+        }
 
         robjects$plot.qc.pca <- fig
 
@@ -87,7 +90,11 @@
 
     # nocov start
     output$qc.gini <- renderPlotly({
-        fig <- plot_bar(robjects$count.summary)
+        if (!is.null(robjects$count.summary)) {
+            fig <- plot_bar(robjects$count.summary)
+        } else {
+            fig <- .empty_plot("No summary provided.\nNo gini values available.", plotly = TRUE)
+        }
         robjects$plot.qc.gini <- fig
         fig
     })
@@ -95,10 +102,15 @@
 
     # nocov start
     output$qc.missed <- renderPlotly({
-        fig <- plot_bar(robjects$count.summary,
-            x = "Label", y = "Zerocounts", fill = "#394E80",
-            ylab = "Zero Count sgRNAs", title = "Fully Depleted sgRNAs", yaxis.addition = 10
-        )
+        if (!is.null(robjects$count.summary)) {
+            fig <- plot_bar(robjects$count.summary,
+                x = "Label", y = "Zerocounts", fill = "#394E80",
+                ylab = "Zero Count sgRNAs", title = "Fully Depleted sgRNAs", yaxis.addition = 10
+            )
+        } else {
+            fig <- .empty_plot("No summary provided.\nNo sgRNA depletion metrics available.", plotly = TRUE)
+        }
+
         robjects$plot.qc.missed <- fig
         fig
     })
@@ -106,7 +118,11 @@
 
     # nocov start
     output$qc.map <- renderPlot({
-        fig <- MapRatesView(robjects$count.summary) + scale_x_discrete(guide = guide_axis(angle = 45))
+        if (!is.null(robjects$count.summary)) {
+            fig <- MapRatesView(robjects$count.summary) + scale_x_discrete(guide = guide_axis(angle = 45))
+        } else {
+            fig <- .empty_plot("No summary provided.\nNo mapping metrics available.")
+        }
         robjects$plot.qc.map <- fig
         fig
     })
@@ -114,17 +130,19 @@
 
     # nocov start
     output$qc.histplot <- renderPlotly({
-        req(robjects$norm.counts)
-
         n.counts <- robjects$norm.counts
         n.counts.log <- as.matrix(log2(n.counts[, c(-1, -2)] + 1))
         colnames(n.counts.log) <- colnames(n.counts)[c(-1, -2)]
 
         # TODO: Add input to control gridlines.
-        fig <- plot_hist(n.counts.log,
-            title = "Distribution of read counts",
-            xlab = "log2(counts + 1)", ylab = "Frequency", show.grid = FALSE
-        )
+        if (!is.null(n.counts.log) & nrow(n.counts.log) > 0) {
+            fig <- plot_hist(n.counts.log,
+                title = "Distribution of read counts",
+                xlab = "log2(counts + 1)", ylab = "Frequency", show.grid = FALSE
+            )
+        } else {
+            fig <- .empty_plot("No counts provided.\nCannot make distribution.", plotly = TRUE)
+        }
 
         robjects$plot.qc.hist <- fig
         fig
@@ -149,8 +167,7 @@
                 max.color = isolate(input$corr.max.col)
             )
         } else {
-            grid.newpage()
-            grid.text("Only one sample, no correlation possible.")
+            fig <- .empty_plot("No correlation possible.\nNo counts or only 1 sample provided.")
         }
 
         robjects$plot.qc.corr <- fig
