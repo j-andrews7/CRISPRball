@@ -153,11 +153,11 @@ plot_volcano <- function(res,
                          h.id.suffix = "_volc") {
     # Check for required columns.
     if (!feat.term %in% colnames(res) & feat.term != "rows") {
-        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!sig.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!lfc.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", lfc.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", lfc.term, "' not found in dataframe."), plotly = TRUE)
     } else {
         # Styling.
         res$col <- rep(insig.color, nrow(res))
@@ -501,11 +501,11 @@ plot_rank <- function(res,
                       h.id.suffix = "_volc") {
     # Check for required columns.
     if (!rank.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", y.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", y.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!is.null(sig.term) & !sig.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!feat.term %in% colnames(res) & feat.term != "rows") {
-        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."), plotly = TRUE)
     } else {
         # Styling.
         res$col <- rep(insig.color, nrow(res))
@@ -800,7 +800,7 @@ plot_rank <- function(res,
 #'
 #' @return An interactive plotly rank plot.
 #'
-#' @importFrom plotly plot_ly toWebGL layout config add_annotations
+#' @importFrom plotly plot_ly toWebGL layout config add_annotations ggplotly
 #'
 #' @author Jared Andrews
 #' @export
@@ -854,13 +854,13 @@ plot_lawn <- function(res,
                       h.id.suffix = "_lawn") {
     # Check for required columns.
     if (!x.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", x.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", x.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!lfc.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", lfc.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", lfc.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!is.null(sig.term) & !sig.term %in% colnames(res)) {
-        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", sig.term, "' not found in dataframe."), plotly = TRUE)
     } else if (!feat.term %in% colnames(res) & feat.term != "rows") {
-        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."))
+        fig <- .empty_plot(paste0("Column '", feat.term, "' not found in dataframe."), plotly = TRUE)
     } else {
         # Styling.
         res$col <- rep(insig.color, nrow(res))

@@ -42,40 +42,35 @@ plot_bar <- function(count.summary,
                      ylab = "Gini Index",
                      fill = "#E69F00",
                      yaxis.addition = 0.05) {
-    if (is.null(count.summary)) {
-        .empty_plot("count.summary is NULL.")
-    } else if (nrow(count.summary) == 0) {
-        .empty_plot("count.summary is empty.")
-    } else {
-        gg <- BarView(count.summary,
-            x = x,
-            y = y,
-            ylab = ylab,
-            xlab = xlab,
-            main = title,
-            fill = fill
-        )
 
-        gg + theme(
-            axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 12),
-            axis.text.y = element_text(size = 12)
-        )
+    gg <- BarView(count.summary,
+        x = x,
+        y = y,
+        ylab = ylab,
+        xlab = xlab,
+        main = title,
+        fill = fill
+    )
 
-        ggplotly(gg, tooltip = c("y")) %>%
-            layout(
-                yaxis = list(range = list(0, max(count.summary[[y]]) + yaxis.addition)),
-                xaxis = list(tickangle = 315)
-            ) %>%
-            config(
-                toImageButtonOptions = list(format = "svg"),
-                displaylogo = FALSE,
-                plotGlPixelRatio = 7,
-                edits = list(
-                    axisTitleText = TRUE,
-                    titleText = TRUE
-                )
+    gg + theme(
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 12),
+        axis.text.y = element_text(size = 12)
+    )
+
+    ggplotly(gg, tooltip = c("y")) %>%
+        layout(
+            yaxis = list(range = list(0, max(count.summary[[y]]) + yaxis.addition)),
+            xaxis = list(tickangle = 315)
+        ) %>%
+        config(
+            toImageButtonOptions = list(format = "svg"),
+            displaylogo = FALSE,
+            plotGlPixelRatio = 7,
+            edits = list(
+                axisTitleText = TRUE,
+                titleText = TRUE
             )
-    }
+        )
 }
 
 
@@ -93,7 +88,7 @@ plot_bar <- function(count.summary,
 #' @param show.grid A boolean for whether to show the grid lines.
 #' @return A plotly plot with the distribution of read counts.
 #'
-#' @importFrom plotly plot_ly add_trace layout config
+#' @importFrom plotly plot_ly add_trace layout config ggplotly
 #' @importFrom graphics hist
 #' @export
 #' @author Jared Andrews
@@ -114,88 +109,83 @@ plot_hist <- function(mat,
                       xlab = "Values",
                       ylab = "Frequency",
                       show.grid = FALSE) {
-    if (is.null(mat)) {
-        .empty_plot("mat is NULL.")
-    } else if (nrow(mat) == 0) {
-        .empty_plot("mat is empty.")
-    } else {
-        histo <- hist(mat, breaks = 40)
+    
+    histo <- hist(mat, breaks = 40)
 
-        if (ncol(mat) >= 1) {
-            histlist <- lapply(1:ncol(mat), function(x) {
-                return(hist(mat[, x], plot = FALSE, breaks = histo$breaks))
-            })
-            xrange <- range(unlist(lapply(histlist, function(x) {
-                x$mids
-            })))
-            yrange <- range(unlist(lapply(histlist, function(x) {
-                x$counts
-            })))
-            hst1 <- histlist[[1]]
-            fig <- plot_ly(
-                x = hst1$mids, y = hst1$counts,
-                type = "scatter", mode = "lines+markers",
-                name = colnames(mat)[1]
-            )
-        }
-
-        if (ncol(mat) >= 2) {
-            for (i in 2:ncol(mat)) {
-                hstn <- histlist[[i]]
-                fig <- fig %>% add_trace(
-                    x = hstn$mids, y = hstn$counts,
-                    type = "scatter", mode = "lines+markers",
-                    name = colnames(mat)[i]
-                )
-            }
-        }
-
-        ay <- list(
-            showline = TRUE,
-            mirror = TRUE,
-            linecolor = toRGB("black"),
-            linewidth = 0.5,
-            showgrid = show.grid,
-            layer = "below traces",
-            zeroline = FALSE,
-            ticks = "outside",
-            zerolinewidth = 0.5,
-            title = ylab,
-            range = c(0, yrange[2] * 1.1)
+    if (ncol(mat) >= 1) {
+        histlist <- lapply(1:ncol(mat), function(x) {
+            return(hist(mat[, x], plot = FALSE, breaks = histo$breaks))
+        })
+        xrange <- range(unlist(lapply(histlist, function(x) {
+            x$mids
+        })))
+        yrange <- range(unlist(lapply(histlist, function(x) {
+            x$counts
+        })))
+        hst1 <- histlist[[1]]
+        fig <- plot_ly(
+            x = hst1$mids, y = hst1$counts,
+            type = "scatter", mode = "lines+markers",
+            name = colnames(mat)[1]
         )
-
-        ax <- list(
-            showline = TRUE,
-            mirror = TRUE,
-            linecolor = toRGB("black"),
-            linewidth = 0.5,
-            zeroline = FALSE,
-            showgrid = show.grid,
-            layer = "below traces",
-            ticks = "outside",
-            zerolinewidth = 0.5,
-            title = xlab,
-            range = c(0, xrange[2] * 1.1)
-        )
-
-        fig <- fig %>%
-            layout(
-                title = title,
-                xaxis = ax,
-                yaxis = ay
-            ) %>%
-            config(
-                toImageButtonOptions = list(format = "svg"),
-                displaylogo = FALSE,
-                plotGlPixelRatio = 7,
-                edits = list(
-                    axisTitleText = TRUE,
-                    titleText = TRUE
-                )
-            )
-
-        fig
     }
+
+    if (ncol(mat) >= 2) {
+        for (i in 2:ncol(mat)) {
+            hstn <- histlist[[i]]
+            fig <- fig %>% add_trace(
+                x = hstn$mids, y = hstn$counts,
+                type = "scatter", mode = "lines+markers",
+                name = colnames(mat)[i]
+            )
+        }
+    }
+
+    ay <- list(
+        showline = TRUE,
+        mirror = TRUE,
+        linecolor = toRGB("black"),
+        linewidth = 0.5,
+        showgrid = show.grid,
+        layer = "below traces",
+        zeroline = FALSE,
+        ticks = "outside",
+        zerolinewidth = 0.5,
+        title = ylab,
+        range = c(0, yrange[2] * 1.1)
+    )
+
+    ax <- list(
+        showline = TRUE,
+        mirror = TRUE,
+        linecolor = toRGB("black"),
+        linewidth = 0.5,
+        zeroline = FALSE,
+        showgrid = show.grid,
+        layer = "below traces",
+        ticks = "outside",
+        zerolinewidth = 0.5,
+        title = xlab,
+        range = c(0, xrange[2] * 1.1)
+    )
+
+    fig <- fig %>%
+        layout(
+            title = title,
+            xaxis = ax,
+            yaxis = ay
+        ) %>%
+        config(
+            toImageButtonOptions = list(format = "svg"),
+            displaylogo = FALSE,
+            plotGlPixelRatio = 7,
+            edits = list(
+                axisTitleText = TRUE,
+                titleText = TRUE
+            )
+        )
+
+    fig
 }
 
 
@@ -214,8 +204,7 @@ plot_hist <- function(mat,
 #' @param plot.title Character scalar for title of the plot.
 #' @param legend.title Character scalar for title of the legend.
 #'
-#' @return A Heatmap object. If only one column is present in the `mat` matrix,
-#'   returns a text grob indicating only one sample was provided.
+#' @return A Heatmap object.
 #'
 #' @importFrom ComplexHeatmap Heatmap
 #' @importFrom circlize colorRamp2
@@ -235,22 +224,14 @@ plot_correlation_heatmap <- function(mat,
                                      max.color = "#0000FF",
                                      legend.title = "Pearson Corr.",
                                      plot.title = "Correlation Matrix") {
-    if (is.null(mat)) {
-        stop("mat is NULL.")
-    } else if (ncol(mat) == 1) {
-        Heatmap(mat,
-            name = legend.title,
-            column_title = plot.title
-        )
-    } else {
-        Heatmap(mat,
-            name = legend.title,
-            column_title = plot.title,
-            cluster_rows = TRUE,
-            cluster_columns = TRUE,
-            col = colorRamp2(c(min(mat), max(mat)), c(min.color, max.color))
-        )
-    }
+
+    Heatmap(mat,
+        name = legend.title,
+        column_title = plot.title,
+        cluster_rows = TRUE,
+        cluster_columns = TRUE,
+        col = colorRamp2(c(min(mat), max(mat)), c(min.color, max.color))
+    )
 }
 
 
@@ -258,7 +239,7 @@ plot_correlation_heatmap <- function(mat,
 #'
 #' This function plots a biplot from a PCAtools \code{\link[PCAtools]{pca}} object.
 #'
-#' @param pca.res A \code{\link[PCAtools]{pca}} generated by the PCAtools package
+#' @param pca.res A \code{\link[PCAtools]{pca}} generated by the PCAtools package.
 #' @param dim.x Character scalar for the principal component to plot on the x-axis.
 #' @param dim.y Character scalar for the principal component to plot on the y-axis.
 #' @param dim.z Character scalar for the principal component to plot on the z-axis.
@@ -269,12 +250,12 @@ plot_correlation_heatmap <- function(mat,
 #' @param show.loadings Boolean indicating whether to show component loadings on the plot.
 #' @param n.loadings Integer for number of loadings to show.
 #' @param pt.size Numeric size of the plotted points.
-#' @return A plotly plot of the PCA biplot
+#' @return A plotly plot of the PCA biplot, or a text grob indicating no PCA was provided.
 #' @export
 #'
 #' @author Jared Andrews
 #'
-#' @importFrom plotly plot_ly layout config add_segments add_annotations
+#' @importFrom plotly plot_ly layout config add_segments add_annotations ggplotly
 #' @importFrom stats as.formula
 #' @importFrom dittoSeq dittoColors
 #'
@@ -377,6 +358,7 @@ plot_pca_biplot <- function(pca.res,
             hov.text <- paste0(hov.text, "</br><b>", n, ":</b>", pca.res$metadata[[n]])
         }
     }
+
 
     fig <- plot_ly(pca.res$rotated,
         x = as.formula(paste0("~", dim.x)),

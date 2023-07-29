@@ -125,6 +125,10 @@ CRISPRball <- function(gene.data = NULL,
         default.tab <- "QC"
     }
 
+    if (!is.null(norm.counts)) {
+        default.tab <- "QC"
+    }
+
     # Load cell line metadata, gene summaries, and release if depmap db provided.
     if (!is.null(depmap.db)) {
         .error_if_no_pool()
@@ -245,8 +249,12 @@ CRISPRball <- function(gene.data = NULL,
             defaultDisabledTabs <- c(defaultDisabledTabs, "sgRNA", "sgRNA Summary Tables")
         }
 
-        if (is.null(count.summary) | is.null(norm.counts)) {
+        if (is.null(count.summary) & is.null(norm.counts)) {
             defaultDisabledTabs <- c(defaultDisabledTabs, "QC", "QC Table")
+        }
+
+        if (is.null(count.summary)) {
+            defaultDisabledTabs <- c(defaultDisabledTabs, "QC Table")
         }
 
         for (tabname in defaultDisabledTabs) {
@@ -268,7 +276,7 @@ CRISPRball <- function(gene.data = NULL,
 
         # Initialize plots by simulating button click once.
         o <- observe({
-            req(robjects$pca.mat, robjects$pca.meta)
+            req(robjects$pca.mat)
             shinyjs::click("pca.update")
             o$destroy
         })
