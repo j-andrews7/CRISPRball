@@ -14,7 +14,7 @@ gene_ingress(
 )
 }
 \arguments{
-\item{df}{data.frame of gene summary data}
+\item{df}{data.frame of gene summary data. Gene IDs should be in the first column.}
 
 \item{sig.thresh}{Numeric scalar for significance threshold to consider a gene a hit.}
 

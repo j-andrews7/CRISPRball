@@ -75,8 +75,8 @@
                     # Make output df from genes using info from all combination members.
                     member.dfs <- lapply(comb.members, function(x) {
                         og.df <- robjects$comps[[x]]
-                        og.df <- og.df[og.df$id %in% comb.genes, ]
-                        rownames(og.df) <- og.df$id
+                        og.df <- og.df[og.df[[1]] %in% comb.genes, ]
+                        rownames(og.df) <- og.df[[1]]
                         og.df <- og.df[, c("FDR", "LFC")]
                         colnames(og.df) <- paste0(colnames(og.df), "_", x)
                         og.df
@@ -124,8 +124,8 @@
                     # Make output df from genes using info from all combination members.
                     member.dfs <- lapply(comb.members, function(x) {
                         og.df <- robjects$comps[[x]]
-                        og.df <- og.df[og.df$id %in% comb.genes, ]
-                        rownames(og.df) <- og.df$id
+                        og.df <- og.df[og.df[[1]] %in% comb.genes, ]
+                        rownames(og.df) <- og.df[[1]]
                         og.df <- og.df[, c("FDR", "LFC")]
                         colnames(og.df) <- paste0(colnames(og.df), "_", x)
                         og.df
@@ -203,25 +203,25 @@
     }
 
     if (input$comp.dep.crispr.ess) {
-        to.remove <- c(to.remove, df$id[df$DepMap_CRISPR_Essential == TRUE])
+        to.remove <- c(to.remove, df[[1]][df$DepMap_CRISPR_Essential == TRUE])
     }
 
     if (input$comp.dep.rnai.ess) {
-        to.remove <- c(to.remove, df$id[df$DepMap_RNAi_Essential == TRUE])
+        to.remove <- c(to.remove, df[[1]][df$DepMap_RNAi_Essential == TRUE])
     }
 
     if (input$comp.dep.crispr.sel) {
-        to.remove <- c(to.remove, df$id[df$DepMap_CRISPR_Selective == TRUE])
+        to.remove <- c(to.remove, df[[1]][df$DepMap_CRISPR_Selective == TRUE])
     }
 
     if (input$comp.dep.crispr.sel) {
-        to.remove <- c(to.remove, df$id[df$DepMap_RNAi_Selective == TRUE])
+        to.remove <- c(to.remove, df[[1]][df$DepMap_RNAi_Selective == TRUE])
     }
 
     if (pos) {
-        out <- df$id[!df$id %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC > input$comp.lfc.th]
+        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC > input$comp.lfc.th]
     } else {
-        out <- df$id[!df$id %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC < -input$comp.lfc.th]
+        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC < -input$comp.lfc.th]
     }
 
     return(out)
