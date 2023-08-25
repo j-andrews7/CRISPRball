@@ -21,7 +21,7 @@ shinyjs.enableTab = function(name) {
 
 
 #' Parse gene summary data for easier plotting and display
-#' @param df data.frame of gene summary data
+#' @param df data.frame of gene summary data. Gene IDs should be in the first column.
 #' @param sig.thresh Numeric scalar for significance threshold to consider a gene a hit.
 #' @param lfc.thresh Numeric scalar for absolute log fold change threshold to consider a gene a hit.
 #' @param positive.ctrl.genes Character vector of gene identifiers to label as positive controls.
@@ -40,27 +40,27 @@ shinyjs.enableTab = function(name) {
 gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
                          essential.genes = NULL, depmap.genes = NULL) {
     if (!is.null(essential.genes)) {
-        df$essential <- df$id %in% essential.genes
+        df$essential <- df[[1]] %in% essential.genes
     }
 
     if (!is.null(positive.ctrl.genes)) {
-        df$Positive_Control <- df$id %in% positive.ctrl.genes
+        df$Positive_Control <- df[[1]] %in% positive.ctrl.genes
     }
 
     if (!is.null(depmap.genes)) {
-        df$DepMap_CRISPR_Essential <- df$id %in%
+        df$DepMap_CRISPR_Essential <- df[[1]] %in%
             depmap.genes$gene_name[depmap.genes$dataset %in%
                 c("Chronos_Combined", "Chronos_Score", "Chronos_Achilles") &
                 depmap.genes$common_essential == TRUE]
 
-        df$DepMap_CRISPR_Selective <- df$id %in%
+        df$DepMap_CRISPR_Selective <- df[[1]] %in%
             depmap.genes$gene_name[depmap.genes$dataset %in%
                 c("Chronos_Combined", "Chronos_Score", "Chronos_Achilles") &
                 depmap.genes$strongly_selective == TRUE]
 
-        df$DepMap_RNAi_Essential <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
+        df$DepMap_RNAi_Essential <- df[[1]] %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
             depmap.genes$common_essential == TRUE]
-        df$DepMap_RNAi_Selective <- df$id %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
+        df$DepMap_RNAi_Selective <- df[[1]] %in% depmap.genes$gene_name[depmap.genes$dataset == "RNAi_merged" &
             depmap.genes$strongly_selective == TRUE]
     }
 
@@ -69,6 +69,58 @@ gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
     }
 
     return(df)
+}
+
+
+#' Read and parse MAGeCK MLE output gene summary file
+#' 
+#' This function reads the gene summary file output by \code{mageck mle} and
+#' parses it into a list of data.frames, one for each sample. The sample names
+#' are extracted from the column names of the input file and used as the names
+#' of the list elements.
+#' 
+#' @param filepath Path to the gene summary file output by \code{mageck mle}.
+#' 
+#' @return A named list of data.frames containing MAGeCK MLE output,
+#'   one for each sample contained in the file.
+#' @author Jared Andrews
+#' @importFrom utils read.delim
+#' @export
+#' 
+#' @examples
+#' library(CRISPRball)
+#' mle_gene_summary <- file.path(system.file("extdata", "beta_leukemia.gene_summary.txt", package = "CRISPRball"))
+#' gene_data <- read_mle_gene_summary(mageck_mlmle_gene_summarye_file)
+read_mle_gene_summary <- function(filepath) {
+    # Read the table
+    data <- read.delim(filepath, check.names = FALSE)
+
+    # Get the sample names
+    samples <- unique(gsub("\\|.*", "", names(data)[-(1:2)]))
+
+    # Create a list to hold the data frames
+    dataframes <- list()
+
+    # For each sample, create a data frame and add it to the list
+    for (sample in samples) {
+        # Find the columns for this sample
+        sample_cols <- grep(paste0("^", sample, "\\|"), names(data))
+
+        # Add the 'Gene' and 'sgRNA' columns
+        sample_cols <- c(1, 2, sample_cols)
+
+        # Extract the data for this sample
+        df <- data[, sample_cols]
+
+        # Remove the sample name from the header
+        names(df) <- gsub(paste0("^", sample, "\\|"), "", names(df))
+
+        # Fix the column names to not use '-'
+        names(df) <- gsub("-", ".", names(df))
+        dataframes[[sample]] <- df
+    }
+
+    return(dataframes)
 }
 
 

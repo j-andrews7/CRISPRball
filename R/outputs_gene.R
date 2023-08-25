@@ -26,7 +26,9 @@
         tagList(
             selectInput("gene.rankby", "Rank by:",
                 choices = choices,
-                selected = ifelse("LFC" %in% choices, "LFC", NULL)
+                selected = ifelse("LFC" %in% choices, "LFC",
+                    ifelse("beta" %in% choices, "beta", choices[1])
+                )
             )
         )
     })
@@ -45,7 +47,7 @@
         df <- robjects$set1.genes
 
         if (!is.null(robjects$common.hits)) {
-            df$Overlap <- df$id %in% robjects$common.hits
+            df$Overlap <- df[[1]] %in% robjects$common.hits
         }
 
         DT::datatable(df,
@@ -400,7 +402,7 @@
 
         # Label overlapping hits between datasets if available.
         if (!is.null(robjects$common.hits)) {
-            df$Overlap <- df$id %in% robjects$common.hits
+            df$Overlap <- df[[1]] %in% robjects$common.hits
         }
 
         DT::datatable(df,
