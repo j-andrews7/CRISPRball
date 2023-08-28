@@ -65,28 +65,32 @@ gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
     }
 
     if ("neg|score" %in% colnames(df)) {
-        df <- .RRA_ingress(df, sig.thresh, lfc.thresh)
+        df <- .rra_ingress(df, sig.thresh, lfc.thresh)
     }
+
+    # TODO: Add check for mle format and add .mle_ingress function to get hit_type
+    # Potentially need to add input to allow user to specify which columns to use
+    # for significance and effect size (LFC, beta, etc.) for full flexibility.
 
     return(df)
 }
 
 
 #' Read and parse MAGeCK MLE output gene summary file
-#' 
+#'
 #' This function reads the gene summary file output by \code{mageck mle} and
 #' parses it into a list of data.frames, one for each sample. The sample names
 #' are extracted from the column names of the input file and used as the names
 #' of the list elements.
-#' 
+#'
 #' @param filepath Path to the gene summary file output by \code{mageck mle}.
-#' 
+#'
 #' @return A named list of data.frames containing MAGeCK MLE output,
 #'   one for each sample contained in the file.
 #' @author Jared Andrews
 #' @importFrom utils read.delim
 #' @export
-#' 
+#'
 #' @examples
 #' library(CRISPRball)
 #' mle_gene_summary <- file.path(system.file("extdata", "beta_leukemia.gene_summary.txt", package = "CRISPRball"))
@@ -129,8 +133,8 @@ read_mle_gene_summary <- function(filepath) {
 #'
 #' @return data.frame of gene summary data with renamed columns.
 #' @author Jared Andrews
-#' @rdname INTERNAL_RRA_ingress
-.RRA_ingress <- function(df, fdr.thresh, lfc.thresh) {
+#' @rdname INTERNAL_rra_ingress
+.rra_ingress <- function(df, fdr.thresh, lfc.thresh) {
     df$LFC <- as.numeric(df$`neg|lfc`)
 
     df$RRAscore <- apply(df, 1, function(x) {
@@ -180,6 +184,7 @@ read_mle_gene_summary <- function(filepath) {
 #' @author Jared Andrews
 #' @rdname INTERNAL_gene_summ_ingress
 .gene_summ_ingress <- function(fileList) {
+    # TODO: Check for mle format and use read_mle_gene_summary if so
     out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
     names(out) <- sapply(fileList$name, gsub,
         pattern = ".gene_summary.txt",
