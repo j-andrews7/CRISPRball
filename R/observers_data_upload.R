@@ -24,10 +24,20 @@
         if (!is.null(robjects$gene.data)) {
             js$enableTab("Gene (Overview)")
             js$enableTab("Gene Summary Tables")
-            updateSelectizeInput(session, "gene.sel1", choices = names(robjects$gene.data), selected = names(robjects$gene.data)[1], server = TRUE)
-            updateSelectizeInput(session, "gene.sel2", choices = names(robjects$gene.data), selected = names(robjects$gene.data)[1], server = TRUE)
+            updateSelectizeInput(session, "gene.sel1",
+                choices = names(robjects$gene.data),
+                selected = names(robjects$gene.data)[1], server = TRUE
+            )
+            updateSelectizeInput(session, "gene.sel2",
+                choices = names(robjects$gene.data),
+                selected = names(robjects$gene.data)[1], server = TRUE
+            )
+
             if (length(robjects$gene.data) > 1) {
-                updateSelectizeInput(session, "comp.sets", choices = names(robjects$gene.data), selected = names(robjects$gene.data), server = TRUE)
+                updateSelectizeInput(session, "comp.sets",
+                    choices = names(robjects$gene.data),
+                    selected = names(robjects$gene.data), server = TRUE
+                )
                 js$enableTab("Comparisons")
             }
         }
@@ -49,8 +59,12 @@
         if (!is.null(robjects$count.summary)) {
             js$enableTab("QC")
             js$enableTab("QC Table")
-            updateSelectizeInput(session, "bip.color", choices = c("", colnames(robjects$count.summary)), server = TRUE)
-            updateSelectizeInput(session, "bip.shape", choices = c("", colnames(robjects$count.summary)), server = TRUE)
+            updateSelectizeInput(session, "bip.color",
+                choices = c("", colnames(robjects$count.summary)), server = TRUE
+            )
+            updateSelectizeInput(session, "bip.shape",
+                choices = c("", colnames(robjects$count.summary)), server = TRUE
+            )
         }
     })
 

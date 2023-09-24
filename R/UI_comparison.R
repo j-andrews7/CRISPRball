@@ -17,14 +17,7 @@
 #'
 #' @rdname INTERNAL_create_tab_comparison
 .create_tab_comparison <- function(datasets) {
-    # Upset plots only allow 30 sets max, so need to adjust default selected sets.
     # nocov start
-    if (length(datasets) > 30) {
-        limit.selected <- TRUE
-    } else {
-        limit.selected <- FALSE
-    }
-
     tabPanel(
         title = "Comparisons",
         id = "comparisons",
@@ -41,10 +34,11 @@
                                 div(
                                     id = "comp_select",
                                     selectizeInput("comp.sets", "Datasets:",
-                                        if (limit.selected) {
-                                            selected = datasets[1:30]
+                                        # Upset plots only allow 30 sets max.
+                                        if (length(datasets) > 30) {
+                                            selected <- datasets[seq_len(30)]
                                         } else {
-                                            selected = datasets
+                                            selected <- datasets
                                         },
                                         choices = datasets,
                                         multiple = TRUE,
@@ -55,15 +49,16 @@
                                 options = list(container = "body")
                             )
                         ),
+                        uiOutput("comp.term.options"),
                         column(
                             6,
-                            numericInput("comp.fdr.th", "FDR threshold:",
+                            numericInput("comp.sig.th", "Significance threshold:",
                                 min = 0, max = 1, step = 0.01, value = 0.05
                             )
                         ),
                         column(
                             6,
-                            numericInput("comp.lfc.th", "log2FC threshold:",
+                            numericInput("comp.es.th", "Effect size threshold:",
                                 min = 0, max = Inf, step = 0.05, value = 0.5
                             )
                         )

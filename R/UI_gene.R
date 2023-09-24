@@ -121,6 +121,9 @@
                     bsCollapsePanel(
                         title = span(icon("plus"), "Common Plot Settings"), value = "com.settings", style = "info",
                         fluidRow(
+                            uiOutput("gene.term.options")
+                        ),
+                        fluidRow(
                             column(
                                 width = 6,
                                 tipify(colourInput("down.color", "Down colour", value = "#0026ff"),
@@ -231,7 +234,6 @@
                         fluidRow(
                             column(
                                 width = 6,
-                                uiOutput("gene.rank.options"),
                                 numericInput("rank.y.max", label = "y-axis max:", value = 10, step = 0.5),
                                 prettyCheckbox("rank.fcline",
                                     label = "Show FC threshold", value = TRUE,
@@ -355,11 +357,11 @@
                             popify(icon("circle-info", style = "font-size: 20px"),
                                 title = "Volcano Plot",
                                 c(
-                                    "This volcano plot shows the log2 fold change on the x-axis and the -log10(FDR) value on the y-axis. ",
+                                    "This volcano plot shows the selected effect size variable on the x-axis and the -log10 of the selected significance value on the y-axis. ",
                                     "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
                                     "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
                                     "Click and drag to zoom in. Hover over a point for additional info.",
-                                    "Genes with full sgRNA depletion tend to all have the same significance value, forming a shelf-like max y-axis value."
+                                    "Genes with full sgRNA depletion sometimes all have the same significance value, forming a shelf-like max y-axis value."
                                 ),
                                 placement = "bottom", trigger = "hover", options = list(container = "body")
                             ),
@@ -373,7 +375,7 @@
                             popify(icon("circle-info", style = "font-size: 20px"),
                                 title = "Rank Plot",
                                 c(
-                                    "This rank plot shows the 'rank by' term on the y-axis and the gene rank on the x-axis. ",
+                                    "This rank plot shows the chosen effect size term on the y-axis and the gene rank on the x-axis. ",
                                     "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
                                     "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
                                     "Click and drag to zoom in. Hover over a point for additional info."
@@ -390,7 +392,7 @@
                             popify(icon("circle-info", style = "font-size: 20px"),
                                 title = "Lawn Plot",
                                 c(
-                                    "This plot shows the log2 fold change on the y-axis and the genes randomly ordered on the x-axis. ",
+                                    "This plot shows the select effect size variable on the y-axis and the genes randomly ordered on the x-axis. ",
                                     "Thresholds are adjustable. Gene labels can be added (or removed) by clicking on a point ",
                                     "and can be moved by clicking and dragging the label. The plot is fully customizable with the settings on the left. ",
                                     "Click and drag to zoom in. Hover over a point for additional info."

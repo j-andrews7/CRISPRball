@@ -16,7 +16,7 @@
 #'
 #' @author Jared Andrews
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(CRISPRball)
 #' build_depmap_db()
 #' pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")

@@ -41,7 +41,7 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
-#' @usage 
+#' @usage
 #' data(depmap_22q1_crispr)
 "depmap_22q1_crispr"
 
@@ -66,7 +66,7 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
-#' @usage 
+#' @usage
 #' data(depmap_22q1_crispr_rnai)
 "depmap_22q1_crispr_rnai"
 
@@ -116,6 +116,6 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
-#' @usage 
+#' @usage
 #' data(depmap_22q1_cn)
 "depmap_22q1_cn"

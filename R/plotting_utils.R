@@ -2,7 +2,7 @@
 #'
 #' @param text Character scalar to show in plot area.
 #' @return A heatmap with no data and text in the plot area.
-#' 
+#'
 #' @author Jared Andrews
 #' @rdname INTERNAL_empty_heatmap
 #' @importFrom ComplexHeatmap Heatmap draw
@@ -42,23 +42,24 @@
 #' @importFrom ggplot2 theme_void geom_text theme margin ggplot
 #' @importFrom plotly ggplotly layout
 .empty_plot <- function(text = NULL, plotly = FALSE) {
-  plot <- ggplot() + 
-    theme_void() +
-    theme(plot.margin = margin(1,1,1,1, "cm")) +
-    geom_text(aes(x = 0.5, y = 0.5, label = text), 
-              inherit.aes = FALSE, check_overlap = TRUE)
-  
-  if (plotly) {
-    plot <- ggplotly(plot)
-    plot <- plot %>% layout(
-        xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
-        yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
-        plot_bgcolor = 'white',
-        showlegend = FALSE,
-        autosize = TRUE,
-        margin = list(l = 0, r = 0, b = 0, t = 0)
-    )
-  }
+    plot <- ggplot() +
+        theme_void() +
+        theme(plot.margin = margin(1, 1, 1, 1, "cm")) +
+        geom_text(aes(x = 0.5, y = 0.5, label = text),
+            inherit.aes = FALSE, check_overlap = TRUE
+        )
 
-  return(plot)
+    if (plotly) {
+        plot <- ggplotly(plot)
+        plot <- plot %>% layout(
+            xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
+            yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE, showline = FALSE),
+            plot_bgcolor = "white",
+            showlegend = FALSE,
+            autosize = TRUE,
+            margin = list(l = 0, r = 0, b = 0, t = 0)
+        )
+    }
+
+    return(plot)
 }

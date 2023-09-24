@@ -29,7 +29,7 @@
 
 #' Build SQLite database of DepMap data
 #'
-#' @param file Name of SQLite database file to create. 
+#' @param file Name of SQLite database file to create.
 #'
 #' @return Name of SQLite database containing DepMap data.
 #'
@@ -42,7 +42,7 @@
 #' \code{\link[pool]{dbPool}}, \code{\link[DBI]{dbWriteTable}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' build_depmap_db()
 #' }
 build_depmap_db <- function(file = "depmap_db.sqlite") {

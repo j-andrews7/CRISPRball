@@ -132,7 +132,11 @@
         df <- robjects$set1.sgrnas
         df <- df[df$Gene == input$sgrna.gene, ]
 
-        target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
+        target <- which(names(df) %in% c(
+            "control_mean", "treat_mean",
+            "control_var", "adj_var", "high_in_treatment", "p.low",
+            "p.high", "p.twosided", "score"
+        )) - 1
 
         DT::datatable(df,
             rownames = FALSE,
@@ -254,7 +258,11 @@
         df <- robjects$set2.sgrnas
         df <- df[df$Gene == input$sgrna.gene, ]
 
-        target <- which(names(df) %in% c("control_mean", "treat_mean", "control_var", "adj_var", "high_in_treatment", "p.low", "p.high", "p.twosided", "score")) - 1
+        target <- which(names(df) %in% c(
+            "control_mean", "treat_mean",
+            "control_var", "adj_var", "high_in_treatment", "p.low",
+            "p.high", "p.twosided", "score"
+        )) - 1
 
         DT::datatable(df,
             rownames = FALSE,

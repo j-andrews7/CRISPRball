@@ -56,8 +56,8 @@ mat <- matrix(
     rexp(col * row, rate = 0.1),
     ncol = col
 )
-rownames(mat) <- paste0("gene", 1:nrow(mat))
-colnames(mat) <- paste0("sample", 1:ncol(mat))
+rownames(mat) <- paste0("gene", seq_len(nrow(mat)))
+colnames(mat) <- paste0("sample", seq_len(ncol(mat)))
 
 metadata <- data.frame(row.names = colnames(mat))
 metadata$Group <- rep(NA, ncol(mat))

@@ -25,7 +25,8 @@
             robjects$comps <- lapply(input$comp.sets, function(x) {
                 df <- robjects$gene.data[[x]]
                 gene_ingress(df,
-                    sig.thresh = input$comp.fdr.th, lfc.thresh = input$comp.lfc.th,
+                    sig.thresh = input$comp.sig.th, es.thresh = input$comp.es.th,
+                    es.col = input$comp.esterm, sig.col = input$comp.sigtern,
                     positive.ctrl.genes = robjects$positive.ctrl.genes,
                     essential.genes = robjects$essential.genes, depmap.genes = robjects$depmap.gene
                 )
@@ -45,7 +46,7 @@
 
             names(robjects$comp.neg.genes) <- input$comp.sets
 
-            # Get the combination matrices. 
+            # Get the combination matrices.
             # If there are no hits in any dataset, make empty annotation.
             # Otherwise, make the UpSet plot.
             if (any(lapply(robjects$comp.pos.genes, length) > 0)) {
@@ -55,7 +56,7 @@
                 robjects$pos.m <- NULL
                 ht.pos <- .empty_heatmap("No positively selected hits in any dataset.")
             }
-                
+
             if (any(lapply(robjects$comp.neg.genes, length) > 0)) {
                 robjects$neg.m <- make_comb_mat(robjects$comp.neg.genes)
                 ht.neg <- draw(UpSet(robjects$neg.m))
@@ -75,9 +76,9 @@
                     # Make output df from genes using info from all combination members.
                     member.dfs <- lapply(comb.members, function(x) {
                         og.df <- robjects$comps[[x]]
-                        og.df <- og.df[og.df$id %in% comb.genes, ]
-                        rownames(og.df) <- og.df$id
-                        og.df <- og.df[, c("FDR", "LFC")]
+                        og.df <- og.df[og.df[[1]] %in% comb.genes, ]
+                        rownames(og.df) <- og.df[[1]]
+                        og.df <- og.df[, c(input$comp.sigterm, input$comp.esterm)]
                         colnames(og.df) <- paste0(colnames(og.df), "_", x)
                         og.df
                     })
@@ -124,9 +125,9 @@
                     # Make output df from genes using info from all combination members.
                     member.dfs <- lapply(comb.members, function(x) {
                         og.df <- robjects$comps[[x]]
-                        og.df <- og.df[og.df$id %in% comb.genes, ]
-                        rownames(og.df) <- og.df$id
-                        og.df <- og.df[, c("FDR", "LFC")]
+                        og.df <- og.df[og.df[[1]] %in% comb.genes, ]
+                        rownames(og.df) <- og.df[[1]]
+                        og.df <- og.df[, c(input$comp.sigterm, input$comp.esterm)]
                         colnames(og.df) <- paste0(colnames(og.df), "_", x)
                         og.df
                     })
@@ -203,25 +204,39 @@
     }
 
     if (input$comp.dep.crispr.ess) {
-        to.remove <- c(to.remove, df$id[df$DepMap_CRISPR_Essential == TRUE])
+        to.remove <- c(to.remove, df[[1]][df$DepMap_CRISPR_Essential == TRUE])
     }
 
     if (input$comp.dep.rnai.ess) {
-        to.remove <- c(to.remove, df$id[df$DepMap_RNAi_Essential == TRUE])
+        to.remove <- c(to.remove, df[[1]][df$DepMap_RNAi_Essential == TRUE])
     }
 
     if (input$comp.dep.crispr.sel) {
-        to.remove <- c(to.remove, df$id[df$DepMap_CRISPR_Selective == TRUE])
+        to.remove <- c(to.remove, df[[1]][df$DepMap_CRISPR_Selective == TRUE])
     }
 
     if (input$comp.dep.crispr.sel) {
-        to.remove <- c(to.remove, df$id[df$DepMap_RNAi_Selective == TRUE])
+        to.remove <- c(to.remove, df[[1]][df$DepMap_RNAi_Selective == TRUE])
+    }
+
+    # This is a workaround for initial load of the app not rendering
+    # the output UI elements for the comparison tab before this is run.
+    if (is.null(input$comp.esterm)) {
+        esterm <- ifelse("LFC" %in% names(df), "LFC", "beta")
+    } else {
+        esterm <- input$comp.esterm
+    }
+
+    if (is.null(input$comp.sigterm)) {
+        sigterm <- ifelse("fdr" %in% names(df), "fdr", "pval")
+    } else {
+        sigterm <- input$comp.sigterm
     }
 
     if (pos) {
-        out <- df$id[!df$id %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC > input$comp.lfc.th]
+        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df[[sigterm]] < input$comp.sig.th & df[[esterm]] > input$comp.es.th]
     } else {
-        out <- df$id[!df$id %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC < -input$comp.lfc.th]
+        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df[[sigterm]] < input$comp.sig.th & df[[esterm]] < -input$comp.es.th]
     }
 
     return(out)

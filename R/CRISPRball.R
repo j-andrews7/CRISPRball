@@ -1,13 +1,8 @@
 #' Create an interactive Shiny app for visualization & exploration of CRISPR analyses
 #'
-#' This shiny app is composed of multiple tabs to peruse analysis results and compare them between timepoints or samples.
-#' Also included are numerous QC plots. Almost all plots are interactive and their aesthetics can be easily tweaked
-#' using the sidebar. See the Details section for more information.
-#'
+#' @details Features with no variation will be removed prior to \code{\link[PCAtools]{pca}} being run for the PCA visualization.
 #' Gene labels can be added to the MAplot and volcano plot by clicking a point. The labels can also be dragged around,
 #' though adding labels will reset the positions, so it's recommended to add all labels prior to re-positioning them.
-#'
-#' @details Features with no variation will be removed prior to \code{\link[PCAtools]{pca}} being run for the PCA visualization.
 #'
 #' @param gene.data A named list containing \code{gene_summary.txt} tables as data.frames.
 #'   Multiple data.frames may be provided, one per element of the list.
@@ -162,31 +157,31 @@ CRISPRball <- function(gene.data = NULL,
             css,
             tags$head(tags$link(rel = "shortcut icon", href = "logo/CRISPRball_Hex.png"))
         ),
-        ##---------------Data Upload-----------------
+        ## ---------------Data Upload-----------------
         .create_tab_data_upload(),
-        ##----------------QC--------------------
+        ## ----------------QC--------------------
         .create_tab_qc(meta.choices),
-        ##-------------------QC Table----------------
+        ## -------------------QC Table----------------
         .create_tab_qc_summary(),
-        ##------------------Gene (Overview)-------------
+        ## ------------------Gene (Overview)-------------
         .create_tab_gene(gene.choices, genesets),
-        ##----------------Gene Summary Tables--------------
+        ## ----------------Gene Summary Tables--------------
         .create_tab_gene_summary(),
-        ##----------------sgRNA---------------------
+        ## ----------------sgRNA---------------------
         .create_tab_sgrna(sgrna.choices, sgrna.gene),
-        ##--------------------sgRNA Summary Tables----------------
+        ## --------------------sgRNA Summary Tables----------------
         .create_tab_sgrna_summary(),
-        ##--------------------Dataset Comparisons----------------
+        ## --------------------Dataset Comparisons----------------
         .create_tab_comparison(gene.choices),
-        ##-----------------DepMap-------------------
+        ## -----------------DepMap-------------------
         .create_tab_depmap(depmap.gene, depmap.meta),
-        ##-----------------About-------------------
+        ## -----------------About-------------------
         .create_tab_about()
     )
 
 
     server <- function(input, output, session) {
-        ##-------------Reactive Values---------------
+        ## -------------Reactive Values---------------
         robjects <- reactiveValues(
             gene.data = gene.data,
             sgrna.data = sgrna.data,
@@ -234,7 +229,7 @@ CRISPRball <- function(gene.data = NULL,
         # Create downloadHander outputs.
         .create_dl_outputs(output, robjects)
 
-        ##--------------Disable Tabs-----------------
+        ## --------------Disable Tabs-----------------
         defaultDisabledTabs <- c()
 
         if (is.null(gene.data)) {
@@ -261,15 +256,15 @@ CRISPRball <- function(gene.data = NULL,
             js$disableTab(tabname)
         }
 
-        ##--------------Disable Inputs-----------------
+        ## --------------Disable Inputs-----------------
         # Disable certain inputs if no data is provided.
         .create_ui_observers(robjects)
 
-        ##------------Data Upload Tab----------------
+        ## ------------Data Upload Tab----------------
         # Create data upload observers.
         .create_upload_observers(input, session, robjects)
 
-        ##-----------QC & QC Summary Tabs------------
+        ## -----------QC & QC Summary Tabs------------
         .create_qc_observers(input, robjects)
 
         .create_qc_outputs(input, output, robjects)
@@ -281,7 +276,7 @@ CRISPRball <- function(gene.data = NULL,
             o$destroy
         })
 
-        ##---------Gene (Overview) & Summary Tables Tabs-------------
+        ## ---------Gene (Overview) & Summary Tables Tabs-------------
         # Load the gene summaries for easy plotting.
         .create_gene_observers(input, robjects)
 
@@ -289,16 +284,20 @@ CRISPRball <- function(gene.data = NULL,
         .create_gene_outputs(input, output, robjects)
 
         # This ensures the rank options are updated even when initially hidden in the collapsible panel.
-        outputOptions(output, "gene.rank.options", suspendWhenHidden = FALSE)
+        outputOptions(output, "gene.term.options", suspendWhenHidden = FALSE)
 
-        ##---------------sgRNA & Summary Tables Tabs-----------------
+        ## ---------------sgRNA & Summary Tables Tabs-----------------
         # Load the gene summaries for easy plotting.
         .create_sgrna_observers(input, robjects)
 
         # Summary tables and plots.
         .create_sgrna_outputs(input, output, robjects)
 
-        ##--------------Comparisons Tab------------
+        ## --------------Comparisons Tab------------
+        # UI elements for comparisons tab.
+        .create_comparisons_outputs(input, output, robjects)
+
+        # Create observers for comparisons tab, this is where upset plots are created as well.
         .create_comparisons_observers(input, session, output, robjects)
 
         # Initialize plots by simulating button click once.
@@ -308,7 +307,7 @@ CRISPRball <- function(gene.data = NULL,
             o$destroy
         })
 
-        ##--------------DepMap Tab-----------------
+        ## --------------DepMap Tab-----------------
         if (!is.null(depmap.gene)) {
             .create_depmap_outputs(input, output, robjects)
         }

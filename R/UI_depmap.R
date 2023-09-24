@@ -315,8 +315,10 @@
                             div(
                                 class = "white",
                                 h3("Gene Info", popify(icon("circle-info", style = "font-size: 20px"), "Gene Info",
-                                    c("Gene info and accessions from the MyGene API. Note that this may occasionally be incorrect",
-                                    " due to the top hit not matching the correct gene symbol, typically for genes with associated antisense genes."),
+                                    c(
+                                        "Gene info and accessions from the MyGene API. Note that this may occasionally be incorrect",
+                                        " due to the top hit not matching the correct gene symbol, typically for genes with associated antisense genes."
+                                    ),
                                     placement = "bottom", trigger = "hover", options = list(container = "body")
                                 ), .noWS = "outside"),
                                 withSpinner(uiOutput("depmap.geneinfo"))

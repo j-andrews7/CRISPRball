@@ -7,18 +7,24 @@
 gene_ingress(
   df,
   sig.thresh,
-  lfc.thresh,
+  es.thresh,
+  es.col,
+  sig.col,
   positive.ctrl.genes = NULL,
   essential.genes = NULL,
   depmap.genes = NULL
 )
 }
 \arguments{
-\item{df}{data.frame of gene summary data}
+\item{df}{data.frame of gene summary data. Gene IDs should be in the first column.}
 
 \item{sig.thresh}{Numeric scalar for significance threshold to consider a gene a hit.}
 
-\item{lfc.thresh}{Numeric scalar for absolute log fold change threshold to consider a gene a hit.}
+\item{es.thresh}{Numeric scalar for absolute log fold change threshold to consider a gene a hit.}
+
+\item{es.col}{Character scalar for the column name of the effect size value.}
+
+\item{sig.col}{Character scalar for the column name of the significance value.}
 
 \item{positive.ctrl.genes}{Character vector of gene identifiers to label as positive controls.}
 
@@ -37,7 +43,7 @@ library(CRISPRball)
 d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
     package = "CRISPRball"
 ), check.names = FALSE)
-out.df <- gene_ingress(d1.genes, 0.05, 0.5)
+out.df <- gene_ingress(d1.genes, 0.05, 0.5, es.col = "LFC", sig.col = "fdr")
 }
 \author{
 Jared Andrews

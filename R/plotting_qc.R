@@ -42,7 +42,6 @@ plot_bar <- function(count.summary,
                      ylab = "Gini Index",
                      fill = "#E69F00",
                      yaxis.addition = 0.05) {
-
     gg <- BarView(count.summary,
         x = x,
         y = y,
@@ -109,11 +108,10 @@ plot_hist <- function(mat,
                       xlab = "Values",
                       ylab = "Frequency",
                       show.grid = FALSE) {
-    
     histo <- hist(mat, breaks = 40)
 
     if (ncol(mat) >= 1) {
-        histlist <- lapply(1:ncol(mat), function(x) {
+        histlist <- lapply(seq_len(ncol(mat)), function(x) {
             return(hist(mat[, x], plot = FALSE, breaks = histo$breaks))
         })
         xrange <- range(unlist(lapply(histlist, function(x) {
@@ -224,7 +222,6 @@ plot_correlation_heatmap <- function(mat,
                                      max.color = "#0000FF",
                                      legend.title = "Pearson Corr.",
                                      plot.title = "Correlation Matrix") {
-
     Heatmap(mat,
         name = legend.title,
         column_title = plot.title,
@@ -270,8 +267,8 @@ plot_correlation_heatmap <- function(mat,
 #'     rexp(col * row, rate = 0.1),
 #'     ncol = col
 #' )
-#' rownames(mat) <- paste0("gene", 1:nrow(mat))
-#' colnames(mat) <- paste0("sample", 1:ncol(mat))
+#' rownames(mat) <- paste0("gene", seq_len(nrow(mat)))
+#' colnames(mat) <- paste0("sample", seq_len(ncol(mat)))
 #'
 #' metadata <- data.frame(row.names = colnames(mat))
 #' metadata$Group <- rep(NA, ncol(mat))

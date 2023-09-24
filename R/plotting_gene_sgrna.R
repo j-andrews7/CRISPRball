@@ -107,7 +107,10 @@
 #' d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
 #'     package = "CRISPRball"
 #' ), check.names = FALSE)
-#' plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
+#' plot.df <- gene_ingress(d1.genes,
+#'     sig.thresh = 0.05, es.thresh = 0.5,
+#'     es.col = "LFC", sig.col = "FDR"
+#' )
 #' plot_volcano(plot.df, feat.term = "id")
 plot_volcano <- function(res,
                          xlim = 5,
@@ -456,7 +459,10 @@ plot_volcano <- function(res,
 #' d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
 #'     package = "CRISPRball"
 #' ), check.names = FALSE)
-#' plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
+#' plot.df <- gene_ingress(d1.genes,
+#'     sig.thresh = 0.05, es.thresh = 0.5,
+#'     es.col = "LFC", sig.col = "FDR"
+#' )
 #' plot_rank(plot.df, feat.term = "id")
 plot_rank <- function(res,
                       ylim = c(-10, 10),
@@ -809,7 +815,10 @@ plot_rank <- function(res,
 #' d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
 #'     package = "CRISPRball"
 #' ), check.names = FALSE)
-#' plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, lfc.thresh = 0.5)
+#' plot.df <- gene_ingress(d1.genes,
+#'     sig.thresh = 0.05, es.thresh = 0.5,
+#'     es.col = "LFC", sig.col = "FDR"
+#' )
 #' plot_lawn(plot.df, feat.term = "id")
 plot_lawn <- function(res,
                       ylim = 5,
