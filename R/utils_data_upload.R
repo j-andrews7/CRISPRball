@@ -23,7 +23,9 @@ shinyjs.enableTab = function(name) {
 #' Parse gene summary data for easier plotting and display
 #' @param df data.frame of gene summary data. Gene IDs should be in the first column.
 #' @param sig.thresh Numeric scalar for significance threshold to consider a gene a hit.
-#' @param lfc.thresh Numeric scalar for absolute log fold change threshold to consider a gene a hit.
+#' @param es.thresh Numeric scalar for absolute log fold change threshold to consider a gene a hit.
+#' @param es.col Character scalar for the column name of the effect size value.
+#' @param sig.col Character scalar for the column name of the significance value.
 #' @param positive.ctrl.genes Character vector of gene identifiers to label as positive controls.
 #' @param essential.genes Character vector of gene identifiers to label as essential genes.
 #' @param depmap.genes data.frame of DepMap gene summary data.
@@ -36,9 +38,17 @@ shinyjs.enableTab = function(name) {
 #' d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
 #'     package = "CRISPRball"
 #' ), check.names = FALSE)
-#' out.df <- gene_ingress(d1.genes, 0.05, 0.5)
-gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
+#' out.df <- gene_ingress(d1.genes, 0.05, 0.5, es.col = "LFC", sig.col = "fdr")
+gene_ingress <- function(df, sig.thresh, es.thresh, es.col, sig.col, positive.ctrl.genes = NULL,
                          essential.genes = NULL, depmap.genes = NULL) {
+    if ("neg|score" %in% colnames(df)) {
+        df <- .rra_ingress(df, sig.thresh, es.thresh, es.col = es.col, sig.col = sig.col)
+    } else if ("beta" %in% colnames(df)) {
+        df <- .mle_ingress(df, sig.thresh, es.thresh, es.col = es.col, sig.col = sig.col)
+    } else {
+        stop("Unknown gene summary format.")
+    }
+
     if (!is.null(essential.genes)) {
         df$essential <- df[[1]] %in% essential.genes
     }
@@ -64,14 +74,6 @@ gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
             depmap.genes$strongly_selective == TRUE]
     }
 
-    if ("neg|score" %in% colnames(df)) {
-        df <- .rra_ingress(df, sig.thresh, lfc.thresh)
-    }
-
-    # TODO: Add check for mle format and add .mle_ingress function to get hit_type
-    # Potentially need to add input to allow user to specify which columns to use
-    # for significance and effect size (LFC, beta, etc.) for full flexibility.
-
     return(df)
 }
 
@@ -93,8 +95,9 @@ gene_ingress <- function(df, sig.thresh, lfc.thresh, positive.ctrl.genes = NULL,
 #'
 #' @examples
 #' library(CRISPRball)
-#' mle_gene_summary <- file.path(system.file("extdata", "beta_leukemia.gene_summary.txt", package = "CRISPRball"))
-#' gene_data <- read_mle_gene_summary(mageck_mlmle_gene_summarye_file)
+#' mle_gene_summary <- file.path(system.file("extdata", "beta_leukemia.gene_summary.txt", 
+#'   package = "CRISPRball"))
+#' gene_data <- read_mle_gene_summary(mle_gene_summary)
 read_mle_gene_summary <- function(filepath) {
     # Read the table
     data <- read.delim(filepath, check.names = FALSE)
@@ -130,11 +133,16 @@ read_mle_gene_summary <- function(filepath) {
 
 #' Rename columns and add additional columns to gene summary data
 #' @param df data.frame of gene summary data
+#' @param sig.thresh Numeric scalar for significance threshold to consider a gene a hit.
+#' @param es.thresh Numeric scalar for absolute effect size threshold to consider a gene a hit.
+#' @param sig.col Character string for the column name of the significance value. 
+#'   Should be one of "fdr" or "pval".
+#' @param es.col Character string for the column name of the effect size value.
 #'
 #' @return data.frame of gene summary data with renamed columns.
 #' @author Jared Andrews
 #' @rdname INTERNAL_rra_ingress
-.rra_ingress <- function(df, fdr.thresh, lfc.thresh) {
+.rra_ingress <- function(df, sig.thresh, es.thresh, sig.col = "fdr", es.col = "LFC") {
     df$LFC <- as.numeric(df$`neg|lfc`)
 
     df$RRAscore <- apply(df, 1, function(x) {
@@ -142,16 +150,15 @@ read_mle_gene_summary <- function(filepath) {
         as.numeric(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`), x$`neg|score`, x$`pos|score`))
     })
 
-    df$FDR <- apply(df, 1, function(x) {
+    # Ease of use for plotting RRAscore as rank and interpreting directionality
+    df$signed_log10_RRAscore <- apply(df, 1, function(x) {
         x <- split(unname(x), names(x))
-        as.numeric(ifelse(as.numeric(x$`neg|fdr`) < as.numeric(x$`pos|fdr`), x$`neg|fdr`, x$`pos|fdr`))
+        as.numeric(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`), -(-log10(x$`neg|score`)), -log10(x$`pos|score`)))
     })
 
-    df$hit_type <- apply(df, 1, function(x) {
+    df$fdr <- apply(df, 1, function(x) {
         x <- split(unname(x), names(x))
-        ifelse(as.numeric(x$`neg|fdr`) < fdr.thresh & as.numeric(x$LFC) < -as.numeric(lfc.thresh), "neg",
-            ifelse(as.numeric(x$`pos|fdr`) < fdr.thresh & as.numeric(x$LFC) > as.numeric(lfc.thresh), "pos", NA)
-        )
+        as.numeric(ifelse(as.numeric(x$`neg|fdr`) < as.numeric(x$`pos|fdr`), x$`neg|fdr`, x$`pos|fdr`))
     })
 
     df$pval <- apply(df, 1, function(x) {
@@ -161,6 +168,23 @@ read_mle_gene_summary <- function(filepath) {
         ))
     })
 
+    if (!sig.col %in% colnames(df)) {
+        message(paste0("Column '", sig.col, "' not found in data. Using 'fdr' instead."))
+        sig.col <- "fdr"
+    }
+
+    if (!es.col %in% colnames(df)) {
+        message(paste0("Column '", es.col, "' not found in data. Using 'LFC' instead."))
+        es.col <- "LFC"
+    }
+
+    df$hit_type <- apply(df, 1, function(x) {
+        x <- split(unname(x), names(x))
+        ifelse(as.numeric(x[[sig.col]]) < sig.thresh & as.numeric(x[[es.col]]) < -as.numeric(es.thresh), "neg",
+            ifelse(as.numeric(x[[sig.col]]) < sig.thresh & as.numeric(x[[es.col]]) > as.numeric(es.thresh), "pos", NA)
+        )
+    })
+
     df$goodsgrna <- apply(df, 1, function(x) {
         x <- split(unname(x), names(x))
         as.integer(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`),
@@ -168,7 +192,44 @@ read_mle_gene_summary <- function(filepath) {
         ))
     })
 
-    df$Rank <- rank(df$LFC)
+    df$Rank <- rank(df[[es.col]])
+    df$RandomIndex <- sample(seq(nrow(df)), nrow(df))
+
+    return(df)
+}
+
+
+#' Rename columns and add additional columns to gene summary data from MAGeCK mle
+#' @param df data.frame of gene summary data.
+#' @param sig.thresh Numeric scalar for significance threshold to consider a gene a hit.
+#' @param es.thresh Numeric scalar for effect size threshold to consider a gene a hit.
+#' @param sig.col Column name for significance values in \code{df}. Should be one of
+#'   "fdr", "p.value", "wald.p.value", or "wald.fdr".
+#' @param es.col Column name for effect size values in \code{df}. Should be one of
+#'   "beta" or "z".
+#'
+#' @return data.frame of gene summary data from MAGeCK mle with renamed columns.
+#' @author Jared Andrews
+#' @rdname INTERNAL_mle_ingress
+.mle_ingress <- function(df, sig.thresh, es.thresh, sig.col = "fdr", es.col = "beta") {
+    if (!sig.col %in% colnames(df)) {
+        message(paste0("Column '", sig.col, "' not found in data. Using 'fdr' instead."))
+        sig.col <- "fdr"
+    }
+
+    if (!es.col %in% colnames(df)) {
+        message(paste0("Column '", es.col, "' not found in data. Using 'beta' instead."))
+        es.col <- "beta"
+    }
+
+    df$hit_type <- apply(df, 1, function(x) {
+        x <- split(unname(x), names(x))
+        ifelse(as.numeric(x[[sig.col]]) < sig.thresh & as.numeric(x[[es.col]]) < -as.numeric(es.thresh), "neg",
+            ifelse(as.numeric(x[[sig.col]]) < sig.thresh & as.numeric(x[[es.col]]) > as.numeric(es.thresh), "pos", NA)
+        )
+    })
+
+    df$Rank <- rank(df[[es.col]])
     df$RandomIndex <- sample(seq(nrow(df)), nrow(df))
 
     return(df)
@@ -177,6 +238,7 @@ read_mle_gene_summary <- function(filepath) {
 
 #' Read user-uploaded gene summary files and assign sample names
 #' @param fileList A list of gene summary files uploaded by the user.
+#'   MAGeCK mle format will be autodetected.
 #'
 #' @importFrom utils read.delim
 #'
@@ -184,7 +246,20 @@ read_mle_gene_summary <- function(filepath) {
 #' @author Jared Andrews
 #' @rdname INTERNAL_gene_summ_ingress
 .gene_summ_ingress <- function(fileList) {
-    # TODO: Check for mle format and use read_mle_gene_summary if so
+    checker <- read.delim(fileList$datapath[[1]], check.names = FALSE)
+
+    if ("neg|score" %in% colnames(checker)) {
+        out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
+        names(out) <- sapply(fileList$name, gsub,
+            pattern = ".gene_summary.txt",
+            replacement = "", fixed = TRUE
+        )
+    } else if ("beta" %in% colnames(checker)) {
+        out <- read_mle_gene_summary(fileList$datapath[[1]])
+    } else {
+        stop("Unknown gene summary format.")
+    }
+
     out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
     names(out) <- sapply(fileList$name, gsub,
         pattern = ".gene_summary.txt",
