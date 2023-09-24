@@ -157,8 +157,10 @@ library(CRISPRball)
 d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
     package = "CRISPRball"
 ), check.names = FALSE)
-plot.df <- gene_ingress(d1.genes, sig.thresh = 0.05, es.thresh = 0.5,
-  es.col = "LFC", sig.col = "FDR")
+plot.df <- gene_ingress(d1.genes,
+    sig.thresh = 0.05, es.thresh = 0.5,
+    es.col = "LFC", sig.col = "FDR"
+)
 plot_volcano(plot.df, feat.term = "id")
 }
 \author{

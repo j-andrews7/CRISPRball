@@ -25,7 +25,7 @@ Based on the requested data type, this function will create a dataframe
 from the DepMap database that can be used for plotting.
 }
 \examples{
-\dontrun{
+\donttest{
 library(CRISPRball)
 build_depmap_db()
 pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")

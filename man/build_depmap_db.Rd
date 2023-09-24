@@ -16,7 +16,7 @@ Name of SQLite database containing DepMap data.
 Build SQLite database of DepMap data
 }
 \examples{
-\dontrun{
+\donttest{
 build_depmap_db()
 }
 }

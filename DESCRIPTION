@@ -67,4 +67,4 @@ Depends:
     shinyBS
 LazyData: false
 Config/testthat/edition: 3
-VignetteEngine: knitr
+VignetteBuilder: knitr
