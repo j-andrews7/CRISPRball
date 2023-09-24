@@ -1,13 +1,8 @@
 #' Create an interactive Shiny app for visualization & exploration of CRISPR analyses
 #'
-#' This shiny app is composed of multiple tabs to peruse analysis results and compare them between timepoints or samples.
-#' Also included are numerous QC plots. Almost all plots are interactive and their aesthetics can be easily tweaked
-#' using the sidebar. See the Details section for more information.
-#'
+#' @details Features with no variation will be removed prior to \code{\link[PCAtools]{pca}} being run for the PCA visualization.
 #' Gene labels can be added to the MAplot and volcano plot by clicking a point. The labels can also be dragged around,
 #' though adding labels will reset the positions, so it's recommended to add all labels prior to re-positioning them.
-#'
-#' @details Features with no variation will be removed prior to \code{\link[PCAtools]{pca}} being run for the PCA visualization.
 #'
 #' @param gene.data A named list containing \code{gene_summary.txt} tables as data.frames.
 #'   Multiple data.frames may be provided, one per element of the list.
