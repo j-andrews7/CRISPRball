@@ -52,7 +52,7 @@ gene_ingress <- function(df, sig.thresh, es.thresh, es.col, sig.col, positive.ct
             sig.col <- "fdr"
         }
         df <- .rra_ingress(df, sig.thresh, es.thresh, es.col = es.col, sig.col = sig.col)
-    } else if ("beta" %in% colnames(df)) {
+    } else if (any(grepl("beta", colnames(df)))) {
         # These handle initial load where UI has not populated the sig.col and es.col values yet.
         if (is.null(es.col)) {
             es.col <- "beta"
@@ -242,6 +242,9 @@ read_mle_gene_summary <- function(filepath) {
         es.col <- "beta"
     }
 
+    # To match RRA output.
+    df$id <- df$Gene
+
     df$hit_type <- apply(df, 1, function(x) {
         x <- split(unname(x), names(x))
         ifelse(as.numeric(x[[sig.col]]) < sig.thresh & as.numeric(x[[es.col]]) < -as.numeric(es.thresh), "neg",
@@ -274,17 +277,12 @@ read_mle_gene_summary <- function(filepath) {
             pattern = ".gene_summary.txt",
             replacement = "", fixed = TRUE
         )
-    } else if ("beta" %in% colnames(checker)) {
+    } else if (any(grepl("beta", colnames(checker)))) {
         out <- read_mle_gene_summary(fileList$datapath[[1]])
     } else {
         stop("Unknown gene summary format.")
     }
 
-    out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-    names(out) <- sapply(fileList$name, gsub,
-        pattern = ".gene_summary.txt",
-        replacement = "", fixed = TRUE
-    )
     return(out)
 }
 

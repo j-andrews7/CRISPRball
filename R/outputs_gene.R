@@ -23,21 +23,38 @@
         # Get only numeric variables.
         choices <- names(df)[vapply(df, is.numeric, logical(1))]
 
+        # This prevents the selected value from resetting each time plots are re-rendered.
+        # TODO: This seems gross, probably make a new function to handle UI output so it's not re-rendered
+        # on plot updates.
+        if (is.null(input$gene.esterm)) {
+            esterm.sel <- ifelse("LFC" %in% choices, "LFC",
+                ifelse("beta" %in% choices, "beta", choices[1])
+            )
+        } else {
+            esterm.sel <- isolate(input$gene.esterm)
+        }
+
+        if (is.null(input$gene.sigterm)) {
+            sigterm.sel <- ifelse("fdr" %in% choices, "fdr",
+                ifelse("pval" %in% choices, "pval", choices[1])
+            )
+        } else {
+            sigterm.sel <- isolate(input$gene.sigterm)
+        }
+
         tagList(
-            column(6,
+            column(
+                6,
                 selectInput("gene.esterm", "Effect size term:",
                     choices = choices,
-                    selected = ifelse("LFC" %in% choices, "LFC",
-                        ifelse("beta" %in% choices, "beta", choices[1])
-                    )
+                    selected = esterm.sel
                 )
             ),
-            column(6,
+            column(
+                6,
                 selectInput("gene.sigterm", "Significance term:",
                     choices = choices,
-                    selected = ifelse("fdr" %in% choices, "fdr",
-                        ifelse("pval" %in% choices, "pval", choices[1])
-                    )
+                    selected = sigterm.sel
                 )
             )
         )

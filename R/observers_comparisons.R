@@ -78,7 +78,7 @@
                         og.df <- robjects$comps[[x]]
                         og.df <- og.df[og.df[[1]] %in% comb.genes, ]
                         rownames(og.df) <- og.df[[1]]
-                        og.df <- og.df[, c("fdr", "LFC")]
+                        og.df <- og.df[, c(input$comp.sigterm, input$comp.esterm)]
                         colnames(og.df) <- paste0(colnames(og.df), "_", x)
                         og.df
                     })
@@ -127,7 +127,7 @@
                         og.df <- robjects$comps[[x]]
                         og.df <- og.df[og.df[[1]] %in% comb.genes, ]
                         rownames(og.df) <- og.df[[1]]
-                        og.df <- og.df[, c("fdr", "LFC")]
+                        og.df <- og.df[, c(input$comp.sigterm, input$comp.esterm)]
                         colnames(og.df) <- paste0(colnames(og.df), "_", x)
                         og.df
                     })
