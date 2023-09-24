@@ -78,7 +78,7 @@
                         og.df <- robjects$comps[[x]]
                         og.df <- og.df[og.df[[1]] %in% comb.genes, ]
                         rownames(og.df) <- og.df[[1]]
-                        og.df <- og.df[, c("FDR", "LFC")]
+                        og.df <- og.df[, c("fdr", "LFC")]
                         colnames(og.df) <- paste0(colnames(og.df), "_", x)
                         og.df
                     })
@@ -127,7 +127,7 @@
                         og.df <- robjects$comps[[x]]
                         og.df <- og.df[og.df[[1]] %in% comb.genes, ]
                         rownames(og.df) <- og.df[[1]]
-                        og.df <- og.df[, c("FDR", "LFC")]
+                        og.df <- og.df[, c("fdr", "LFC")]
                         colnames(og.df) <- paste0(colnames(og.df), "_", x)
                         og.df
                     })
@@ -219,10 +219,24 @@
         to.remove <- c(to.remove, df[[1]][df$DepMap_RNAi_Selective == TRUE])
     }
 
-    if (pos) {
-        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df[[input$comp.sigterm]] < input$comp.sig.th & df[[input$comp.esterm]] > input$comp.es.th]
+    # This is a workaround for initial load of the app not rendering
+    # the output UI elements for the comparison tab before this is run.
+    if (is.null(input$comp.esterm)) {
+        esterm <- ifelse("LFC" %in% names(df), "LFC", "beta")
     } else {
-        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df[[input$comp.sigterm]] < input$comp.sig.th & df[[input$comp.esterm]] < -input$comp.es.th]
+        esterm <- input$comp.esterm
+    }
+
+    if (is.null(input$comp.sigterm)) {
+        sigterm <- ifelse("fdr" %in% names(df), "fdr", "pval")
+    } else {
+        sigterm <- input$comp.sigterm
+    }
+
+    if (pos) {
+        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df[[sigterm]] < input$comp.sig.th & df[[esterm]] > input$comp.es.th]
+    } else {
+        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df[[sigterm]] < input$comp.sig.th & df[[esterm]] < -input$comp.es.th]
     }
 
     return(out)
