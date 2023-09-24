@@ -17,14 +17,7 @@
 #'
 #' @rdname INTERNAL_create_tab_comparison
 .create_tab_comparison <- function(datasets) {
-    # Upset plots only allow 30 sets max, so need to adjust default selected sets.
     # nocov start
-    if (length(datasets) > 30) {
-        limit.selected <- TRUE
-    } else {
-        limit.selected <- FALSE
-    }
-
     tabPanel(
         title = "Comparisons",
         id = "comparisons",
@@ -41,8 +34,9 @@
                                 div(
                                     id = "comp_select",
                                     selectizeInput("comp.sets", "Datasets:",
-                                        if (limit.selected) {
-                                            selected = datasets[1:30]
+                                        # Upset plots only allow 30 sets max.
+                                        if (length(datasets) > 30) {
+                                            selected = datasets[seq(30)]
                                         } else {
                                             selected = datasets
                                         },

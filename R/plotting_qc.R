@@ -42,7 +42,6 @@ plot_bar <- function(count.summary,
                      ylab = "Gini Index",
                      fill = "#E69F00",
                      yaxis.addition = 0.05) {
-
     gg <- BarView(count.summary,
         x = x,
         y = y,
@@ -109,7 +108,6 @@ plot_hist <- function(mat,
                       xlab = "Values",
                       ylab = "Frequency",
                       show.grid = FALSE) {
-    
     histo <- hist(mat, breaks = 40)
 
     if (ncol(mat) >= 1) {
@@ -224,7 +222,6 @@ plot_correlation_heatmap <- function(mat,
                                      max.color = "#0000FF",
                                      legend.title = "Pearson Corr.",
                                      plot.title = "Correlation Matrix") {
-
     Heatmap(mat,
         name = legend.title,
         column_title = plot.title,

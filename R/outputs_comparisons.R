@@ -24,7 +24,8 @@
         choices <- names(df)[vapply(df, is.numeric, logical(1))]
 
         tagList(
-            column(6,
+            column(
+                6,
                 selectInput("comp.esterm", "Effect size term:",
                     choices = choices,
                     selected = ifelse("LFC" %in% choices, "LFC",
@@ -32,7 +33,8 @@
                     )
                 )
             ),
-            column(6,
+            column(
+                6,
                 selectInput("comp.sigterm", "Significance term:",
                     choices = choices,
                     selected = ifelse("fdr" %in% choices, "fdr",

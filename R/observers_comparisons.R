@@ -46,7 +46,7 @@
 
             names(robjects$comp.neg.genes) <- input$comp.sets
 
-            # Get the combination matrices. 
+            # Get the combination matrices.
             # If there are no hits in any dataset, make empty annotation.
             # Otherwise, make the UpSet plot.
             if (any(lapply(robjects$comp.pos.genes, length) > 0)) {
@@ -56,7 +56,7 @@
                 robjects$pos.m <- NULL
                 ht.pos <- .empty_heatmap("No positively selected hits in any dataset.")
             }
-                
+
             if (any(lapply(robjects$comp.neg.genes, length) > 0)) {
                 robjects$neg.m <- make_comb_mat(robjects$comp.neg.genes)
                 ht.neg <- draw(UpSet(robjects$neg.m))
