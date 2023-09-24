@@ -29,7 +29,7 @@
 
 #' Build SQLite database of DepMap data
 #'
-#' @param file Name of SQLite database file to create. 
+#' @param file Name of SQLite database file to create.
 #'
 #' @return Name of SQLite database containing DepMap data.
 #'

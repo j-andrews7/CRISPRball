@@ -1,6 +1,6 @@
 #' Define observers for sgRNA tab
 #'
-#' Define a series of observers to parse sgRNA data based 
+#' Define a series of observers to parse sgRNA data based
 #'   on new data upload or dataset selection.
 #'
 #' @param input The Shiny input object from the server function.

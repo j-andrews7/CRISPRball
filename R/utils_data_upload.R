@@ -120,7 +120,7 @@ read_mle_gene_summary <- function(filepath) {
     data <- read.delim(filepath, check.names = FALSE)
 
     # Get the sample names
-    samples <- unique(gsub("\\|.*", "", names(data)[-(seq(2))]))
+    samples <- unique(gsub("\\|.*", "", names(data)[-(seq_len(2))]))
 
     # Create a list to hold the data frames
     dataframes <- list()
@@ -188,12 +188,14 @@ read_mle_gene_summary <- function(filepath) {
     })
 
     if (!sig.col %in% colnames(df)) {
-        message(paste0("Column '", sig.col, "' not found in data. Using 'fdr' instead."))
+        mess <- paste0("Column '", sig.col, "' not found in data. Using 'fdr' instead.")
+        message(mess)
         sig.col <- "fdr"
     }
 
     if (!es.col %in% colnames(df)) {
-        message(paste0("Column '", es.col, "' not found in data. Using 'LFC' instead."))
+        mess <- paste0("Column '", es.col, "' not found in data. Using 'LFC' instead.")
+        message(mess)
         es.col <- "LFC"
     }
 
@@ -212,7 +214,7 @@ read_mle_gene_summary <- function(filepath) {
     })
 
     df$Rank <- rank(df[[es.col]])
-    df$RandomIndex <- sample(seq(nrow(df)), nrow(df))
+    df$RandomIndex <- sample(seq_len(nrow(df)), nrow(df))
 
     return(df)
 }
@@ -232,12 +234,14 @@ read_mle_gene_summary <- function(filepath) {
 #' @rdname INTERNAL_mle_ingress
 .mle_ingress <- function(df, sig.thresh, es.thresh, sig.col = "fdr", es.col = "beta") {
     if (!sig.col %in% colnames(df)) {
-        message(paste0("Column '", sig.col, "' not found in data. Using 'fdr' instead."))
+        mess <- paste0("Column '", sig.col, "' not found in data. Using 'fdr' instead.")
+        message(mess)
         sig.col <- "fdr"
     }
 
     if (!es.col %in% colnames(df)) {
-        message(paste0("Column '", es.col, "' not found in data. Using 'beta' instead."))
+        mess <- paste0("Column '", es.col, "' not found in data. Using 'beta' instead.")
+        message(mess)
         es.col <- "beta"
     }
 
@@ -252,7 +256,7 @@ read_mle_gene_summary <- function(filepath) {
     })
 
     df$Rank <- rank(df[[es.col]])
-    df$RandomIndex <- sample(seq(nrow(df)), nrow(df))
+    df$RandomIndex <- sample(seq_len(nrow(df)), nrow(df))
 
     return(df)
 }
@@ -273,11 +277,11 @@ read_mle_gene_summary <- function(filepath) {
     if ("neg|score" %in% colnames(checker)) {
         out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
         names(out) <- vapply(fileList$name, FUN = function(x) {
-        gsub(
-            pattern = ".gene_summary.txt",
-            replacement = "", x, fixed = TRUE
-        )
-    }, FUN.VALUE = character(1))
+            gsub(
+                pattern = ".gene_summary.txt",
+                replacement = "", x, fixed = TRUE
+            )
+        }, FUN.VALUE = character(1))
     } else if (any(grepl("beta", colnames(checker)))) {
         out <- read_mle_gene_summary(fileList$datapath[[1]])
     } else {

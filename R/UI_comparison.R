@@ -36,9 +36,9 @@
                                     selectizeInput("comp.sets", "Datasets:",
                                         # Upset plots only allow 30 sets max.
                                         if (length(datasets) > 30) {
-                                            selected = datasets[seq(30)]
+                                            selected <- datasets[seq_len(30)]
                                         } else {
-                                            selected = datasets
+                                            selected <- datasets
                                         },
                                         choices = datasets,
                                         multiple = TRUE,

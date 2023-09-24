@@ -111,7 +111,7 @@ plot_hist <- function(mat,
     histo <- hist(mat, breaks = 40)
 
     if (ncol(mat) >= 1) {
-        histlist <- lapply(1:ncol(mat), function(x) {
+        histlist <- lapply(seq_len(ncol(mat)), function(x) {
             return(hist(mat[, x], plot = FALSE, breaks = histo$breaks))
         })
         xrange <- range(unlist(lapply(histlist, function(x) {
@@ -267,8 +267,8 @@ plot_correlation_heatmap <- function(mat,
 #'     rexp(col * row, rate = 0.1),
 #'     ncol = col
 #' )
-#' rownames(mat) <- paste0("gene", seq(nrow(mat)))
-#' colnames(mat) <- paste0("sample", seq(ncol(mat)))
+#' rownames(mat) <- paste0("gene", seq_len(nrow(mat)))
+#' colnames(mat) <- paste0("sample", seq_len(ncol(mat)))
 #'
 #' metadata <- data.frame(row.names = colnames(mat))
 #' metadata$Group <- rep(NA, ncol(mat))

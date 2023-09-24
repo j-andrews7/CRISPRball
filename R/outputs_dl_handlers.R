@@ -4,7 +4,7 @@
 #' @param robjects A reactive list of values generated in the server function.
 #'
 #' @return A \linkS4class{NULL} is invisibly returned
-#' and handlers for plotly plot downloads are added to \code{output}.
+#' and handlers for plotly & static plot downloads are added to \code{output}.
 #'
 #' @author Jared Andrews
 #'
@@ -56,7 +56,7 @@
                 if ("Heatmap" %in% class(robjects[[x]])) {
                     draw(robjects[[x]])
                 } else {
-                    print(robjects[[x]])
+                    robjects[[x]]
                 }
                 dev.off()
             }
