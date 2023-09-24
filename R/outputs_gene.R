@@ -17,17 +17,27 @@
 #' @rdname INTERNAL_create_gene_outputs
 .create_gene_outputs <- function(input, output, robjects) {
     # nocov start
-    output$gene.rank.options <- renderUI({
+    output$gene.term.options <- renderUI({
         req(robjects$set1.genes)
         df <- robjects$set1.genes
         # Get only numeric variables.
         choices <- names(df)[vapply(df, is.numeric, logical(1))]
 
         tagList(
-            selectInput("gene.rankby", "Rank by:",
-                choices = choices,
-                selected = ifelse("LFC" %in% choices, "LFC",
-                    ifelse("beta" %in% choices, "beta", choices[1])
+            column(6,
+                selectInput("gene.esterm", "Effect size term:",
+                    choices = choices,
+                    selected = ifelse("LFC" %in% choices, "LFC",
+                        ifelse("beta" %in% choices, "beta", choices[1])
+                    )
+                )
+            ),
+            column(6,
+                selectInput("gene.sigterm", "Significance term:",
+                    choices = choices,
+                    selected = ifelse("fdr" %in% choices, "fdr",
+                        ifelse("pval" %in% choices, "pval", choices[1])
+                    )
                 )
             )
         )
@@ -41,7 +51,8 @@
         target <- which(names(robjects$set1.genes) %in% c(
             "neg|score", "neg|p-value", "neg|rank",
             "neg|lfc", "pos|score", "pos|p-value", "pos|rank",
-            "pos|lfc", "RandomIndex", "Rank", "goodsgrna"
+            "pos|lfc", "RandomIndex", "Rank", "goodsgrna",
+            "beta", "pval", "fdr", "wald.p.value", "p.value", "wald.fdr", "z"
         )) - 1
 
         df <- robjects$set1.genes
@@ -126,8 +137,8 @@
             sig.line = isolate(input$vol.sigline),
             h.id = robjects$h.id,
             h.id.suffix = "_volc1",
-            sig.term = "FDR",
-            lfc.term = "LFC",
+            sig.term = isolate(input$gene.sigterm),
+            lfc.term = isolate(input$gene.esterm),
             feat.term = "id",
             hover.info = hov.info,
             fs = robjects$clicked.volc1,
@@ -177,7 +188,7 @@
 
     # nocov start
     output$gene1.rank <- renderPlotly({
-        req(robjects$set1.genes, input$gene.rankby)
+        req(robjects$set1.genes, input$gene.esterm)
         input$rank.update
 
         df <- robjects$set1.genes
@@ -232,8 +243,8 @@
             sig.thresh = isolate(input$gene.fdr.th),
             h.id = robjects$h.id,
             h.id.suffix = "_rank1",
-            sig.term = "FDR",
-            rank.term = isolate(input$gene.rankby),
+            sig.term = isolate(input$gene.sigterm),
+            rank.term = isolate(input$gene.esterm),
             rank.ascending = isolate(input$gene.rank.ascending),
             feat.term = "id",
             hover.info = c("hit_type", "goodsgrna"),
@@ -338,8 +349,8 @@
             sig.line = isolate(input$lawn.sigline),
             h.id = robjects$h.id,
             h.id.suffix = "_lawn1",
-            sig.term = "FDR",
-            lfc.term = "LFC",
+            sig.term = isolate(input$gene.sigterm),
+            lfc.term = isolate(input$gene.esterm),
             feat.term = "id",
             x.term = "RandomIndex",
             hover.info = hov.info,
@@ -397,7 +408,8 @@
         target <- which(names(robjects$set2.genes) %in% c(
             "neg|score", "neg|p-value", "neg|rank",
             "neg|lfc", "pos|score", "pos|p-value", "pos|rank",
-            "pos|lfc", "RandomIndex", "Rank", "goodsgrna"
+            "pos|lfc", "RandomIndex", "Rank", "goodsgrna",
+            "beta", "pval", "fdr", "wald.p.value", "p.value", "wald.fdr", "z"
         )) - 1
 
         # Label overlapping hits between datasets if available.
@@ -480,8 +492,8 @@
             sig.line = isolate(input$vol.sigline),
             h.id = robjects$h.id,
             h.id.suffix = "_volc2",
-            sig.term = "FDR",
-            lfc.term = "LFC",
+            sig.term = isolate(input$gene.sigterm),
+            lfc.term = isolate(input$gene.esterm),
             feat.term = "id",
             hover.info = hov.info,
             fs = robjects$clicked.volc2,
@@ -532,7 +544,7 @@
 
     # nocov start
     output$gene2.rank <- renderPlotly({
-        req(robjects$set2.genes, input$gene.rankby)
+        req(robjects$set2.genes, input$gene.esterm)
         input$rank.update
 
         hov.info <- c("hit_type", "num", "goodsgrna")
@@ -587,8 +599,8 @@
             sig.thresh = isolate(input$gene.fdr.th),
             h.id = robjects$h.id,
             h.id.suffix = "_rank2",
-            sig.term = "FDR",
-            rank.term = isolate(input$gene.rankby),
+            sig.term = isolate(input$gene.sigterm),
+            rank.term = isolate(input$gene.esterm),
             rank.ascending = isolate(input$gene.rank.ascending),
             feat.term = "id",
             hover.info = hov.info,
@@ -694,8 +706,8 @@
             sig.line = isolate(input$lawn.sigline),
             h.id = robjects$h.id,
             h.id.suffix = "_lawn2",
-            sig.term = "FDR",
-            lfc.term = "LFC",
+            sig.term = isolate(input$gene.sigterm),
+            lfc.term = isolate(input$gene.esterm),
             feat.term = "id",
             x.term = "RandomIndex",
             hover.info = hov.info,

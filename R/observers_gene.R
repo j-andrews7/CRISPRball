@@ -18,7 +18,8 @@
         if (input$gene.sel1 != "") {
             df <- robjects$gene.data[[input$gene.sel1]]
             robjects$set1.genes <- gene_ingress(df,
-                sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
+                sig.thresh = input$gene.fdr.th, es.thresh = input$gene.lfc.th,
+                sig.col = input$gene.sigterm, es.col = input$gene.esterm,
                 positive.ctrl.genes = robjects$positive.ctrl.genes, essential.genes = robjects$essential.genes,
                 depmap.genes = robjects$depmap.gene
             )
@@ -32,7 +33,8 @@
             df <- robjects$gene.data[[input$gene.sel2]]
             if (!is.null(df)) {
                 robjects$set2.genes <- gene_ingress(df,
-                    sig.thresh = input$gene.fdr.th, lfc.thresh = input$gene.lfc.th,
+                    sig.thresh = input$gene.fdr.th, es.thresh = input$gene.lfc.th,
+                    sig.col = input$gene.sigterm, es.col = input$gene.esterm,
                     positive.ctrl.genes = robjects$positive.ctrl.genes, essential.genes = robjects$essential.genes,
                     depmap.genes = robjects$depmap.gene
                 )

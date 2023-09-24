@@ -121,6 +121,9 @@
                     bsCollapsePanel(
                         title = span(icon("plus"), "Common Plot Settings"), value = "com.settings", style = "info",
                         fluidRow(
+                            uiOutput("gene.term.options")
+                        ),
+                        fluidRow(
                             column(
                                 width = 6,
                                 tipify(colourInput("down.color", "Down colour", value = "#0026ff"),
@@ -231,7 +234,6 @@
                         fluidRow(
                             column(
                                 width = 6,
-                                uiOutput("gene.rank.options"),
                                 numericInput("rank.y.max", label = "y-axis max:", value = 10, step = 0.5),
                                 prettyCheckbox("rank.fcline",
                                     label = "Show FC threshold", value = TRUE,
