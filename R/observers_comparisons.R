@@ -25,7 +25,8 @@
             robjects$comps <- lapply(input$comp.sets, function(x) {
                 df <- robjects$gene.data[[x]]
                 gene_ingress(df,
-                    sig.thresh = input$comp.fdr.th, lfc.thresh = input$comp.lfc.th,
+                    sig.thresh = input$comp.sig.th, es.thresh = input$comp.es.th,
+                    es.col = input$comp.esterm, sig.col = input$comp.sigtern,
                     positive.ctrl.genes = robjects$positive.ctrl.genes,
                     essential.genes = robjects$essential.genes, depmap.genes = robjects$depmap.gene
                 )
@@ -219,9 +220,9 @@
     }
 
     if (pos) {
-        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC > input$comp.lfc.th]
+        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df[[input$comp.sigterm]] < input$comp.sig.th & df[[input$comp.esterm]] > input$comp.es.th]
     } else {
-        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df$FDR < input$comp.fdr.th & df$LFC < -input$comp.lfc.th]
+        out <- df[[1]][!df[[1]] %in% unique(to.remove) & df[[input$comp.sigterm]] < input$comp.sig.th & df[[input$comp.esterm]] < -input$comp.es.th]
     }
 
     return(out)

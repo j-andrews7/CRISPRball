@@ -55,15 +55,16 @@
                                 options = list(container = "body")
                             )
                         ),
+                        uiOutput("comp.term.options"),
                         column(
                             6,
-                            numericInput("comp.fdr.th", "FDR threshold:",
+                            numericInput("comp.sig.th", "Significance threshold:",
                                 min = 0, max = 1, step = 0.01, value = 0.05
                             )
                         ),
                         column(
                             6,
-                            numericInput("comp.lfc.th", "log2FC threshold:",
+                            numericInput("comp.es.th", "Effect size threshold:",
                                 min = 0, max = Inf, step = 0.05, value = 0.5
                             )
                         )
