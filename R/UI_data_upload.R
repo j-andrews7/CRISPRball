@@ -49,9 +49,9 @@
                             column(
                                 12,
                                 h2("Getting Started with CRISPRball"),
-                                strong("CRISPRball"), " is a Shiny/web application for visualizing MAGeCK RRA analysis results.",
+                                strong("CRISPRball"), " is a Shiny/web application for visualizing MAGeCK RRA or MLE analysis results.",
                                 "For more information on running the analysis, see the ",
-                                a("MAGeCK RRA Analysis User Guide.", href = "https://sourceforge.net/p/mageck/wiki/Home/"),
+                                a("MAGeCK Analysis User Guide.", href = "https://sourceforge.net/p/mageck/wiki/Home/"),
                                 "This tool complements the ",
                                 a("MAGeCKFlute package", href = "https://www.bioconductor.org/packages/release/bioc/html/MAGeCKFlute.html"),
                                 " by focusing on an interactive experience and the simple production of publication-quality figures.",
@@ -68,7 +68,8 @@
                                     " with ", code("*.countsummary.txt"), "and ", code("*.count_norm.txt"), " extensions, respectively. ",
                                     "The gene and sgRNA summary files should be tab-delimited text files with ", code("*.gene_summary.txt"), " and ", code("*.sgrna_summary.txt"), "  extensions, ",
                                     "multiple sets of which can be uploaded. The prefixes of the gene summary and sgrna summary files should match, ",
-                                    "e.g. P7.gene_summary.txt and P7.sgrna_summary.txt."
+                                    "e.g. P7.gene_summary.txt and P7.sgrna_summary.txt. MAGeCK MLE outputs will be appropriately parsed upon upload into ",
+                                    "individual tables for each comparison."
                                 ),
                                 br(),
                                 br(),
