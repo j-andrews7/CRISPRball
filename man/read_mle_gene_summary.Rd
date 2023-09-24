@@ -21,8 +21,9 @@ of the list elements.
 }
 \examples{
 library(CRISPRball)
-mle_gene_summary <- file.path(system.file("extdata", "beta_leukemia.gene_summary.txt", 
-  package = "CRISPRball"))
+mle_gene_summary <- file.path(system.file("extdata", "beta_leukemia.gene_summary.txt",
+    package = "CRISPRball"
+))
 gene_data <- read_mle_gene_summary(mle_gene_summary)
 }
 \author{

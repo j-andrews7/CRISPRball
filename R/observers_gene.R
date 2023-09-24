@@ -17,6 +17,7 @@
     observeEvent(c(input$gene.sel1, input$gene.update), {
         if (input$gene.sel1 != "") {
             df <- robjects$gene.data[[input$gene.sel1]]
+
             robjects$set1.genes <- gene_ingress(df,
                 sig.thresh = input$gene.fdr.th, es.thresh = input$gene.lfc.th,
                 sig.col = input$gene.sigterm, es.col = input$gene.esterm,

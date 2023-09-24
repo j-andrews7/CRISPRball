@@ -41,9 +41,26 @@ shinyjs.enableTab = function(name) {
 #' out.df <- gene_ingress(d1.genes, 0.05, 0.5, es.col = "LFC", sig.col = "fdr")
 gene_ingress <- function(df, sig.thresh, es.thresh, es.col, sig.col, positive.ctrl.genes = NULL,
                          essential.genes = NULL, depmap.genes = NULL) {
+
     if ("neg|score" %in% colnames(df)) {
+        # These handle initial load where UI has not populated the sig.col and es.col values yet.
+        if (is.null(es.col)) {
+            es.col <- "LFC"
+        }
+
+        if (is.null(sig.col)) {
+            sig.col <- "fdr"
+        }
         df <- .rra_ingress(df, sig.thresh, es.thresh, es.col = es.col, sig.col = sig.col)
     } else if ("beta" %in% colnames(df)) {
+        # These handle initial load where UI has not populated the sig.col and es.col values yet.
+        if (is.null(es.col)) {
+            es.col <- "beta"
+        }
+
+        if (is.null(sig.col)) {
+            sig.col <- "fdr"
+        }
         df <- .mle_ingress(df, sig.thresh, es.thresh, es.col = es.col, sig.col = sig.col)
     } else {
         stop("Unknown gene summary format.")
@@ -95,8 +112,9 @@ gene_ingress <- function(df, sig.thresh, es.thresh, es.col, sig.col, positive.ct
 #'
 #' @examples
 #' library(CRISPRball)
-#' mle_gene_summary <- file.path(system.file("extdata", "beta_leukemia.gene_summary.txt", 
-#'   package = "CRISPRball"))
+#' mle_gene_summary <- file.path(system.file("extdata", "beta_leukemia.gene_summary.txt",
+#'     package = "CRISPRball"
+#' ))
 #' gene_data <- read_mle_gene_summary(mle_gene_summary)
 read_mle_gene_summary <- function(filepath) {
     # Read the table
@@ -135,7 +153,7 @@ read_mle_gene_summary <- function(filepath) {
 #' @param df data.frame of gene summary data
 #' @param sig.thresh Numeric scalar for significance threshold to consider a gene a hit.
 #' @param es.thresh Numeric scalar for absolute effect size threshold to consider a gene a hit.
-#' @param sig.col Character string for the column name of the significance value. 
+#' @param sig.col Character string for the column name of the significance value.
 #'   Should be one of "fdr" or "pval".
 #' @param es.col Character string for the column name of the effect size value.
 #'
@@ -153,7 +171,9 @@ read_mle_gene_summary <- function(filepath) {
     # Ease of use for plotting RRAscore as rank and interpreting directionality
     df$signed_log10_RRAscore <- apply(df, 1, function(x) {
         x <- split(unname(x), names(x))
-        as.numeric(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`), -(-log10(x$`neg|score`)), -log10(x$`pos|score`)))
+        as.numeric(ifelse(as.numeric(x$`neg|score`) < as.numeric(x$`pos|score`),
+            -(-log10(as.numeric(x$`neg|score`))), -log10(as.numeric(x$`pos|score`))
+        ))
     })
 
     df$fdr <- apply(df, 1, function(x) {

@@ -289,7 +289,7 @@ CRISPRball <- function(gene.data = NULL,
         .create_gene_outputs(input, output, robjects)
 
         # This ensures the rank options are updated even when initially hidden in the collapsible panel.
-        outputOptions(output, "gene.rank.options", suspendWhenHidden = FALSE)
+        outputOptions(output, "gene.term.options", suspendWhenHidden = FALSE)
 
         ##---------------sgRNA & Summary Tables Tabs-----------------
         # Load the gene summaries for easy plotting.
@@ -299,11 +299,11 @@ CRISPRball <- function(gene.data = NULL,
         .create_sgrna_outputs(input, output, robjects)
 
         ##--------------Comparisons Tab------------
-        # Create observers for comparisons tab, this is where upset plots are created as well.
-        .create_comparisons_observers(input, session, output, robjects)
-
         # UI elements for comparisons tab.
         .create_comparisons_outputs(input, output, robjects)
+        
+        # Create observers for comparisons tab, this is where upset plots are created as well.
+        .create_comparisons_observers(input, session, output, robjects)
 
         # Initialize plots by simulating button click once.
         o <- observe({
