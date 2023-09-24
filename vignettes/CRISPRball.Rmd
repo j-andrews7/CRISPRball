@@ -231,7 +231,7 @@ CRISPRball(
 )
 ```
 
-```{r, fig.cap="Screenshot of the `CRISPRball` application, with focus on the DepMap tab for CDK2.", echo=FALSE}}
+```{r, fig.cap="Screenshot of the `CRISPRball` application, with focus on the DepMap tab for CDK2.", echo=FALSE}
 knitr::include_graphics("depmap_cb.png")
 ```
 
