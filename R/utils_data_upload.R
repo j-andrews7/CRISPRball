@@ -120,7 +120,7 @@ read_mle_gene_summary <- function(filepath) {
     data <- read.delim(filepath, check.names = FALSE)
 
     # Get the sample names
-    samples <- unique(gsub("\\|.*", "", names(data)[-(1:2)]))
+    samples <- unique(gsub("\\|.*", "", names(data)[-(seq(2))]))
 
     # Create a list to hold the data frames
     dataframes <- list()

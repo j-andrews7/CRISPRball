@@ -59,7 +59,7 @@
         # If input to use top N features instead rather than percent-based feature removal, account for that
         if (input$keep.top.n) {
             pca.mat <- pca.mat[order(rowVars(pca.mat), decreasing = TRUE), ]
-            pca.mat <- pca.mat[1:input$var.n.keep, ]
+            pca.mat <- pca.mat[seq(input$var.n.keep), ]
             var.remove <- 0
         } else {
             var.remove <- input$var.remove
