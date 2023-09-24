@@ -42,7 +42,7 @@
 #' \code{\link[pool]{dbPool}}, \code{\link[DBI]{dbWriteTable}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' build_depmap_db()
 #' }
 build_depmap_db <- function(file = "depmap_db.sqlite") {

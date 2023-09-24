@@ -41,7 +41,6 @@ shinyjs.enableTab = function(name) {
 #' out.df <- gene_ingress(d1.genes, 0.05, 0.5, es.col = "LFC", sig.col = "fdr")
 gene_ingress <- function(df, sig.thresh, es.thresh, es.col, sig.col, positive.ctrl.genes = NULL,
                          essential.genes = NULL, depmap.genes = NULL) {
-
     if ("neg|score" %in% colnames(df)) {
         # These handle initial load where UI has not populated the sig.col and es.col values yet.
         if (is.null(es.col)) {
@@ -273,10 +272,12 @@ read_mle_gene_summary <- function(filepath) {
 
     if ("neg|score" %in% colnames(checker)) {
         out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-        names(out) <- sapply(fileList$name, gsub,
+        names(out) <- vapply(fileList$name, FUN = function(x) {
+        gsub(
             pattern = ".gene_summary.txt",
-            replacement = "", fixed = TRUE
+            replacement = "", x, fixed = TRUE
         )
+    }, FUN.VALUE = character(1))
     } else if (any(grepl("beta", colnames(checker)))) {
         out <- read_mle_gene_summary(fileList$datapath[[1]])
     } else {
@@ -298,9 +299,12 @@ read_mle_gene_summary <- function(filepath) {
 #' @rdname INTERNAL_sgrna_summ_ingress
 .sgrna_summ_ingress <- function(fileList) {
     out <- lapply(fileList$datapath, read.delim, check.names = FALSE)
-    names(out) <- sapply(fileList$name, gsub,
-        pattern = ".sgrna_summary.txt",
-        replacement = "", fixed = TRUE
-    )
+    names(out) <- vapply(fileList$name, FUN = function(x) {
+        gsub(
+            pattern = ".sgrna_summary.txt",
+            replacement = "", x, fixed = TRUE
+        )
+    }, FUN.VALUE = character(1))
+
     return(out)
 }

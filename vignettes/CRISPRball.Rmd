@@ -1,10 +1,10 @@
 ---
-title: "CRISPRball - Lift the Fog from Your CRISPR Screen"
+title: "CRISPRball Quick Start"
 author: 
 - name: "Jared Andrews"
   email: jared.andrews07@gmail.com
   affiliation: St. Jude Children's Research Hospital, Memphis, TN
-date: "August 25th, 2023"
+date: "September 24th, 2023"
 output: 
   html_document:
     code_folding: hide
@@ -13,9 +13,9 @@ output:
     toc_float: true	 
 runtime: shiny
 vignette: >
-  %\VignetteIndexEntry{CRISPRball}
+  %\VignetteIndexEntry{CRISPRball Quick Start}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{css, echo=FALSE}
@@ -68,7 +68,7 @@ once the initially planned features are completed.
 
 To install the package via Github:
 
-```{r}
+```{r, eval = FALSE}
 install.packages("devtools")
 devtools::install_github("j-andrews7/CRISPRball")
 ```
@@ -120,6 +120,8 @@ CRISPRball(gene.data = genes, sgrna.data = sgrnas,
 
 ### MAGeCK MLE Output
 
+CRISPRball also supports the MLE output from MAGeCK. In this case, we'll use the example data from the [fourth MAGeCK tutorial](https://sourceforge.net/p/mageck/wiki/demo/#the-fourth-tutorial-using-mageck-mle-module).
+
 ```{r}
 # Create lists of results summaries for each dataset.
 genes <-  read_mle_gene_summary(system.file("extdata", "beta_leukemia.gene_summary.txt", 
@@ -137,7 +139,7 @@ CRISPRball(gene.data = genes,
 Passing data directly can be useful when hosting the app on a local Shiny server where 
 having pre-loaded data for the user is wanted. 
 
-### Adding Genesets
+### Highlighting Gene(sets)
 
 Often, it can be useful to label a set of genes on the plots. 
 This can be done by passing a named list of gene identifiers to the `genesets` argument.
@@ -159,6 +161,7 @@ CRISPRball(gene.data = genes, sgrna.data = sgrnas, count.summary = count.summ,
 Such genesets can then be highlighted very easily on the plots in the **Gene (Overview)** 
 tab using the "Highlight Gene(sets)" inputs in the sidebar.
 
+Individual genes of interest can also be added by the user manually from within the app.
 
 ### Incorporating DepMap Data
 
