@@ -8,7 +8,7 @@ date: "`r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('CRISPRball')`"
 output: 
   BiocStyle::html_document:
-    code_folding: hide
+    code_folding: show
     toc: true
     toc_depth: 3
     toc_float: true	 
@@ -196,10 +196,6 @@ identification of poor sgRNAs and validation of hits.
 
 The second provides the sgRNA rank among all sgRNAs for a chosen effect size variable.
 This provides a useful view of how a given sgRNA compares to all sgRNAs.
-
-```{r,fig.cap="Screenshot of the `CRISPRball` sgRNA tab, when launched with MAGeCk RRA output provided.", echo=FALSE}
-knitr::include_graphics("rra_sgrna_cb.png")
-```
 
 ## The DepMap Tab
 
