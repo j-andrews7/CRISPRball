@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{depmap_22q1_TPM}}{
 
-A data frame with 1754 rows and 9 columns:
+A dataframe with 1754 rows and 9 columns:
 \describe{
 \item{depmap_id}{Depmap cell line ID}
 \item{log_copy_number}{log2 copy number}
@@ -29,6 +29,9 @@ A data frame with 1754 rows and 9 columns:
 }
 \usage{
 data(depmap_22q1_cn)
+}
+\value{
+A dataframe containing DepMap 22Q1 copy number data.
 }
 \description{
 The DepMap copy number data for CDK2.

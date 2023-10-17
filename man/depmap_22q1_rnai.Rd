@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{depmap_22q1_rnai}}{
 
-A data frame with 712 rows and 9 columns:
+A dataframe with 712 rows and 9 columns:
 \describe{
 \item{dependency}{Depmap dependency score}
 \item{entrez_id}{Numeric entrez gene ID}
@@ -28,6 +28,9 @@ A data frame with 712 rows and 9 columns:
 }
 \usage{
 data(depmap_22q1_rnai)
+}
+\value{
+A dataframe containing DepMap 22Q1 RNAi screen data.
 }
 \description{
 The DepMap RNAi screen data for CDK2.

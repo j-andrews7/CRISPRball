@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{depmap_22q1_crispr}}{
 
-A data frame with 1070 rows and 9 columns:
+A dataframe with 1070 rows and 9 columns:
 \describe{
 \item{depmap_id}{Depmap cell line ID}
 \item{dependency}{Depmap dependency score}
@@ -28,6 +28,9 @@ A data frame with 1070 rows and 9 columns:
 }
 \usage{
 data(depmap_22q1_crispr)
+}
+\value{
+A dataframe containing DepMap 22Q1 CRISPR screen data.
 }
 \description{
 The DepMap CRISPR screen data for CDK2.

@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{depmap_22q1_TPM}}{
 
-A data frame with 1393 rows and 9 columns:
+A dataframe with 1393 rows and 9 columns:
 \describe{
 \item{depmap_id}{Depmap cell line ID}
 \item{rna_expression}{log2(TPM+1) expression}
@@ -29,6 +29,9 @@ A data frame with 1393 rows and 9 columns:
 }
 \usage{
 data(depmap_22q1_TPM)
+}
+\value{
+A dataframe containing DepMap 22Q1 expression data.
 }
 \description{
 The DepMap expression data for CDK2.
