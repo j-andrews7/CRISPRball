@@ -53,7 +53,7 @@
             },
             content = function(file) {
                 pdf(file, width = 7, height = 7)
-                if ("Heatmap" %in% class(robjects[[x]])) {
+                if (is(robjects[[x]], "Heatmap")) {
                     draw(robjects[[x]])
                 } else {
                     robjects[[x]]
