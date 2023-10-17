@@ -12,7 +12,7 @@
 #' @author Jared Andrews
 #'
 #' @importFrom shiny isolate selectInput tagList renderUI
-#' @importFrom plotly renderPlotly
+#' @importFrom plotly renderPlotly %>%
 #' @importFrom DT renderDT datatable formatStyle
 #' @rdname INTERNAL_create_gene_outputs
 .create_gene_outputs <- function(input, output, robjects) {

@@ -15,7 +15,7 @@
 #'      The axis and plot title are editable.
 #'
 #' @author Jared Andrews
-#' @importFrom plotly ggplotly layout config
+#' @importFrom plotly ggplotly layout config %>%
 #' @importFrom MAGeCKFlute BarView
 #' @importFrom ggplot2 theme element_text
 #' @export
@@ -87,7 +87,7 @@ plot_bar <- function(count.summary,
 #' @param show.grid A boolean for whether to show the grid lines.
 #' @return A plotly plot with the distribution of read counts.
 #'
-#' @importFrom plotly plot_ly add_trace layout config ggplotly
+#' @importFrom plotly plot_ly add_trace layout config ggplotly %>%
 #' @importFrom graphics hist
 #' @export
 #' @author Jared Andrews
@@ -252,7 +252,7 @@ plot_correlation_heatmap <- function(mat,
 #'
 #' @author Jared Andrews
 #'
-#' @importFrom plotly plot_ly layout config add_segments add_annotations ggplotly
+#' @importFrom plotly plot_ly layout config add_segments add_annotations ggplotly %>%
 #' @importFrom stats as.formula
 #' @importFrom dittoSeq dittoColors
 #'

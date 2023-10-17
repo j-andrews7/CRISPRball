@@ -17,6 +17,7 @@
 #' @importFrom shiny observeEvent
 #' @importFrom ComplexHeatmap Heatmap pheatmap make_comb_mat extract_comb set_name comb_name UpSet draw
 #' @importFrom InteractiveComplexHeatmap makeInteractiveComplexHeatmap
+#' @importFrom DT renderDT datatable formatStyle %>%
 .create_comparisons_observers <- function(input, session, output, robjects) {
     # nocov start
     observeEvent(input$comp.update, {
@@ -100,7 +101,7 @@
                 }
 
                 output$comp.pos.info <- renderDT(server = FALSE, {
-                    DT::datatable(comp_pos_df,
+                    datatable(comp_pos_df,
                         rownames = TRUE,
                         filter = "top",
                         extensions = c("Buttons"),
@@ -111,7 +112,7 @@
                             dom = "Blfrtip",
                             buttons = c("copy", "csv", "excel", "pdf", "print")
                         )
-                    ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
+                    ) %>% formatStyle(0, target = "row", lineHeight = "30%")
                 })
             }
 
@@ -149,7 +150,7 @@
                 }
 
                 output$comp.neg.info <- renderDT(server = FALSE, {
-                    DT::datatable(comp_neg_df,
+                    datatable(comp_neg_df,
                         rownames = TRUE,
                         filter = "top",
                         extensions = c("Buttons"),
@@ -160,7 +161,7 @@
                             dom = "Blfrtip",
                             buttons = c("copy", "csv", "excel", "pdf", "print")
                         )
-                    ) %>% DT::formatStyle(0, target = "row", lineHeight = "30%")
+                    ) %>% formatStyle(0, target = "row", lineHeight = "30%")
                 })
             }
 

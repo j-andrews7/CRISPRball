@@ -806,7 +806,7 @@ plot_rank <- function(res,
 #'
 #' @return An interactive plotly rank plot.
 #'
-#' @importFrom plotly plot_ly toWebGL layout config add_annotations ggplotly
+#' @importFrom plotly plot_ly toWebGL layout config add_annotations ggplotly %>%
 #'
 #' @author Jared Andrews
 #' @export
@@ -1136,6 +1136,8 @@ plot_lawn <- function(res,
 #'
 #' @param df A data frame containing sgRNA counts for control and treatment.
 #' @return A plotly object.
+#' 
+#' @importFrom plotly plot_ly layout config %>%
 #'
 #' @author Jared Andrews
 #' @rdname INTERNAL_make_sgrna_pairplot

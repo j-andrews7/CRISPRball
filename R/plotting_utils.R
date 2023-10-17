@@ -39,8 +39,8 @@
 #'
 #' @rdname INTERNAL_empty_plot
 #' @seealso \code{\link[ggplot2]{geom_text}}, \code{\link[ggplot2]{theme_void}}
-#' @importFrom ggplot2 theme_void geom_text theme margin ggplot
-#' @importFrom plotly ggplotly layout
+#' @importFrom ggplot2 theme_void geom_text theme margin ggplot aes
+#' @importFrom plotly ggplotly layout %>%
 .empty_plot <- function(text = NULL, plotly = FALSE) {
     plot <- ggplot() +
         theme_void() +

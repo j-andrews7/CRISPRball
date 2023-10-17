@@ -13,7 +13,7 @@
 #'
 #' @importFrom shiny isolate
 #' @importFrom plotly renderPlotly
-#' @importFrom DT renderDT datatable formatStyle
+#' @importFrom DT renderDT datatable formatStyle %>%
 #' @rdname INTERNAL_create_sgrna_outputs
 .create_sgrna_outputs <- function(input, output, robjects) {
     # nocov start

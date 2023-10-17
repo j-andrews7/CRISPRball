@@ -12,7 +12,8 @@
 #' @author Jared Andrews
 #'
 #' @importFrom shiny renderUI renderPlot tagList column selectInput isolate fluidRow
-#' @importFrom plotly renderPlotly ggplotly layout config plot_ly toWebGL add_segments add_annotations
+#' @importFrom plotly renderPlotly ggplotly layout config plot_ly toWebGL add_segments add_annotations %>%
+#' @importFrom ggplot2 scale_x_discrete guide_axis
 #' @importFrom MAGeCKFlute MapRatesView
 #' @importFrom shinyWidgets updatePickerInput
 #' @importFrom shinyjs js
