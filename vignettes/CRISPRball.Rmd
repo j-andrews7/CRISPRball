@@ -85,7 +85,7 @@ In this case, we'll use the example output from the
 In this example, the two datasets are just reverse comparisons (ESC vs plasmid & plasmid vs ESC) where DDX27 has 
 been manually altered in the ESC vs plasmid comparison to no longer be a significant hit.
 
-```{r, eval = TRUE}
+```{r}
 # Create lists of results summaries for each dataset.
 d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
     package = "CRISPRball"

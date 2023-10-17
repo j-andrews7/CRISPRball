@@ -28,9 +28,7 @@
 #' @return A Shiny app containing interactive visualizations of CRISPR analysis results.
 #'
 #' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
-#' @import DT
 #' @importFrom plotly ggplotly plotlyOutput renderPlotly toWebGL plot_ly layout add_annotations add_segments config toRGB event_data add_trace style
-#' @import ggplot2
 #' @importFrom shinyWidgets prettyCheckbox dropdownButton tooltipOptions pickerInput updatePickerInput
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable

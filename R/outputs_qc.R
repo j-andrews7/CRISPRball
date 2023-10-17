@@ -20,7 +20,6 @@
 #' @importFrom grid grid.newpage grid.text
 #' @importFrom DT renderDT datatable formatStyle
 #' @importFrom stats cor as.formula
-#' @import ggplot2
 #' @rdname INTERNAL_create_qc_output
 .create_qc_outputs <- function(input, output, robjects) {
     # nocov start
@@ -178,7 +177,7 @@
 
     # nocov start
     output$count.summary <- renderDT(server = FALSE, {
-        DT::datatable(robjects$count.summary,
+        datatable(robjects$count.summary,
             rownames = FALSE,
             filter = "top",
             extensions = c("Buttons", "Scroller"),
@@ -192,7 +191,7 @@
                 scrollY = 600,
                 scroller = TRUE
             )
-        ) %>% DT::formatStyle(0, target = "row", lineHeight = "80%")
+        ) %>% formatStyle(0, target = "row", lineHeight = "80%")
     })
     # nocov end
     invisible(NULL)

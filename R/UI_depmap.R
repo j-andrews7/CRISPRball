@@ -10,11 +10,11 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny sidebarLayout sidebarPanel mainPanel fluidRow column hr br div numericInput selectInput h4 h3 uiOutput downloadButton tabPanel span actionButton icon
 #' @importFrom colourpicker colourInput
 #' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
 #' @importFrom shinycssloaders withSpinner
-#' @importFrom shinyWidgets prettyCheckbox
+#' @importFrom shinyWidgets prettyCheckbox pickerInput
 #' @importFrom shinyjqui jqui_resizable
 #' @importFrom plotly plotlyOutput
 #'
