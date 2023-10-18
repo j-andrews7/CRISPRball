@@ -250,9 +250,7 @@ CRISPRball <- function(gene.data = NULL,
             defaultDisabledTabs <- c(defaultDisabledTabs, "QC Table")
         }
 
-        for (tabname in defaultDisabledTabs) {
-            js$disableTab(tabname)
-        }
+        lapply(defaultDisabledTabs, function(tabname) js$disableTab(tabname))
 
         ## --------------Disable Inputs-----------------
         # Disable certain inputs if no data is provided.

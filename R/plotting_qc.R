@@ -351,11 +351,10 @@ plot_pca_biplot <- function(pca.res,
 
     # Get hover info.
     if (!is.null(hover.info) & !is.null(pca.res$metadata)) {
-        for (n in hover.info) {
-            hov.text <- paste0(hov.text, "</br><b>", n, ":</b>", pca.res$metadata[[n]])
-        }
+        hover.strings <- lapply(hover.info, function(n) paste0("</br><b>", n, ":</b> ", pca.res$metadata[[n]]))
+        h.strings <- do.call("paste0", hover.strings)
+        hov.text <- paste0(hov.text, h.strings)
     }
-
 
     fig <- plot_ly(pca.res$rotated,
         x = as.formula(paste0("~", dim.x)),

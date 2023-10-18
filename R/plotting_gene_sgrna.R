@@ -178,9 +178,7 @@ plot_volcano <- function(res,
 
         highlight.fs <- highlight.featsets
         if (!is.null(highlight.featsets)) {
-            for (featset in highlight.featsets) {
-                highlight.fs <- c(highlight.fs, featsets[[featset]])
-            }
+            highlight.fs <- unlist(lapply(highlight.featsets, function(featset) featsets[[featset]]))
         }
 
         # Significance filter.
@@ -286,9 +284,9 @@ plot_volcano <- function(res,
         )
 
         if (!is.null(hover.info)) {
-            for (n in hover.info) {
-                res$hover.string <- paste0(res$hover.string, "</br><b>", n, ":</b>", res[[n]])
-            }
+            hover.strings <- lapply(hover.info, function(n) paste0("</br><b>", n, ":</b> ", res[[n]]))
+            h.strings <- do.call("paste0", hover.strings)
+            res$hover.string <- paste0(res$hover.string, h.strings)
         }
 
         res <- as.data.frame(res)
@@ -531,9 +529,7 @@ plot_rank <- function(res,
 
         highlight.fs <- NULL
         if (!is.null(highlight.featsets)) {
-            for (featset in highlight.featsets) {
-                highlight.fs <- c(highlight.fs, featsets[[featset]])
-            }
+            highlight.fs <- unlist(lapply(highlight.featsets, function(featset) featsets[[featset]]))
         }
 
         # Significance filter, if provided.
@@ -640,7 +636,7 @@ plot_rank <- function(res,
             }
         }
 
-        res$hover.string <- paste(
+        res$hover.string <- paste0(
             "</br><b>", feat.term, ":</b> ", res$feat,
             "</br><b>Rank:</b> ", res$x,
             "</br><b>", rank.term, ":</b> ", format(round(res[[rank.term]], 4), nsmall = 4),
@@ -648,9 +644,9 @@ plot_rank <- function(res,
         )
 
         if (!is.null(hover.info)) {
-            for (n in hover.info) {
-                res$hover.string <- paste0(res$hover.string, "</br><b>", n, ":</b> ", res[[n]])
-            }
+            hover.strings <- lapply(hover.info, function(n) paste0("</br><b>", n, ":</b> ", res[[n]]))
+            h.strings <- do.call("paste0", hover.strings)
+            res$hover.string <- paste0(res$hover.string, h.strings)
         }
 
         res <- as.data.frame(res)
@@ -887,9 +883,7 @@ plot_lawn <- function(res,
 
         highlight.fs <- NULL
         if (!is.null(highlight.featsets)) {
-            for (featset in highlight.featsets) {
-                highlight.fs <- c(highlight.fs, featsets[[featset]])
-            }
+            highlight.fs <- unlist(lapply(highlight.featsets, function(featset) featsets[[featset]]))
         }
 
         # Significance filter.
@@ -990,9 +984,9 @@ plot_lawn <- function(res,
         )
 
         if (!is.null(hover.info)) {
-            for (n in hover.info) {
-                res$hover.string <- paste0(res$hover.string, "</br><b>", n, ":</b> ", res[[n]])
-            }
+            hover.strings <- lapply(hover.info, function(n) paste0("</br><b>", n, ":</b> ", res[[n]]))
+            h.strings <- do.call("paste0", hover.strings)
+            res$hover.string <- paste0(res$hover.string, h.strings)
         }
 
         res <- as.data.frame(res)
