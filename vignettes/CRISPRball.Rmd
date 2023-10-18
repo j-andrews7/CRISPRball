@@ -42,13 +42,14 @@ returning results to users. Pointing users to the online version of the app
 Currently, it supports the output from [MAGeCK](https://sourceforge.net/projects/mageck/) RRA and MLE analysis methods.
 This package supplements the [MAGeCKFlute](https://www.bioconductor.org/packages/release/bioc/html/MAGeCKFlute.html) bioconductor package, adding
 additional functionality, visualizations, and a Shiny interface to explore the results generated with that package.
+
 Support for the output of additional analysis tools and methods will be added upon request.
 
 ## Installation
 
 **CRISPRball** is available on Bioconductor and can be installed as follows:
 
-```{r}
+```{r, eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("CRISPRball")

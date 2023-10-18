@@ -51,7 +51,8 @@ Imports:
     PCAtools,
     utils,
     grDevices,
-    htmlwidgets
+    htmlwidgets,
+    methods
 Suggests:
     BiocStyle,
     msigdbr,
