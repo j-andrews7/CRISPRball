@@ -117,7 +117,7 @@ get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
 #' @return plotly object
 #'
 #' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank geom_vline
-#' @importFrom plotly ggplotly layout config
+#' @importFrom plotly ggplotly layout config %>%
 #'
 #' @seealso \code{\link{get_depmap_plot_data}}
 #'
@@ -202,7 +202,7 @@ plot_depmap_dependency <- function(df,
 #' @return plotly object
 #'
 #' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank
-#' @importFrom plotly ggplotly layout config
+#' @importFrom plotly ggplotly layout config %>%
 #'
 #' @seealso \code{\link{get_depmap_plot_data}}
 #'
@@ -264,7 +264,7 @@ plot_depmap_expression <- function(df,
 #' @return plotly object
 #'
 #' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank
-#' @importFrom plotly ggplotly layout config
+#' @importFrom plotly ggplotly layout config %>%
 #'
 #' @seealso \code{\link{get_depmap_plot_data}}
 #'
@@ -334,7 +334,7 @@ plot_depmap_cn <- function(df,
 #' @return plotly object
 #'
 #' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank
-#' @importFrom plotly ggplotly layout config
+#' @importFrom plotly ggplotly layout config %>%
 #'
 #' @seealso \code{\link{get_depmap_plot_data}}
 #'

@@ -15,7 +15,7 @@
 #'      The axis and plot title are editable.
 #'
 #' @author Jared Andrews
-#' @importFrom plotly ggplotly layout config
+#' @importFrom plotly ggplotly layout config %>%
 #' @importFrom MAGeCKFlute BarView
 #' @importFrom ggplot2 theme element_text
 #' @export
@@ -87,7 +87,7 @@ plot_bar <- function(count.summary,
 #' @param show.grid A boolean for whether to show the grid lines.
 #' @return A plotly plot with the distribution of read counts.
 #'
-#' @importFrom plotly plot_ly add_trace layout config ggplotly
+#' @importFrom plotly plot_ly add_trace layout config ggplotly %>%
 #' @importFrom graphics hist
 #' @export
 #' @author Jared Andrews
@@ -252,7 +252,7 @@ plot_correlation_heatmap <- function(mat,
 #'
 #' @author Jared Andrews
 #'
-#' @importFrom plotly plot_ly layout config add_segments add_annotations ggplotly
+#' @importFrom plotly plot_ly layout config add_segments add_annotations ggplotly %>%
 #' @importFrom stats as.formula
 #' @importFrom dittoSeq dittoColors
 #'
@@ -351,11 +351,10 @@ plot_pca_biplot <- function(pca.res,
 
     # Get hover info.
     if (!is.null(hover.info) & !is.null(pca.res$metadata)) {
-        for (n in hover.info) {
-            hov.text <- paste0(hov.text, "</br><b>", n, ":</b>", pca.res$metadata[[n]])
-        }
+        hover.strings <- lapply(hover.info, function(n) paste0("</br><b>", n, ":</b> ", pca.res$metadata[[n]]))
+        h.strings <- do.call("paste0", hover.strings)
+        hov.text <- paste0(hov.text, h.strings)
     }
-
 
     fig <- plot_ly(pca.res$rotated,
         x = as.formula(paste0("~", dim.x)),

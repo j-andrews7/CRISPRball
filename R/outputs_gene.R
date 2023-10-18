@@ -12,7 +12,7 @@
 #' @author Jared Andrews
 #'
 #' @importFrom shiny isolate selectInput tagList renderUI
-#' @importFrom plotly renderPlotly
+#' @importFrom plotly renderPlotly %>%
 #' @importFrom DT renderDT datatable formatStyle
 #' @rdname INTERNAL_create_gene_outputs
 .create_gene_outputs <- function(input, output, robjects) {
@@ -78,7 +78,7 @@
             df$Overlap <- df[[1]] %in% robjects$common.hits
         }
 
-        DT::datatable(df,
+        datatable(df,
             rownames = FALSE,
             filter = "top",
             extensions = c("Buttons"),
@@ -90,7 +90,7 @@
                 buttons = c("copy", "csv", "excel", "pdf", "print"),
                 columnDefs = list(list(visible = FALSE, targets = target))
             )
-        ) %>% DT::formatStyle(0, target = "row", lineHeight = "50%")
+        ) %>% formatStyle(0, target = "row", lineHeight = "50%")
     })
     # nocov end
 
@@ -434,7 +434,7 @@
             df$Overlap <- df[[1]] %in% robjects$common.hits
         }
 
-        DT::datatable(df,
+        datatable(df,
             rownames = FALSE,
             filter = "top",
             extensions = c("Buttons"),
@@ -446,7 +446,7 @@
                 pageLength = 10,
                 columnDefs = list(list(visible = FALSE, targets = target))
             )
-        ) %>% DT::formatStyle(0, target = "row", lineHeight = "50%")
+        ) %>% formatStyle(0, target = "row", lineHeight = "50%")
     })
     # nocov end
 

@@ -1,3 +1,3 @@
-# CRISPRball 1.0
+# CRISPRball 0.99.0
 
 * Submitted to Bioconductor 3.18.

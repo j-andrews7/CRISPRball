@@ -10,7 +10,8 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny sidebarLayout sidebarPanel mainPanel fluidRow column hr br div numericInput 
+#'   selectizeInput h4 h3 uiOutput downloadButton tabPanel span actionButton icon splitLayout
 #' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable
@@ -438,7 +439,8 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom DT DTOutput
+#' @importFrom shiny tabPanel br div
 #' @importFrom shinycssloaders withSpinner
 #'
 #' @rdname INTERNAL_create_tab_gene_summary
@@ -448,9 +450,9 @@
         title = "Gene Summary Tables",
         id = "gene-summ",
         br(),
-        div(withSpinner(DT::dataTableOutput("gene1.summary")), style = "font-size:80%;"),
+        div(withSpinner(DTOutput("gene1.summary")), style = "font-size:80%;"),
         br(),
-        div(withSpinner(DT::dataTableOutput("gene2.summary")), style = "font-size:80%;")
+        div(withSpinner(DTOutput("gene2.summary")), style = "font-size:80%;")
     )
     # nocov end
 }

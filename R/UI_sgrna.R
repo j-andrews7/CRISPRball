@@ -10,12 +10,14 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny tabPanel sidebarLayout sidebarPanel mainPanel fluidRow column hr br
+#'   div numericInput selectizeInput h4 tabPanel span actionButton uiOutput icon downloadButton
 #' @importFrom colourpicker colourInput
 #' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable
 #' @importFrom plotly plotlyOutput
+#' @importFrom DT DTOutput
 #'
 #' @rdname INTERNAL_create_tab_sgrna
 .create_tab_sgrna <- function(sgrna.choices, sgrna.gene) {
@@ -99,7 +101,7 @@
                     ),
                     column(
                         width = 6,
-                        jqui_resizable(div(DT::dataTableOutput("sgrna1.detail"), style = "font-size:80%;"))
+                        jqui_resizable(div(DTOutput("sgrna1.detail"), style = "font-size:80%;"))
                     )
                 ),
                 hr(),
@@ -116,7 +118,7 @@
                     ),
                     column(
                         width = 6,
-                        jqui_resizable(div(DT::dataTableOutput("sgrna2.detail"), style = "font-size:80%;"))
+                        jqui_resizable(div(DTOutput("sgrna2.detail"), style = "font-size:80%;"))
                     )
                 )
             )
@@ -135,7 +137,8 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny tabPanel br div
+#' @importFrom DT DTOutput
 #' @importFrom shinycssloaders withSpinner
 #'
 #' @rdname INTERNAL_create_tab_sgrna_summary
@@ -145,9 +148,9 @@
         title = "sgRNA Summary Tables",
         id = "sgrna-tables",
         br(),
-        div(withSpinner(DT::dataTableOutput("sgrna1.summary")), style = "font-size:80%;"),
+        div(withSpinner(DTOutput("sgrna1.summary")), style = "font-size:80%;"),
         br(),
-        div(withSpinner(DT::dataTableOutput("sgrna2.summary")), style = "font-size:80%;")
+        div(withSpinner(DTOutput("sgrna2.summary")), style = "font-size:80%;")
     )
     # nocov end
 }

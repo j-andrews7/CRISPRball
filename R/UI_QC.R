@@ -2,14 +2,16 @@
 #'
 #' Create a \code{\link{tabPanel}} with UI elements for the QC tab.
 #'
-#' @param meta.choices A character vector containing the metadata columns that can be used to color and/or shape points in the PCA biplot.
+#' @param meta.choices A character vector containing the metadata columns that 
+#'   can be used to color and/or shape points in the PCA biplot.
 #'
 #' @return
 #' A \code{\link{tabPanel}} with UI elements for the QC tab.
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny sidebarLayout sidebarPanel mainPanel fluidRow column hr br div numericInput 
+#'   selectizeInput h4 h3 uiOutput downloadButton tabPanel span actionButton icon conditionalPanel plotOutput
 #' @importFrom shinyBS tipify popify bsCollapse bsCollapsePanel
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable
@@ -267,7 +269,8 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny tabPanel br
+#' @importFrom DT DTOutput
 #'
 #' @rdname INTERNAL_create_tab_qc_summary
 .create_tab_qc_summary <- function() {

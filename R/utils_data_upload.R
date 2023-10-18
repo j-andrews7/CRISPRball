@@ -122,12 +122,8 @@ read_mle_gene_summary <- function(filepath) {
     # Get the sample names
     samples <- unique(gsub("\\|.*", "", names(data)[-(seq_len(2))]))
 
-    # Create a list to hold the data frames
-    dataframes <- list()
-
-    # For each sample, create a data frame and add it to the list
-    for (sample in samples) {
-        # Find the columns for this sample
+    dataframes <- lapply(samples, function(sample) {
+        # Find the column names containing this sample name
         sample_cols <- grep(paste0("^", sample, "\\|"), names(data))
 
         # Add the 'Gene' and 'sgRNA' columns
@@ -141,8 +137,12 @@ read_mle_gene_summary <- function(filepath) {
 
         # Fix the column names to not use '-'
         names(df) <- gsub("-", ".", names(df))
-        dataframes[[sample]] <- df
-    }
+
+        df
+    })
+
+    # Associate the samples names with their corresponding data frames
+    names(dataframes) <- samples
 
     return(dataframes)
 }

@@ -9,7 +9,8 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny sidebarLayout sidebarPanel mainPanel fluidRow column hr div numericInput selectizeInput h4 tabPanel span actionButton
+#' @importFrom DT DTOutput
 #' @importFrom shinyBS tipify
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom shinyjqui jqui_resizable
@@ -141,7 +142,7 @@
                                 title3 = "Shared Positively Selected Hits for Clicked Set",
                                 width1 = 950, width3 = 600, height1 = 300,
                                 response = "click", # Removes the sub-heatmap
-                                output_ui = div(DT::dataTableOutput("comp.pos.info"), style = "font-size:70%;")
+                                output_ui = div(DTOutput("comp.pos.info"), style = "font-size:70%;")
                             ))
                         ),
                         hr(),
@@ -160,7 +161,7 @@
                                 title3 = "Shared Negatively Selected Hits for Clicked Set",
                                 width1 = 950, width3 = 600, height1 = 300,
                                 response = "click", # Removes the sub-heatmap
-                                output_ui = div(DT::dataTableOutput("comp.neg.info"), style = "font-size:70%;")
+                                output_ui = div(DTOutput("comp.neg.info"), style = "font-size:70%;")
                             ))
                         )
                     )

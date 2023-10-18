@@ -7,7 +7,7 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny tabPanel fluidRow column a img h2 hr HTML
 #'
 #' @rdname INTERNAL_create_tab_about
 .create_tab_about <- function() {

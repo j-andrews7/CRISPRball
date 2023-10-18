@@ -3,7 +3,7 @@
 #' The DepMap RNAi screen data for CDK2.
 #'
 #' @format ## `depmap_22q1_rnai`
-#' A data frame with 712 rows and 9 columns:
+#' A dataframe with 712 rows and 9 columns:
 #' \describe{
 #'   \item{dependency}{Depmap dependency score}
 #'   \item{entrez_id}{Numeric entrez gene ID}
@@ -17,6 +17,7 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @return A dataframe containing DepMap 22Q1 RNAi screen data.
 #' @usage
 #' data(depmap_22q1_rnai)
 "depmap_22q1_rnai"
@@ -27,7 +28,7 @@
 #' The DepMap CRISPR screen data for CDK2.
 #'
 #' @format ## `depmap_22q1_crispr`
-#' A data frame with 1070 rows and 9 columns:
+#' A dataframe with 1070 rows and 9 columns:
 #' \describe{
 #'   \item{depmap_id}{Depmap cell line ID}
 #'   \item{dependency}{Depmap dependency score}
@@ -41,6 +42,7 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @return A dataframe containing DepMap 22Q1 CRISPR screen data.
 #' @usage
 #' data(depmap_22q1_crispr)
 "depmap_22q1_crispr"
@@ -51,7 +53,7 @@
 #' The DepMap CRISPR & RNAi screen data for CDK2.
 #'
 #' @format ## `depmap_22q1_crispr_rnai`
-#' A data frame with 1782 rows and 9 columns:
+#' A dataframe with 1782 rows and 9 columns:
 #' \describe{
 #'   \item{depmap_id}{Depmap cell line ID}
 #'   \item{dependency}{Depmap dependency score}
@@ -66,6 +68,7 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @return A dataframe containing DepMap 22Q1 CRISPR and RNAi data.
 #' @usage
 #' data(depmap_22q1_crispr_rnai)
 "depmap_22q1_crispr_rnai"
@@ -76,7 +79,7 @@
 #' The DepMap expression data for CDK2.
 #'
 #' @format ## `depmap_22q1_TPM`
-#' A data frame with 1393 rows and 9 columns:
+#' A dataframe with 1393 rows and 9 columns:
 #' \describe{
 #'   \item{depmap_id}{Depmap cell line ID}
 #'   \item{rna_expression}{log2(TPM+1) expression}
@@ -91,6 +94,7 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @return A dataframe containing DepMap 22Q1 expression data.
 #' @usage
 #' data(depmap_22q1_TPM)
 "depmap_22q1_TPM"
@@ -101,7 +105,7 @@
 #' The DepMap copy number data for CDK2.
 #'
 #' @format ## `depmap_22q1_TPM`
-#' A data frame with 1754 rows and 9 columns:
+#' A dataframe with 1754 rows and 9 columns:
 #' \describe{
 #'   \item{depmap_id}{Depmap cell line ID}
 #'   \item{log_copy_number}{log2 copy number}
@@ -116,6 +120,7 @@
 #' }
 #' @source <https://depmap.org/portal/download/all/>
 #' @source <https://bioconductor.org/packages/release/data/experiment/html/depmap.html>
+#' @return A dataframe containing DepMap 22Q1 copy number data.
 #' @usage
 #' data(depmap_22q1_cn)
 "depmap_22q1_cn"

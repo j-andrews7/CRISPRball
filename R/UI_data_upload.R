@@ -7,7 +7,7 @@
 #'
 #' @author Jared Andrews
 #'
-#' @rawNamespace import(shiny, except = c(dataTableOutput, renderDataTable))
+#' @importFrom shiny wellPanel fluidRow column hr div numericInput selectizeInput h3 h2 a strong tabPanel span actionButton fileInput br hr code icon
 #'
 #' @rdname INTERNAL_create_tab_data_upload
 .create_tab_data_upload <- function() {

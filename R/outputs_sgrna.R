@@ -13,7 +13,7 @@
 #'
 #' @importFrom shiny isolate
 #' @importFrom plotly renderPlotly
-#' @importFrom DT renderDT datatable formatStyle
+#' @importFrom DT renderDT datatable formatStyle %>%
 #' @rdname INTERNAL_create_sgrna_outputs
 .create_sgrna_outputs <- function(input, output, robjects) {
     # nocov start
@@ -33,7 +33,7 @@
 
         df <- robjects$set1.sgrnas
 
-        DT::datatable(df,
+        datatable(df,
             rownames = FALSE,
             filter = "top",
             extensions = c("Buttons"),
@@ -44,7 +44,7 @@
                 dom = "Blfrtip",
                 buttons = c("copy", "csv", "excel", "pdf", "print")
             )
-        ) %>% DT::formatStyle(0, target = "row", lineHeight = "50%")
+        ) %>% formatStyle(0, target = "row", lineHeight = "50%")
     })
     # nocov end
 
@@ -138,7 +138,7 @@
             "p.high", "p.twosided", "score"
         )) - 1
 
-        DT::datatable(df,
+        datatable(df,
             rownames = FALSE,
             filter = "top",
             extensions = c("Buttons"),
@@ -149,7 +149,7 @@
                 buttons = c("copy", "csv", "excel", "pdf", "print"),
                 columnDefs = list(list(visible = FALSE, targets = target))
             )
-        ) %>% DT::formatStyle(0, target = "row", lineHeight = "50%")
+        ) %>% formatStyle(0, target = "row", lineHeight = "50%")
     })
     # nocov end
 
@@ -159,7 +159,7 @@
 
         df <- robjects$set2.sgrnas
 
-        DT::datatable(df,
+        datatable(df,
             rownames = FALSE,
             filter = "top",
             extensions = c("Buttons"),
@@ -170,7 +170,7 @@
                 dom = "Blfrtip",
                 buttons = c("copy", "csv", "excel", "pdf", "print")
             )
-        ) %>% DT::formatStyle(0, target = "row", lineHeight = "50%")
+        ) %>% formatStyle(0, target = "row", lineHeight = "50%")
     })
     # nocov end
 
@@ -264,7 +264,7 @@
             "p.high", "p.twosided", "score"
         )) - 1
 
-        DT::datatable(df,
+        datatable(df,
             rownames = FALSE,
             filter = "top",
             extensions = c("Buttons"),
@@ -275,7 +275,7 @@
                 buttons = c("copy", "csv", "excel", "pdf", "print"),
                 columnDefs = list(list(visible = FALSE, targets = target))
             )
-        ) %>% DT::formatStyle(0, target = "row", lineHeight = "50%")
+        ) %>% formatStyle(0, target = "row", lineHeight = "50%")
     })
     # nocov end
     invisible(NULL)
