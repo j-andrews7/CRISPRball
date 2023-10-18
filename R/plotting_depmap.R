@@ -116,7 +116,8 @@ get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
 #' @param plot.grid Boolean indicating whether to plot gridlines.
 #' @return plotly object
 #'
-#' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank geom_vline
+#' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density
+#'   geom_rug xlab ylab aes_string element_blank geom_vline .data
 #' @importFrom plotly ggplotly layout config %>%
 #'
 #' @seealso \code{\link{get_depmap_plot_data}}
@@ -201,7 +202,8 @@ plot_depmap_dependency <- function(df,
 #' @param color Character scalar for trace color.
 #' @return plotly object
 #'
-#' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank
+#' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual 
+#'   geom_density geom_rug xlab ylab aes_string element_blank .data
 #' @importFrom plotly ggplotly layout config %>%
 #'
 #' @seealso \code{\link{get_depmap_plot_data}}
@@ -263,7 +265,8 @@ plot_depmap_expression <- function(df,
 #' @param color Character scalar for trace color.
 #' @return plotly object
 #'
-#' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual geom_density geom_rug xlab ylab aes_string element_blank
+#' @importFrom ggplot2 ggplot theme_bw theme scale_color_manual scale_fill_manual 
+#'   geom_density geom_rug xlab ylab aes_string element_blank .data
 #' @importFrom plotly ggplotly layout config %>%
 #'
 #' @seealso \code{\link{get_depmap_plot_data}}

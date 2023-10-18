@@ -13,6 +13,7 @@
 #' @importFrom shinyjqui jqui_resizable
 #' @importFrom grDevices pdf dev.off
 #' @importFrom ComplexHeatmap draw
+#' @importFrom methods is
 #' @rdname INTERNAL_create_dl_outputs
 .create_dl_outputs <- function(output, robjects) {
     plotters.int <- list(
