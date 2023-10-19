@@ -20,12 +20,14 @@ will be set to \code{FALSE}.
 Get essential/selective gene information from DepMap summary table.
 }
 \examples{
+\dontrun{
 library(CRISPRball)
 build_depmap_db()
 pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
 depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
 
 essentials <- get_depmap_essentiality(gene = "CDK2", depmap.summary = depmap.gene)
+}
 }
 \author{
 Jared Andrews

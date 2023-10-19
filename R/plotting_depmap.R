@@ -16,16 +16,17 @@
 #'
 #' @author Jared Andrews
 #' @examples
+#' \dontrun{
 #' library(CRISPRball)
 #' build_depmap_db()
 #' pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
 #' depmap.meta <- pool::dbGetQuery(pool, "SELECT * FROM 'meta'")
-#' depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
 #'
 #' df <- get_depmap_plot_data(
 #'     gene = "CDK2", data.type = "crispr",
 #'     depmap.meta = depmap.meta, depmap.pool = pool
 #' )
+#' }
 get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
     # Get appropriate plot stuff based on datatype.
     switch(data.type,

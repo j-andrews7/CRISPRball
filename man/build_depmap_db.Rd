@@ -16,8 +16,10 @@ Name of SQLite database containing DepMap data.
 Build SQLite database of DepMap data
 }
 \examples{
+\dontrun{
 library(CRISPRball)
 build_depmap_db()
+}
 }
 \seealso{
 \code{\link[depmap]{depmap_rnai}}, \code{\link[depmap]{depmap_crispr}},

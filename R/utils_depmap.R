@@ -42,8 +42,10 @@
 #' \code{\link[pool]{dbPool}}, \code{\link[DBI]{dbWriteTable}}
 #'
 #' @examples
+#' \dontrun{
 #' library(CRISPRball)
 #' build_depmap_db()
+#' }
 build_depmap_db <- function(file = "depmap_db.sqlite") {
     # nocov start
     .error_if_no_depmap()
@@ -111,12 +113,14 @@ build_depmap_db <- function(file = "depmap_db.sqlite") {
 #' @author Jared Andrews
 #'
 #' @examples
+#' \dontrun{
 #' library(CRISPRball)
 #' build_depmap_db()
 #' pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
 #' depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
 #'
 #' essentials <- get_depmap_essentiality(gene = "CDK2", depmap.summary = depmap.gene)
+#' }
 get_depmap_essentiality <- function(gene, depmap.summary) {
     crispr <- list(avail = FALSE)
     rnai <- list(avail = FALSE)
