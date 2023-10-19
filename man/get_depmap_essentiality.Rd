@@ -9,7 +9,7 @@ get_depmap_essentiality(gene, depmap.summary)
 \arguments{
 \item{gene}{Character scalar for gene symbol.}
 
-\item{depmap.summary}{data.frame containing DepMap summary information.}
+\item{depmap.summary}{data.frame containing DepMap gene summary information.}
 }
 \value{
 Named list containing RNAi and CRISPR named lists containing dataset information for the provided gene,
@@ -18,6 +18,14 @@ will be set to \code{FALSE}.
 }
 \description{
 Get essential/selective gene information from DepMap summary table.
+}
+\examples{
+library(CRISPRball)
+build_depmap_db()
+pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
+depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
+
+essentials <- get_depmap_essentiality(gene = "CDK2", depmap.summary = depmap.gene)
 }
 \author{
 Jared Andrews
