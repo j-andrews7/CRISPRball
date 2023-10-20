@@ -4,9 +4,25 @@
 \alias{build_depmap_db}
 \title{Build SQLite database of DepMap data}
 \usage{
-build_depmap_db(file = "depmap_db.sqlite")
+build_depmap_db(
+  retrieve = c("rnai", "crispr", "dependency", "cn", "ccle_tpm", "meta", "drug",
+    "gene.summary", "release"),
+  file = "depmap_db.sqlite"
+)
 }
 \arguments{
+\item{retrieve}{Character vector of data to retrieve from DepMap. Options include:
+\itemize{
+\item \code{rnai}: RNAi screen data from \code{\link[depmap]{depmap_rnai}}.
+\item \code{crispr}: CRISPR screen data from \code{\link[depmap]{depmap_crispr}}.
+\item \code{cn}: Copy number data from \code{\link[depmap]{depmap_copyNumber}}.
+\item \code{ccle_tpm}: TPM data from \code{\link[depmap]{depmap_TPM}}.
+\item \code{meta}: Cell line metadata from \code{\link[depmap]{depmap_metadata}}.
+\item \code{drug}: Drug sensitivity data from \code{\link[depmap]{depmap_drug_sensitivity}}.
+\item \code{gene.summary}: Gene summary data from \code{\link[depmap]{depmap_gene_summary}}.
+\item \code{release}: DepMap release information from from \code{\link[depmap]{depmap_release}}.
+}}
+
 \item{file}{Name of SQLite database file to create.}
 }
 \value{
@@ -16,15 +32,14 @@ Name of SQLite database containing DepMap data.
 Build SQLite database of DepMap data
 }
 \examples{
-\dontrun{
 library(CRISPRball)
-build_depmap_db()
-}
+build_depmap_db(retrieve = "release")
 }
 \seealso{
 \code{\link[depmap]{depmap_rnai}}, \code{\link[depmap]{depmap_crispr}},
 \code{\link[depmap]{depmap_copyNumber}}, \code{\link[depmap]{depmap_TPM}},
 \code{\link[depmap]{depmap_metadata}}, \code{\link[depmap]{depmap_gene_summary}},
+\code{\link[depmap]{depmap_drug_sensitivity}}, \code{\link[depmap]{depmap_release}}
 \code{\link[pool]{dbPool}}, \code{\link[DBI]{dbWriteTable}}
 }
 \author{

@@ -29,6 +29,17 @@
 
 #' Build SQLite database of DepMap data
 #'
+#' @param retrieve Character vector of data to retrieve from DepMap. Options include:
+#' \itemize{
+#'   \item \code{rnai}: RNAi screen data from \code{\link[depmap]{depmap_rnai}}.
+#'   \item \code{crispr}: CRISPR screen data from \code{\link[depmap]{depmap_crispr}}.
+#'   \item \code{cn}: Copy number data from \code{\link[depmap]{depmap_copyNumber}}.
+#'   \item \code{ccle_tpm}: TPM data from \code{\link[depmap]{depmap_TPM}}.
+#'   \item \code{meta}: Cell line metadata from \code{\link[depmap]{depmap_metadata}}.
+#'   \item \code{drug}: Drug sensitivity data from \code{\link[depmap]{depmap_drug_sensitivity}}.
+#'   \item \code{gene.summary}: Gene summary data from \code{\link[depmap]{depmap_gene_summary}}.
+#'   \item \code{release}: DepMap release information from from \code{\link[depmap]{depmap_release}}.
+#' }
 #' @param file Name of SQLite database file to create.
 #'
 #' @return Name of SQLite database containing DepMap data.
@@ -39,15 +50,18 @@
 #' @seealso \code{\link[depmap]{depmap_rnai}}, \code{\link[depmap]{depmap_crispr}},
 #' \code{\link[depmap]{depmap_copyNumber}}, \code{\link[depmap]{depmap_TPM}},
 #' \code{\link[depmap]{depmap_metadata}}, \code{\link[depmap]{depmap_gene_summary}},
+#' \code{\link[depmap]{depmap_drug_sensitivity}}, \code{\link[depmap]{depmap_release}}
 #' \code{\link[pool]{dbPool}}, \code{\link[DBI]{dbWriteTable}}
 #'
 #' @examples
-#' \dontrun{
 #' library(CRISPRball)
-#' build_depmap_db()
-#' }
-build_depmap_db <- function(file = "depmap_db.sqlite") {
-    # nocov start
+#' build_depmap_db(retrieve = "release")
+build_depmap_db <- function(retrieve = c(
+                                "rnai", "crispr", "dependency", "cn",
+                                "ccle_tpm", "meta", "drug", "gene.summary",
+                                "release"
+                            ),
+                            file = "depmap_db.sqlite") {
     .error_if_no_depmap()
     .error_if_no_pool()
     .error_if_no_rsqlite()
@@ -55,49 +69,68 @@ build_depmap_db <- function(file = "depmap_db.sqlite") {
     pool <- pool::dbPool(RSQLite::SQLite(), dbname = file)
 
     # Get depmap data and make table in database.
-    rnai <- depmap::depmap_rnai()
-    rnai$gene <- NULL
-    rnai$cell_line <- NULL
-    pool::dbWriteTable(pool, "rnai", rnai, overwrite = TRUE, append = FALSE)
-    rm(rnai)
+    if ("rnai" %in% retrieve) {
+        rnai <- depmap::depmap_rnai()
+        rnai$gene <- NULL
+        rnai$cell_line <- NULL
+        pool::dbWriteTable(pool, "rnai", rnai, overwrite = TRUE, append = FALSE)
+        rm(rnai)
+    }
 
-    crispr <- depmap::depmap_crispr()
-    crispr$gene <- NULL
-    crispr$cell_line <- NULL
-    pool::dbWriteTable(pool, "crispr", crispr, overwrite = TRUE, append = FALSE)
-    rm(crispr)
+    if ("crispr" %in% retrieve) {
+        crispr <- depmap::depmap_crispr()
+        crispr$gene <- NULL
+        crispr$cell_line <- NULL
+        pool::dbWriteTable(pool, "crispr", crispr, overwrite = TRUE, append = FALSE)
+        rm(crispr)
+    }
 
-    cn <- depmap::depmap_copyNumber()
-    cn$gene <- NULL
-    cn$cell_line <- NULL
-    pool::dbWriteTable(pool, "cn", cn, overwrite = TRUE, append = FALSE)
-    rm(cn)
+    if ("cn" %in% retrieve) {
+        cn <- depmap::depmap_copyNumber()
+        cn$gene <- NULL
+        cn$cell_line <- NULL
+        pool::dbWriteTable(pool, "cn", cn, overwrite = TRUE, append = FALSE)
+        rm(cn)
+    }
 
-    ccle_tpm <- depmap::depmap_TPM()
-    ccle_tpm$gene <- NULL
-    ccle_tpm$cell_line <- NULL
-    pool::dbWriteTable(pool, "ccle_tpm", ccle_tpm, overwrite = TRUE, append = FALSE)
-    rm(ccle_tpm)
+    if ("ccle_tpm" %in% retrieve) {
+        ccle_tpm <- depmap::depmap_TPM()
+        ccle_tpm$gene <- NULL
+        ccle_tpm$cell_line <- NULL
+        pool::dbWriteTable(pool, "ccle_tpm", ccle_tpm, overwrite = TRUE, append = FALSE)
+        rm(ccle_tpm)
+    }
 
-    meta <- depmap::depmap_metadata()
-    pool::dbWriteTable(pool, "meta", as.data.frame(meta), overwrite = TRUE, append = FALSE)
+    if ("meta" %in% retrieve) {
+        meta <- depmap::depmap_metadata()
+        pool::dbWriteTable(pool, "meta", as.data.frame(meta), overwrite = TRUE, append = FALSE)
+        rm(meta)
+    }
 
-    drug <- depmap::depmap_drug_sensitivity()
-    drug$gene <- NULL
-    drug$cell_line <- NULL
-    drug$smiles <- NULL
-    pool::dbWriteTable(pool, "drug", drug, overwrite = TRUE, append = FALSE)
+    if ("drug" %in% retrieve) {
+        drug <- depmap::depmap_drug_sensitivity()
+        drug$gene <- NULL
+        drug$cell_line <- NULL
+        drug$smiles <- NULL
+        pool::dbWriteTable(pool, "drug", drug, overwrite = TRUE, append = FALSE)
+        rm(drug)
+    }
 
-    gene.summary <- depmap::depmap_gene_summary()
-    pool::dbWriteTable(pool, "gene.summary", as.data.frame(gene.summary), overwrite = TRUE, append = FALSE)
+    if ("gene.summary" %in% retrieve) {
+        gene.summary <- depmap::depmap_gene_summary()
+        pool::dbWriteTable(pool, "gene.summary", as.data.frame(gene.summary), overwrite = TRUE, append = FALSE)
+        rm(gene.summary)
+    }
 
-    release <- depmap::depmap_release()
-    pool::dbWriteTable(pool, "release", as.data.frame(list("depmap_release" = depmap::depmap_release())), overwrite = TRUE, append = FALSE)
+    if ("release" %in% retrieve) {
+        release <- depmap::depmap_release()
+        pool::dbWriteTable(pool, "release", as.data.frame(list("depmap_release" = depmap::depmap_release())), overwrite = TRUE, append = FALSE)
+        rm(release)
+    }
 
     pool::poolClose(pool)
 
-    return(file)
-    # nocov end
+    file
 }
 
 
@@ -113,14 +146,12 @@ build_depmap_db <- function(file = "depmap_db.sqlite") {
 #' @author Jared Andrews
 #'
 #' @examples
-#' \dontrun{
 #' library(CRISPRball)
-#' build_depmap_db()
+#' build_depmap_db(retrieve = "gene.summary")
 #' pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
 #' depmap.gene <- pool::dbGetQuery(pool, "SELECT * FROM 'gene.summary'")
 #'
 #' essentials <- get_depmap_essentiality(gene = "CDK2", depmap.summary = depmap.gene)
-#' }
 get_depmap_essentiality <- function(gene, depmap.summary) {
     crispr <- list(avail = FALSE)
     rnai <- list(avail = FALSE)

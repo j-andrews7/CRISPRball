@@ -25,9 +25,8 @@ Based on the requested data type, this function will create a dataframe
 from the DepMap database that can be used for plotting.
 }
 \examples{
-\dontrun{
 library(CRISPRball)
-build_depmap_db()
+build_depmap_db(retrieve = c("meta", "crispr"))
 pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
 depmap.meta <- pool::dbGetQuery(pool, "SELECT * FROM 'meta'")
 
@@ -35,7 +34,6 @@ df <- get_depmap_plot_data(
     gene = "CDK2", data.type = "crispr",
     depmap.meta = depmap.meta, depmap.pool = pool
 )
-}
 }
 \seealso{
 \code{\link{plot_depmap_lineages}}
