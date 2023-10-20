@@ -14,7 +14,7 @@ plot_volcano(
   sig.line = TRUE,
   h.id = "crispr",
   feat.term = "rows",
-  sig.term = "FDR",
+  sig.term = "fdr",
   lfc.term = "LFC",
   down.color = "#0026ff",
   up.color = "#ff0000",
@@ -159,7 +159,7 @@ d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
 ), check.names = FALSE)
 plot.df <- gene_ingress(d1.genes,
     sig.thresh = 0.05, es.thresh = 0.5,
-    es.col = "LFC", sig.col = "FDR"
+    es.col = "LFC", sig.col = "fdr"
 )
 plot_volcano(plot.df, feat.term = "id")
 }

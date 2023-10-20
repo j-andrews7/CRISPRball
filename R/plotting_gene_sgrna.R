@@ -109,7 +109,7 @@
 #' ), check.names = FALSE)
 #' plot.df <- gene_ingress(d1.genes,
 #'     sig.thresh = 0.05, es.thresh = 0.5,
-#'     es.col = "LFC", sig.col = "FDR"
+#'     es.col = "LFC", sig.col = "fdr"
 #' )
 #' plot_volcano(plot.df, feat.term = "id")
 plot_volcano <- function(res,
@@ -121,7 +121,7 @@ plot_volcano <- function(res,
                          sig.line = TRUE,
                          h.id = "crispr",
                          feat.term = "rows",
-                         sig.term = "FDR",
+                         sig.term = "fdr",
                          lfc.term = "LFC",
                          down.color = "#0026ff",
                          up.color = "#ff0000",
@@ -459,7 +459,7 @@ plot_volcano <- function(res,
 #' ), check.names = FALSE)
 #' plot.df <- gene_ingress(d1.genes,
 #'     sig.thresh = 0.05, es.thresh = 0.5,
-#'     es.col = "LFC", sig.col = "FDR"
+#'     es.col = "LFC", sig.col = "fdr"
 #' )
 #' plot_rank(plot.df, feat.term = "id")
 plot_rank <- function(res,
@@ -469,7 +469,7 @@ plot_rank <- function(res,
                       hover.info = NULL,
                       h.id = "crispr",
                       feat.term = "rows",
-                      sig.term = "FDR",
+                      sig.term = "fdr",
                       rank.term = "LFC",
                       rank.ascending = TRUE,
                       down.color = "#0026ff",
@@ -813,7 +813,7 @@ plot_rank <- function(res,
 #' ), check.names = FALSE)
 #' plot.df <- gene_ingress(d1.genes,
 #'     sig.thresh = 0.05, es.thresh = 0.5,
-#'     es.col = "LFC", sig.col = "FDR"
+#'     es.col = "LFC", sig.col = "fdr"
 #' )
 #' plot_lawn(plot.df, feat.term = "id")
 plot_lawn <- function(res,
@@ -824,7 +824,7 @@ plot_lawn <- function(res,
                       h.id = "crispr",
                       feat.term = "rows",
                       x.term = "RandomIndex",
-                      sig.term = "FDR",
+                      sig.term = "fdr",
                       lfc.term = "LFC",
                       down.color = "#0026ff",
                       up.color = "#ff0000",

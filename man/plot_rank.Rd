@@ -12,7 +12,7 @@ plot_rank(
   hover.info = NULL,
   h.id = "crispr",
   feat.term = "rows",
-  sig.term = "FDR",
+  sig.term = "fdr",
   rank.term = "LFC",
   rank.ascending = TRUE,
   down.color = "#0026ff",
@@ -154,7 +154,7 @@ d1.genes <- read.delim(system.file("extdata", "esc1.gene_summary.txt",
 ), check.names = FALSE)
 plot.df <- gene_ingress(d1.genes,
     sig.thresh = 0.05, es.thresh = 0.5,
-    es.col = "LFC", sig.col = "FDR"
+    es.col = "LFC", sig.col = "fdr"
 )
 plot_rank(plot.df, feat.term = "id")
 }
