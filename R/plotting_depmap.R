@@ -17,6 +17,7 @@
 #' @author Jared Andrews
 #' @examples
 #' library(CRISPRball)
+#' \dontrun{
 #' build_depmap_db(retrieve = c("meta", "crispr"))
 #' pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
 #' depmap.meta <- pool::dbGetQuery(pool, "SELECT * FROM 'meta'")
@@ -25,6 +26,7 @@
 #'     gene = "CDK2", data.type = "crispr",
 #'     depmap.meta = depmap.meta, depmap.pool = pool
 #' )
+#' }
 get_depmap_plot_data <- function(gene, data.type, depmap.meta, depmap.pool) {
     # Get appropriate plot stuff based on datatype.
     switch(data.type,
