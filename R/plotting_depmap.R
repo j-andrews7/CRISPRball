@@ -16,8 +16,8 @@
 #'
 #' @author Jared Andrews
 #' @examples
-#' library(CRISPRball)
 #' \dontrun{
+#' library(CRISPRball)
 #' build_depmap_db(retrieve = c("meta", "crispr"))
 #' pool <- pool::dbPool(RSQLite::SQLite(), dbname = "depmap_db.sqlite")
 #' depmap.meta <- pool::dbGetQuery(pool, "SELECT * FROM 'meta'")
