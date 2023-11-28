@@ -1,6 +1,6 @@
 Package: CRISPRball
 Title: Shiny Application for Interactive CRISPR Screen Visualization, Exploration, Comparison, and Filtering
-Version: 0.99.8
+Version: 0.99.9
 Authors@R: 
     c(person(given = "Jared",
            family = "Andrews",

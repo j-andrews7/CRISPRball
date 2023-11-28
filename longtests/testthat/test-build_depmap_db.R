@@ -15,39 +15,39 @@ test_that("DepMap database is retrieved properly", {
     expect_true(is(depmap.meta, "data.frame"))
 
     df <- get_depmap_plot_data(
-       gene = "CDK2", data.type = "dependency",
-       depmap.meta = depmap.meta, depmap.pool = pool
+        gene = "CDK2", data.type = "dependency",
+        depmap.meta = depmap.meta, depmap.pool = pool
     )
     expect_equal(ncol(df), 10)
     expect_true(nrow(df) > 0)
 
     df <- get_depmap_plot_data(
-       gene = "CDK2", data.type = "crispr",
-       depmap.meta = depmap.meta, depmap.pool = pool
+        gene = "CDK2", data.type = "crispr",
+        depmap.meta = depmap.meta, depmap.pool = pool
     )
     expect_equal(ncol(df), 9)
     expect_true(nrow(df) > 0)
 
     df <- get_depmap_plot_data(
-       gene = "CDK2", data.type = "rnai",
-       depmap.meta = depmap.meta, depmap.pool = pool
+        gene = "CDK2", data.type = "rnai",
+        depmap.meta = depmap.meta, depmap.pool = pool
     )
     expect_equal(ncol(df), 9)
     expect_true(nrow(df) > 0)
 
     df <- get_depmap_plot_data(
-       gene = "CDK2", data.type = "cn",
-       depmap.meta = depmap.meta, depmap.pool = pool
+        gene = "CDK2", data.type = "cn",
+        depmap.meta = depmap.meta, depmap.pool = pool
     )
     expect_equal(ncol(df), 9)
     expect_true(nrow(df) > 0)
 
     df <- get_depmap_plot_data(
-       gene = "CDK2", data.type = "ccle_tpm",
-       depmap.meta = depmap.meta, depmap.pool = pool
+        gene = "CDK2", data.type = "ccle_tpm",
+        depmap.meta = depmap.meta, depmap.pool = pool
     )
     expect_equal(ncol(df), 9)
     expect_true(nrow(df) > 0)
 
-    dbDisconnect(pool)
+    pool::poolClose(pool)
 })
