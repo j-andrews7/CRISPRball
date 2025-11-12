@@ -44,7 +44,7 @@
     # nocov end
 
     # Static plots
-    plotters.stat <- list("plot.qc.corr")
+    plotters.stat <- list("plot.qc.corr", "plot.heatmap")
 
     # nocov start
     lapply(plotters.stat, function(x) {

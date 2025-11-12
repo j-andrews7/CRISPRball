@@ -24,6 +24,7 @@
         if (!is.null(robjects$gene.data)) {
             js$enableTab("Gene (Overview)")
             js$enableTab("Gene Summary Tables")
+            js$enableTab("Heatmaps")
             updateSelectizeInput(session, "gene.sel1",
                 choices = names(robjects$gene.data),
                 selected = names(robjects$gene.data)[1], server = TRUE
