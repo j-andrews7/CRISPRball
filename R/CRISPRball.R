@@ -171,6 +171,8 @@ CRISPRball <- function(gene.data = NULL,
         .create_tab_sgrna_summary(),
         ## --------------------Dataset Comparisons----------------
         .create_tab_comparison(gene.choices),
+        ## --------------------Heatmaps----------------
+        .create_tab_heatmap(),
         ## -----------------DepMap-------------------
         .create_tab_depmap(depmap.gene, depmap.meta),
         ## -----------------About-------------------
@@ -221,7 +223,8 @@ CRISPRball <- function(gene.data = NULL,
             plot.depmap.expplot = NULL,
             plot.depmap.cnplot = NULL,
             plot.depmap.lineages = NULL,
-            plot.depmap.sublineage = NULL
+            plot.depmap.sublineage = NULL,
+            plot.heatmap = NULL
         )
 
         # Create downloadHander outputs.
@@ -248,6 +251,10 @@ CRISPRball <- function(gene.data = NULL,
 
         if (is.null(count.summary)) {
             defaultDisabledTabs <- c(defaultDisabledTabs, "QC Table")
+        }
+
+        if (is.null(gene.data) || length(gene.data) == 0) {
+            defaultDisabledTabs <- c(defaultDisabledTabs, "Heatmaps")
         }
 
         lapply(defaultDisabledTabs, function(tabname) js$disableTab(tabname))
@@ -306,6 +313,7 @@ CRISPRball <- function(gene.data = NULL,
         ## --------------DepMap Tab-----------------
         if (!is.null(depmap.gene)) {
             .create_depmap_outputs(input, output, robjects)
+            .create_heatmap_observers(input, session, output, robjects)
         }
     }
 

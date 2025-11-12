@@ -31,6 +31,16 @@
             # Hide depmap tab if database not provided.
             # Tried disable, still looks/feels selectable which may be confusing.
             shinyjs::hide(selector = '.navbar-nav a[data-value="DepMap"')
+        } else {
+            shinyjs::show(selector = '.navbar-nav a[data-value="DepMap"')
+        }
+    })
+
+    observe({
+        if (is.null(robjects$gene.data) || length(robjects$gene.data) == 0) {
+            shinyjs::hide(selector = '.navbar-nav a[data-value="Heatmaps"')
+        } else {
+            shinyjs::show(selector = '.navbar-nav a[data-value="Heatmaps"')
         }
     })
     # nocov end
